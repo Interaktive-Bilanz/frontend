@@ -1,7 +1,7 @@
 import React from "react";
 import "./App.css";
 import Workspace from "./pages/Workspace";
-import BilanzComponent from "./components/BilanzComponent";
+import BilanzComponent from "./components/bilanz/BilanzComponent";
 
 function App() {
   return (

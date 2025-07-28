@@ -6,7 +6,7 @@ import data from "../../api/bilanz.json";
 
 const BilanzComponent: React.FC = () => {
   return (
-    <div className="flex w-1/2 bg-white border-black border-2 rounded-md border-solid">
+    <div className="flex w-1/3 bg-white border-black border rounded-md border-double">
       <BilanzColumn title="Aktiva" posten={data.aktiva.posten} />
       <BilanzColumn title="Passiva" posten={data.passiva.posten} />
     </div>

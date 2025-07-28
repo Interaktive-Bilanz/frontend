@@ -1,9 +1,20 @@
 import React from "react";
 import "./App.css";
+import Workspace from "./pages/Workspace";
+import BilanzComponent from "./components/BilanzComponent";
 
 function App() {
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+    <Workspace>
+      <BilanzComponent></BilanzComponent>
+    </Workspace>
+  );
+}
+
+export default App;
+
+/*
+<div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden">
         <div className="p-8">
           <div className="uppercase tracking-wide text-sm text-indigo-500 font-semibold">
@@ -24,7 +35,4 @@ function App() {
         </div>
       </div>
     </div>
-  );
-}
-
-export default App;
+  */

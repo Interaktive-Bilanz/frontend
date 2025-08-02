@@ -20,7 +20,7 @@ const WindowManager = () => {
     const id = Date.now();
     setWindows((prev) => [
       ...prev,
-      { id, x: 100, y: 100, width: 300, height: 200, title: "" },
+      { id, x: 100, y: 100, width: 300, height: 200, title: title },
     ]);
     setZIndices((prev) => ({ ...prev, [id]: topZ }));
     setTopZ((prev) => prev + 1);
@@ -58,7 +58,7 @@ const WindowManager = () => {
           className="border border-gray-700 bg-white shadow-lg absolute flex flex-col"
         >
           <div className="bg-gray-800 text-white px-3 py-2 flex justify-between items-center cursor-move">
-            <span>Window {w.id}</span>
+            <span>{w.title}</span>
             <button
               onClick={() => closeWindow(w.id)}
               className="bg-red-700 hover:bg-red-500 text-white px-2 py-1 rounded"
@@ -67,7 +67,7 @@ const WindowManager = () => {
             </button>
           </div>
           <div className="p-4 text-sm text-gray-700">
-            This is a floating window.
+            Place to render the table with account data and fields
           </div>
         </Rnd>
       ))}

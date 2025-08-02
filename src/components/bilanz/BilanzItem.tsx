@@ -24,7 +24,7 @@ const BilanzItem: React.FC<{
             <button
               key={i}
               className="mt-1 bg-green-100 hover:bg-green-400 border border-gray-300 rounded px-2 py-1 w-full text-left"
-              onClick={() => openTAccWindow(node.label)}
+              onClick={() => openTAccWindow(`${konto.nr}: ${konto.name}`)}
             >
               {konto.nr} {konto.name}
             </button>

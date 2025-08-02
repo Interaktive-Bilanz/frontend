@@ -16,4 +16,5 @@ export type BilanzNode = {
 export type BilanzProps = {
   title: string;
   posten: BilanzNode[];
+  openTAccWindow: (title: string) => void;
 };

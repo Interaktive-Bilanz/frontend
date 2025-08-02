@@ -2,10 +2,11 @@ import React, { useState } from "react";
 
 import { BilanzNode } from "./BilanzInterfaces";
 
-const BilanzItem: React.FC<{ node: BilanzNode; level?: number }> = ({
-  node,
-  level = 0,
-}) => {
+const BilanzItem: React.FC<{
+  node: BilanzNode;
+  level?: number;
+  openTAccWindow: (title: string) => void;
+}> = ({ node, level = 0, openTAccWindow }) => {
   const [open, setOpen] = useState(false);
 
   return (
@@ -23,13 +24,19 @@ const BilanzItem: React.FC<{ node: BilanzNode; level?: number }> = ({
             <button
               key={i}
               className="mt-1 bg-green-100 hover:bg-green-400 border border-gray-300 rounded px-2 py-1 w-full text-left"
+              onClick={() => openTAccWindow(node.label)}
             >
               {konto.nr} {konto.name}
             </button>
           ))}
 
           {node.struktur.posten?.map((child, i) => (
-            <BilanzItem key={i} node={child} level={level + 1} />
+            <BilanzItem
+              key={i}
+              node={child}
+              level={level + 1}
+              openTAccWindow={openTAccWindow}
+            />
           ))}
         </div>
       )}

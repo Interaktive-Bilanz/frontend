@@ -20,7 +20,7 @@ const WindowManager = () => {
     const id = Date.now();
     setWindows((prev) => [
       ...prev,
-      { id, x: 100, y: 100, width: 300, height: 200, title: title },
+      { id, x: 100, y: 100, width: 500, height: 400, title: title },
     ]);
     setZIndices((prev) => ({ ...prev, [id]: topZ }));
     setTopZ((prev) => prev + 1);
@@ -66,9 +66,7 @@ const WindowManager = () => {
               X
             </button>
           </div>
-          <div className="p-4 text-sm text-gray-700">
-            Place to render the table with account data and fields
-          </div>
+          <div className="p-4 text-sm text-gray-700">Hier Konto Daten etc</div>
         </Rnd>
       ))}
     </div>

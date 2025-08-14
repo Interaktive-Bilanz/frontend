@@ -14,6 +14,9 @@ const WindowManager = () => {
   const [windows, setWindows] = useState<WindowType[]>([]);
 
   const openWindow = (title: string) => {
+    /* Opens a new window for windows arr
+    preventing from opening more than 3 windows
+    and window with same title */
     setWindows((prev) => {
       if (prev.length >= 3) return prev;
 
@@ -36,6 +39,7 @@ const WindowManager = () => {
   };
 
   const bringToFront = (title: string) => {
+    // changes array order to render in correct order
     setWindows((prev) => {
       const windowToBring = prev.find((w) => w.title === title);
       if (!windowToBring) return prev;

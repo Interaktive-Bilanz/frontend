@@ -1,9 +1,8 @@
-import React, { ReactNode, useState } from "react";
+import React, { useState } from "react";
 import { Rnd } from "react-rnd";
 import BilanzComponent from "../components/bilanz/BilanzComponent";
 
 interface WindowType {
-  id: number;
   x: number;
   y: number;
   width: number;
@@ -13,37 +12,47 @@ interface WindowType {
 
 const WindowManager = () => {
   const [windows, setWindows] = useState<WindowType[]>([]);
-  const [zIndices, setZIndices] = useState<Record<number, number>>({});
-  const [topZ, setTopZ] = useState<number>(1);
 
   const openWindow = (title: string) => {
-    const id = Date.now();
-    setWindows((prev) => [
-      ...prev,
-      { id, x: 100, y: 100, width: 500, height: 400, title: title },
-    ]);
-    setZIndices((prev) => ({ ...prev, [id]: topZ }));
-    setTopZ((prev) => prev + 1);
+    setWindows((prev) => {
+      if (prev.length >= 3) return prev;
+
+      if (prev.some((w) => w.title === title)) return prev;
+
+      const newWindow: WindowType = {
+        x: 100 + prev.length * 10,
+        y: 100 + prev.length * 10,
+        width: 500,
+        height: 400,
+        title,
+      };
+
+      return [...prev, newWindow];
+    });
   };
 
-  const closeWindow = (id: number) => {
-    setWindows((prev) => prev.filter((w) => w.id !== id));
+  const closeWindow = (title: string) => {
+    setWindows((prev) => prev.filter((w) => w.title !== title));
   };
 
-  const bringToFront = (id: number) => {
-    setZIndices((prev) => ({ ...prev, [id]: topZ }));
-    setTopZ((prev) => prev + 1);
+  const bringToFront = (title: string) => {
+    setWindows((prev) => {
+      const windowToBring = prev.find((w) => w.title === title);
+      if (!windowToBring) return prev;
+
+      return [...prev.filter((w) => w.title !== title), windowToBring];
+    });
   };
 
   return (
     <div className="w-screen h-screen bg-gray-200 relative overflow-hidden">
       <div className="flex justify-center p-8">
-        <BilanzComponent openTAccWindow={openWindow}></BilanzComponent>
+        <BilanzComponent openTAccWindow={openWindow} />
       </div>
 
-      {windows.map((w) => (
+      {windows.map((w, index) => (
         <Rnd
-          key={w.id}
+          key={w.title}
           default={{
             x: w.x,
             y: w.y,
@@ -52,15 +61,15 @@ const WindowManager = () => {
           }}
           bounds="window"
           style={{
-            zIndex: zIndices[w.id] || 1,
+            zIndex: index + 1,
           }}
-          onMouseDown={() => bringToFront(w.id)}
+          onMouseDown={() => bringToFront(w.title)}
           className="border border-gray-700 bg-white shadow-lg absolute flex flex-col"
         >
           <div className="bg-gray-800 text-white px-3 py-2 flex justify-between items-center cursor-move">
             <span>{w.title}</span>
             <button
-              onClick={() => closeWindow(w.id)}
+              onClick={() => closeWindow(w.title)}
               className="bg-red-700 hover:bg-red-500 text-white px-2 py-1 rounded"
             >
               X

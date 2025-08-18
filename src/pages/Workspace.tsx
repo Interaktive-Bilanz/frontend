@@ -6,7 +6,7 @@ type WorkspaceProps = {
 
 const Workspace = ({ children }: WorkspaceProps) => {
   return (
-    <div className="flex justify-center min-h-screen bg-gray-100 p-4">
+    <div className="flex justify-center min-h-screen bg-gray-100">
       {children}
     </div>
   );

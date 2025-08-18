@@ -22,17 +22,6 @@ describe("BilanzColumn", () => {
     );
 
     expect(screen.getByText("Aktiva")).toBeInTheDocument();
-  });
-
-  it("renders all posten labels", () => {
-    render(
-      <BilanzColumn
-        title="Aktiva"
-        posten={mockPosten}
-        openTAccWindow={mockOpenTAccWindow}
-      />
-    );
-
     expect(screen.getByText("Anlagevermögen")).toBeInTheDocument();
     expect(screen.getByText("Umlaufvermögen")).toBeInTheDocument();
   });

@@ -7,7 +7,14 @@
           "posten": [
             {
               "label": "I. Immaterielles Vermögen",
-              "struktur": {}
+              "struktur": {
+                "konto": [
+                  {
+                    "nr": "0100",
+                    "name": "Lizenzen"
+                  }
+                ]
+              }
             },
             {
               "label": "II. Sachanlagen",

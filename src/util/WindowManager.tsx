@@ -70,6 +70,8 @@ const WindowManager = () => {
             width: w.width,
             height: w.height,
           }}
+          minWidth={400}
+          minHeight={400}
           bounds="window"
           style={{
             zIndex: index + 1,

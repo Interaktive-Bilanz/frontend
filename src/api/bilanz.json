@@ -1,0 +1,171 @@
+{
+  "aktiva": {
+    "posten": [
+      {
+        "label": "A. Anlagevermögen",
+        "struktur": {
+          "posten": [
+            {
+              "label": "I. Immaterielles Vermögen",
+              "struktur": {
+                "konto": [
+                  {
+                    "nr": "0100",
+                    "name": "Lizenzen"
+                  }
+                ]
+              }
+            },
+            {
+              "label": "II. Sachanlagen",
+              "struktur": {
+                "posten": [
+                  {
+                    "label": "1. Grundstücke",
+                    "struktur": {}
+                  },
+                  {
+                    "label": "2. Maschinen",
+                    "struktur": {}
+                  },
+                  {
+                    "label": "3. BGA",
+                    "struktur": {
+                      "konto": [
+                        {
+                          "nr": "0500",
+                          "name": "Betriebs-/Geschäftsausstattung"
+                        },
+                        {
+                          "nr": "0670",
+                          "name": "Geringwertige Wirtschaftsgüter"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "label": "III. Finanzanlagen",
+              "struktur": {}
+            }
+          ]
+        }
+      },
+      {
+        "label": "B. Umlaufvermögen",
+        "struktur": {
+          "posten": [
+            {
+              "label": "I. Vorräte",
+              "struktur": {}
+            },
+            {
+              "label": "II. Forderungen",
+              "struktur": {
+                "konto": [
+                  {
+                    "nr": "1200",
+                    "name": "Forderungen aLuL"
+                  },
+                  {
+                    "nr": "1400",
+                    "name": "Abziehbare Vorsteuer"
+                  }
+                ]
+              }
+            },
+            {
+              "label": "III. Wertpapiere",
+              "struktur": {}
+            },
+            {
+              "label": "IV. Kassenbestand etc.",
+              "struktur": {
+                "konto": [
+                  {
+                    "nr": "1600",
+                    "name": "Kasse"
+                  },
+                  {
+                    "nr": "1800",
+                    "name": "Bank"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "label": "C. Rechnungsabgrenzungsposten",
+        "struktur": {}
+      }
+    ]
+  },
+  "passiva": {
+    "posten": [
+      {
+        "label": "A. Eigenkapital",
+        "struktur": {
+          "posten": [
+            {
+              "label": "I. Kapital",
+              "struktur": {
+                "konto": [
+                  {
+                    "nr": "2000",
+                    "name": "Eigenkapital"
+                  }
+                ]
+              }
+            },
+            {
+              "label": "II. Rücklagen",
+              "struktur": {}
+            },
+            {
+              "label": "III. Jahresüberschuß/-verlust",
+              "struktur": {}
+            }
+          ]
+        }
+      },
+      {
+        "label": "B. Rückstellungen",
+        "struktur": {}
+      },
+      {
+        "label": "C. Verbindlichkeiten",
+        "struktur": {
+          "posten": [
+            {
+              "label": "1. Verb. ggü. Kreditinstituten",
+              "struktur": {}
+            },
+            {
+              "label": "2. Verb. aus LuL",
+              "struktur": {
+                "konto": [
+                  {
+                    "nr": "3300",
+                    "name": "Verb. aLuL"
+                  }
+                ]
+              }
+            },
+            {
+              "label": "3. sonstige Verbindlichkeiten",
+              "struktur": {}
+            }
+          ]
+        }
+      },
+      {
+        "label": "D. Rechnungsabgrenzungsposten",
+        "struktur": {}
+      }
+    ]
+  }
+}

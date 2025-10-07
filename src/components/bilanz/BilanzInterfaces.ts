@@ -1,4 +1,4 @@
-// Leaf account
+// Leaf Konto
 export type Konto = {
   nr: string;
   name: string;

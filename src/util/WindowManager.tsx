@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Rnd } from "react-rnd";
 import BilanzComponent from "../components/bilanz/BilanzComponent";
 import { TAccount } from "../components/tAccount/tAccountInterfaces";
+import { TAccountComponent } from "../components/tAccount/tAccountComponent";
 import { getTAccountByNr } from "../api/tAccountApi";
 
 interface WindowType {
@@ -68,9 +69,9 @@ const WindowManager = () => {
             x: w.x,
             y: w.y,
             width: w.width,
-            height: w.height,
+            height: "auto",
           }}
-          minWidth={400}
+          minWidth={550}
           minHeight={400}
           bounds="window"
           style={{
@@ -90,27 +91,7 @@ const WindowManager = () => {
           </div>
           <div className="p-4 text-sm text-gray-700">
             {w.account ? (
-              <div>
-                <h4>Soll</h4>
-                <ul>
-                  {w.account.soll.map((b, i) => (
-                    <li key={i}>
-                      {b.date}: {b.value} €{" "}
-                      {b.description && `- ${b.description}`}
-                    </li>
-                  ))}
-                </ul>
-
-                <h4>Haben</h4>
-                <ul>
-                  {w.account.haben.map((b, i) => (
-                    <li key={i}>
-                      {b.date}: {b.value} €{" "}
-                      {b.description && `- ${b.description}`}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <TAccountComponent account={w.account} />
             ) : (
               <div>Konto nicht gefunden</div>
             )}

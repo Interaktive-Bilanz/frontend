@@ -1,5 +1,6 @@
 // A single booking entry
 export type Booking = {
+  id: string;
   date: string; // ISO date string
   value: number; // positive number
   description?: string;
@@ -12,6 +13,10 @@ export type TAccount = {
   soll: Booking[];
   haben: Booking[];
 };
+
+export interface TAccountProps {
+  account: TAccount;
+}
 
 // Backend-style lookup object
 export type TAccountMap = {

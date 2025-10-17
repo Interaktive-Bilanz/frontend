@@ -18,6 +18,10 @@ export interface TAccountProps {
   account: TAccount;
 }
 
+export interface BookingsListProps {
+  bookings: Booking[];
+}
+
 // Backend-style lookup object
 export type TAccountMap = {
   [nr: string]: TAccount; // key = account number

@@ -6,6 +6,7 @@ import { TAccountComponent } from "../components/tAccount/tAccountComponent";
 import { getTAccountByNr } from "../api/tAccountApi";
 import { useInteractiveBalanceData } from "../context/InteractiveBalanceDataContext";
 import { Account } from "../types/InteractiveBalanceData";
+import Buchungsformular from "../components/buchungssatz/Formular";
 
 interface WindowType {
   x: number;
@@ -67,6 +68,7 @@ const WindowManager = () => {
     <div className="w-screen h-screen bg-gray-200 relative overflow-hidden">
       <div className="flex justify-center p-8">
         <BilanzComponent openTAccWindow={openWindow} />
+        <Buchungsformular></Buchungsformular>
       </div>
 
       {windows.map((w, index) => (

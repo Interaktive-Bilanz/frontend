@@ -1,3 +1,5 @@
+import { Account, EntryLine } from "../../types/InteractiveBalanceData";
+
 // A single booking entry
 export type Booking = {
   id: string;
@@ -8,14 +10,21 @@ export type Booking = {
 
 // A T-Account
 export type TAccount = {
-  nr: string;
+  id: number;
   name: string;
-  soll: Booking[];
-  haben: Booking[];
+  // soll: Booking[];
+  // haben: Booking[];
 };
 
 export interface TAccountProps {
-  account: TAccount;
+  account: Account;
+}
+
+export interface EntryLinesProps {
+  lines: {
+    entryId: number,
+    line: EntryLine
+  }[];
 }
 
 export interface BookingsListProps {

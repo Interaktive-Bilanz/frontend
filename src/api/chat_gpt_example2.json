@@ -1,0 +1,77 @@
+{
+  "balanceSheet": {
+    "assets": [
+      {
+        "label": "Anlagevermögen",
+        "accounts": [1],
+        "positions": []
+      },
+      {
+        "label": "Umlaufvermögen",
+        "accounts": [2, 3, 7],
+        "positions": []
+      }
+    ],
+    "liabilitiesAndEquity": [
+      {
+        "label": "Eigenkapital",
+        "accounts": [4],
+        "positions": []
+      },
+      {
+        "label": "Fremdkapital",
+        "accounts": [5, 6],
+        "positions": []
+      }
+    ]
+  },
+  "accounts": [
+    { "id": 1, "label": "Maschinen" },
+    { "id": 2, "label": "Bank" },
+    { "id": 3, "label": "Forderungen aus Lieferungen und Leistungen" },
+    { "id": 4, "label": "Gezeichnetes Kapital" },
+    { "id": 5, "label": "Verbindlichkeiten aus Lieferungen und Leistungen" },
+    { "id": 6, "label": "Darlehen" },
+    { "id": 7, "label": "Bürobedarf" }
+  ],
+  "journalEntries": [
+    {
+      "id": 1,
+      "entryLines": [
+        { "accountId": 1, "amount": 50000, "entryType": "debit" },
+        { "accountId": 2, "amount": 50000, "entryType": "credit" }
+      ]
+    },
+    {
+      "id": 2,
+      "entryLines": [
+        { "accountId": 3, "amount": 10000, "entryType": "debit" },
+        { "accountId": 5, "amount": 10000, "entryType": "credit" }
+      ]
+    },
+    {
+      "id": 3,
+      "entryLines": [
+        { "accountId": 2, "amount": 20000, "entryType": "debit" },
+        { "accountId": 6, "amount": 15000, "entryType": "credit" },
+        { "accountId": 5, "amount": 5000, "entryType": "credit" }
+      ]
+    },
+    {
+      "id": 4,
+      "entryLines": [
+        { "accountId": 4, "amount": 75000, "entryType": "credit" },
+        { "accountId": 2, "amount": 50000, "entryType": "debit" },
+        { "accountId": 1, "amount": 25000, "entryType": "debit" }
+      ]
+    },
+    {
+      "id": 5,
+      "entryLines": [
+        { "accountId": 7, "amount": 2000, "entryType": "debit" },
+        { "accountId": 2, "amount": 1000, "entryType": "credit" },
+        { "accountId": 5, "amount": 1000, "entryType": "credit" }
+      ]
+    }
+  ]
+}

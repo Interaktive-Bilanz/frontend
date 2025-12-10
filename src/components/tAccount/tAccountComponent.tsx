@@ -1,15 +1,35 @@
-import { Booking, TAccountProps } from "./tAccountInterfaces";
+import { Booking, EntryLinesProps, TAccountProps } from "./tAccountInterfaces";
 import { BookingsListComponent } from "./bookingsListComponent";
 import React from "react";
+import { useInteractiveBalanceData } from "../../context/InteractiveBalanceDataContext";
+import { EntryLine } from "../../types/InteractiveBalanceData";
 
-const sumBookings = (bookings: Booking[]) =>
-    bookings.reduce((sum, b) => sum + b.value, 0);
+const sumBookings = (lines:EntryLinesProps["lines"]) =>
+    lines.reduce((sum, item) => sum + item.line.amount, 0);
 
 export const TAccountComponent: React.FC<TAccountProps> = ({
     account,
 }) => {
-    const sollSum = sumBookings(account.soll);
-    const habenSum = sumBookings(account.haben)
+
+    const { interactiveBalanceData } = useInteractiveBalanceData();
+
+    const journalEntries = interactiveBalanceData.journalEntries;
+
+    const accountId = account.id;
+
+    const lines: EntryLinesProps["lines"] = journalEntries
+        ?.flatMap(entry =>
+            entry.entryLines
+                ?.filter(line => line.accountId === accountId)
+                .map(line => entry.id !== undefined ? { entryId: entry.id, line } : null)
+        )
+        .filter((x): x is { entryId: number; line: EntryLine } => x !== null) ?? [];
+
+    const debitLines = lines?.filter(l => l.line.entryType === "debit");
+    const creditLines = lines?.filter(l => l.line.entryType === "credit");
+
+    const sollSum = sumBookings(debitLines);
+    const habenSum = sumBookings(creditLines)
     const sumDif = sollSum - habenSum;
     return (
         <div>
@@ -19,10 +39,10 @@ export const TAccountComponent: React.FC<TAccountProps> = ({
             </div>
             <div className="grid grid-cols-2 border-t-4 border-solid border-black">
                 <div className="pr-1 border-r-2 border-solid border-black w-full pb-1">
-                    <BookingsListComponent bookings={account.soll} />
+                    <BookingsListComponent lines={debitLines} />
                 </div>
                 <div className="pl-1 border-l-2 border-solid border-black w-full pb-1">
-                    <BookingsListComponent bookings={account.haben} />
+                    <BookingsListComponent lines={creditLines} />
                 </div>
             </div>
             <div className="grid grid-cols-2 border-t-2 border-solid border-gray-300 -mt-1">

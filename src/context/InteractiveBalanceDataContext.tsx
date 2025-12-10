@@ -1,7 +1,7 @@
 import React, {createContext, useContext} from "react";
 import { InteractiveBalanceData } from "../types/InteractiveBalanceData";
 import { useLocalStorage } from "../hooks/useLocalStorage";
-import defaultDataJson from "../api/chat_gpt_example.json"
+import defaultDataJson from "../api/chat_gpt_example2.json"
 
 interface InteractiveBalanceDataContextType {
     interactiveBalanceData: InteractiveBalanceData;

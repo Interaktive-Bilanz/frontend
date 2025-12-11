@@ -1,3 +1,5 @@
+import { Position } from "../../types/InteractiveBalanceData";
+
 // Leaf Konto
 export type Konto = {
   nr: string;
@@ -6,6 +8,7 @@ export type Konto = {
 
 // Node structure
 export type Struktur = {
+  label: string;
   posten?: BilanzNode[]; // child nodes
   konto?: Konto[]; // leaf accounts
 };
@@ -19,7 +22,9 @@ export type BilanzNode = {
 // Props for React components
 export type BilanzProps = {
   title: string;
-  posten: BilanzNode[];
+  //posten: BilanzNode[];
+  positions?: Position[]; // child nodes
+  konto?: Konto[]; // leaf accounts
   openTAccWindow: (title: string) => void;
 };
 

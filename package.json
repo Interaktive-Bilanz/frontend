@@ -11,6 +11,7 @@
     "@types/node": "^16.18.126",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
+    "ajv": "^8.17.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-rnd": "^10.5.2",
@@ -20,7 +21,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "generate-types": "json2ts ./src/schemas/interactive_balance_data.schema.json -o ./src/types/InteractiveBalanceData.ts --cwd ./src/schemas --strict-index-signatures"
   },
   "eslintConfig": {
     "extends": [
@@ -45,6 +47,7 @@
     "@vitejs/plugin-react": "^5.1.2",
     "autoprefixer": "^10.4.14",
     "babel-plugin-react-compiler": "^1.0.0",
+    "json-schema-to-typescript": "^15.0.4",
     "postcss": "^8.4.24",
     "prettier": "3.6.2",
     "tailwindcss": "^3.3.0",

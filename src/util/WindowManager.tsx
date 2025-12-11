@@ -2,7 +2,10 @@ import React, { useState } from "react";
 import { Rnd } from "react-rnd";
 import BilanzComponent from "../components/bilanz/BilanzComponent";
 import { TAccount } from "../components/tAccount/tAccountInterfaces";
+import { TAccountComponent } from "../components/tAccount/tAccountComponent";
 import { getTAccountByNr } from "../api/tAccountApi";
+import { useInteractiveBalanceData } from "../context/InteractiveBalanceDataContext";
+import { Account } from "../types/InteractiveBalanceData";
 
 interface WindowType {
   x: number;
@@ -10,11 +13,15 @@ interface WindowType {
   width: number;
   height: number;
   title: string;
-  account?: TAccount; // not necessary for now
+  account?: Account; // not necessary for now
 }
 
 const WindowManager = () => {
   const [windows, setWindows] = useState<WindowType[]>([]);
+  const { interactiveBalanceData } = useInteractiveBalanceData();
+
+  const accounts = interactiveBalanceData.accounts;
+  const journalEntries = interactiveBalanceData.journalEntries;
 
   const openWindow = (title: string) => {
     /* Opens a new window for windows arr
@@ -25,8 +32,9 @@ const WindowManager = () => {
 
       if (prev.some((w) => w.title === title)) return prev;
 
-      const nr = title.split(":")[0].trim();
-      const account = getTAccountByNr(nr); // fetch TAccount object
+      const id = parseInt(title.split(":")[0].trim());
+      const account = accounts.find(a => a.id === id)
+      // const account = getTAccountByNr(nr); // fetch TAccount object
 
       const newWindow: WindowType = {
         x: 100 + prev.length * 10,
@@ -68,9 +76,9 @@ const WindowManager = () => {
             x: w.x,
             y: w.y,
             width: w.width,
-            height: w.height,
+            height: "auto",
           }}
-          minWidth={400}
+          minWidth={550}
           minHeight={400}
           bounds="window"
           style={{
@@ -90,27 +98,7 @@ const WindowManager = () => {
           </div>
           <div className="p-4 text-sm text-gray-700">
             {w.account ? (
-              <div>
-                <h4>Soll</h4>
-                <ul>
-                  {w.account.soll.map((b, i) => (
-                    <li key={i}>
-                      {b.date}: {b.value} €{" "}
-                      {b.description && `- ${b.description}`}
-                    </li>
-                  ))}
-                </ul>
-
-                <h4>Haben</h4>
-                <ul>
-                  {w.account.haben.map((b, i) => (
-                    <li key={i}>
-                      {b.date}: {b.value} €{" "}
-                      {b.description && `- ${b.description}`}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <TAccountComponent account={w.account} />
             ) : (
               <div>Konto nicht gefunden</div>
             )}

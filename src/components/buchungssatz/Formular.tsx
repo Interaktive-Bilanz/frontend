@@ -37,20 +37,20 @@ export default function Buchungsformular() {
     });
   }
 
-function addRow(collection: "sollKonten" | "habenKonten") {
-  setEntry(prev => {
-    if (prev[collection].length >= 3) {
-      return prev;
-    }
-    return {
-      ...prev,
-      [collection]: [
-        ...prev[collection],
-        { konto: kontoOptions[0].value, name: "" }
-      ],
-    };
-  });
-}
+  function addRow(collection: "sollKonten" | "habenKonten") {
+    setEntry(prev => {
+      if (prev[collection].length >= 3) {
+        return prev;
+      }
+      return {
+        ...prev,
+        [collection]: [
+          ...prev[collection],
+          { konto: kontoOptions[0].value, name: "" }
+        ],
+      };
+    });
+  }
 
 
   function removeRow(collection: "sollKonten" | "habenKonten", idx: number) {

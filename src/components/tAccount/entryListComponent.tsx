@@ -1,9 +1,13 @@
 import React from "react";
 import { BookingsListProps, EntryLinesProps } from "./tAccountInterfaces";
+import { useWindowManager } from "../../context/WindowManagerContext";
 
 export const BookingsListComponent: React.FC<EntryLinesProps> = ({
     lines
 }) => {
+
+    const { openWindow } = useWindowManager()
+
     return (
         <table className="w-full border-collapse">
             <thead>
@@ -15,7 +19,11 @@ export const BookingsListComponent: React.FC<EntryLinesProps> = ({
             </thead>
             <tbody>
                 {lines.map((l) => (
-                    <tr className="align-top border-t boder-solid" key={l.entryId}>
+                    <tr
+                        className="align-top border-t boder-solid"
+                        key={l.entryId}
+                        onClick={() => openWindow({ type: "JournalEntry", payload: { id: l.entryId } })}
+                    >
                         <td className="whitespace-nowrap border-r border-solid">{l.entryId}</td>
                         {/* <td>{b.description && b.description}</td> */}
                         <td className="whitespace-nowrap text-right border-l border-solid">{l.line.amount.toFixed(2)} €</td>

@@ -25,7 +25,6 @@ export type BilanzProps = {
   //posten: BilanzNode[];
   positions?: Position[]; // child nodes
   konto?: Konto[]; // leaf accounts
-  openTAccWindow: (title: string) => void;
 };
 
 // Optional: Column type for backend

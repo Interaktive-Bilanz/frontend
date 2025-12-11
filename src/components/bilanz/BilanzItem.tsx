@@ -1,19 +1,19 @@
 import React, { useState } from "react";
-
-import { BilanzNode } from "./BilanzInterfaces";
 import { Position } from "../../types/InteractiveBalanceData";
 import { useInteractiveBalanceData } from "../../context/InteractiveBalanceDataContext";
+import { useWindowManager } from "../../context/WindowManagerContext";
 
 const BilanzItem: React.FC<{
   position: Position;
   level?: number;
-  openTAccWindow: (title: string) => void;
-}> = ({ position, level = 0, openTAccWindow }) => {
+}> = ({ position, level = 0 }) => {
   const [open, setOpen] = useState(false);
 
   const { interactiveBalanceData } = useInteractiveBalanceData();
 
   const accounts = interactiveBalanceData.accounts;
+
+  const { openWindow } = useWindowManager();
 
   return (
     <div className={`ml-${level} mt-1`}>
@@ -31,7 +31,10 @@ const BilanzItem: React.FC<{
             return (<button
               key={i}
               className="mt-1 bg-green-100 hover:bg-green-400 border border-gray-300 rounded px-2 py-1 w-full text-left"
-              onClick={() => openTAccWindow(`${accountId}: ${account?.label}`)}
+              onClick={() => openWindow({
+                type: "Account",
+                payload: account
+              })}
             >
               {accountId} {account?.label}
             </button>);
@@ -42,7 +45,6 @@ const BilanzItem: React.FC<{
               key={i}
               position={child}
               level={level + 1}
-              openTAccWindow={openTAccWindow}
             />
           ))}
         </div>

@@ -1,5 +1,5 @@
 import { Booking, EntryLinesProps, TAccountProps } from "./tAccountInterfaces";
-import { BookingsListComponent } from "./bookingsListComponent";
+import { BookingsListComponent } from "./entryListComponent";
 import React from "react";
 import { useInteractiveBalanceData } from "../../context/InteractiveBalanceDataContext";
 import { EntryLine } from "../../types/InteractiveBalanceData";

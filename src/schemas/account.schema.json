@@ -13,5 +13,5 @@
         }
     },
     "additionalProperties": false,
-    "required": ["id", "lable"]
+    "required": ["id", "label"]
 }

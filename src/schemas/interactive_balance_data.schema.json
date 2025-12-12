@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "./interactive_balance_data.schema.json",
   "title": "Interactive Balance Data",
-  "description": "Interactive balance data with accounts, bookings and the balance sheet structure",
+  "description": "Interactive balance data with accounts, journal entries and the balance sheet structure",
   "type": "object",
   "properties": {
     "balanceSheet": {
@@ -20,5 +20,5 @@
     }
   },
   "additionalProperties": false,
-  "required": ["balanceSheet", "accounts", "bookings"]
+  "required": ["balanceSheet", "accounts", "journalEntries"]
 }

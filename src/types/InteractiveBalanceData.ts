@@ -6,7 +6,7 @@
  */
 
 /**
- * Interactive balance data with accounts, bookings and the balance sheet structure
+ * Interactive balance data with accounts, journal entries and the balance sheet structure
  */
 export interface InteractiveBalanceData {
   balanceSheet: BalanceSheet;
@@ -17,7 +17,7 @@ export interface InteractiveBalanceData {
   /**
    * List of all journal Entries
    */
-  journalEntries?: JournalEntry[];
+  journalEntries: JournalEntry[];
 }
 /**
  * The balance sheet holding the structure of accounts, sums and balance
@@ -37,22 +37,22 @@ export interface Position {
   /**
    * List of account ids directly assigned to this position
    */
-  accounts?: number[];
-  positions?: Position[];
+  accounts: number[];
+  positions: Position[];
 }
 /**
  * Account in the balance sheet
  */
 export interface Account {
   id: number;
-  label?: string;
+  label: string;
 }
 /**
  * A journal entry with at least one debit-line and one credit-line
  */
 export interface JournalEntry {
-  id?: number;
-  entryLines?: {
+  id: number;
+  entryLines: {
     [k: string]: unknown;
   } & EntryLine[];
   additionalProperties?: never;

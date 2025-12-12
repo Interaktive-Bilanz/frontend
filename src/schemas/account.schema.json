@@ -6,7 +6,8 @@
     "type": "object",
     "properties": {
         "id": {
-            "type": "integer"
+            "type": "string",
+            "format": "^[0-9{4}$"
         },
         "label": {
             "type": "string"

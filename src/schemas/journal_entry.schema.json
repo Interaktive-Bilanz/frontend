@@ -6,7 +6,8 @@
     "type": "object",
     "properties": {
         "id": {
-            "type": "integer"
+            "type": "string",
+            "format": "^[0-9{4}$"
         },
         "entryLines": {
             "type": "array",
@@ -26,7 +27,8 @@
             "type": "object",
             "properties": {
                 "accountId": {
-                    "type": "integer"
+                    "type": "string",
+                    "format": "^[0-9{4}$"
                 },
                 "amount": {
                     "type": "number"

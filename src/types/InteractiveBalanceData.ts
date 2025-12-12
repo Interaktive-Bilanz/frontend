@@ -37,25 +37,25 @@ export interface Position {
   /**
    * List of account ids directly assigned to this position
    */
-  accounts: number[];
+  accounts: string[];
   positions: Position[];
 }
 /**
  * Account in the balance sheet
  */
 export interface Account {
-  id: number;
+  id: string;
   label: string;
 }
 /**
  * A journal entry with at least one debit-line and one credit-line
  */
 export interface JournalEntry {
-  id: number;
+  id: string;
   entryLines: EntryLine[];
 }
 export interface EntryLine {
-  accountId: number;
+  accountId: string;
   amount: number;
   entryType: "credit" | "debit";
 }

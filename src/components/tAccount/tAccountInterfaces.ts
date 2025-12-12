@@ -17,13 +17,13 @@ export type TAccount = {
 };
 
 export interface TAccountProps {
-  id: number;
+  id: string;
   label: string;
 }
 
 export interface EntryLinesProps {
   lines: {
-    entryId: number,
+    entryId: string,
     line: EntryLine
   }[];
 }

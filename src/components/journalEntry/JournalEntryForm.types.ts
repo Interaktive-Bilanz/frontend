@@ -3,6 +3,6 @@ import { JournalEntry } from "../../types/InteractiveBalanceData";
 
 
 export interface JournalEntryProps {
-    entryId?: number;
+    entryId?: string;
     onClose?: () => void;
 }

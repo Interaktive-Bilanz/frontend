@@ -33,7 +33,8 @@
                     "description": "List of account ids directly assigned to this position",
                     "type": "array",
                     "items": {
-                        "type": "integer"
+                        "type": "string",
+                        "format": "^[0-9{4}$"
                     }
                 },
                 "positions": {

@@ -37,7 +37,7 @@ export function JournalEntryForm({ entryId, onClose }: JournalEntryProps) {
         console.log("Draft updated:", draftEntry);
     }, [draftEntry]);
 
-    const removeLine = (accountId: number) => {
+    const removeLine = (accountId: string) => {
         if (!draftEntry?.entryLines) return;
         setDraftEntry({
             ...draftEntry,

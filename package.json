@@ -22,7 +22,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "generate-types": "json2ts ./src/schemas/interactive_balance_data.schema.json -o ./src/types/InteractiveBalanceData.ts --cwd ./src/schemas --strict-index-signatures"
+    "generate-types": "json2ts ./src/schemas/interactive_balance_data.schema.json -o ./src/types/InteractiveBalanceData.ts --cwd ./src/schemas"
   },
   "eslintConfig": {
     "extends": [

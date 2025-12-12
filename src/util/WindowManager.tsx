@@ -53,10 +53,11 @@ const initialJournalEntry: WindowData = {
 const WindowManager = () => {
   const [windows, setWindows] = useState<WindowType[]>([]);
   const [topZ, setTopZ] = useState(1);
+  const { cancelDraft } = useInteractiveBalanceData()
 
   const maxWindowCounts: Record<WindowContentType, number> = {
     "Account": 3,
-    "JournalEntry": 2,
+    "JournalEntry": 1,
   }
 
   const openWindow = (windowData: WindowData) => {
@@ -70,8 +71,8 @@ const WindowManager = () => {
       if (prev.some((w) => w.title === generateTitle(windowData))) return prev;
 
       const newWindow: WindowType = {
-        x: 100 + prev.length * 10,
-        y: 100 + prev.length * 10,
+        x: 100 + prev.length * 200,
+        y: 100 + prev.length * 50,
         width: 500,
         height: 400,
         title: generateTitle(windowData),
@@ -84,6 +85,7 @@ const WindowManager = () => {
   };
 
   const closeWindow = (windowData: WindowData) => {
+    if (windowData.type === "JournalEntry") cancelDraft();
     setWindows((prev) => prev.filter((w) => w.title !== generateTitle(windowData)));
   };
 

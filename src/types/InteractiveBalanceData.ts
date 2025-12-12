@@ -52,11 +52,7 @@ export interface Account {
  */
 export interface JournalEntry {
   id: number;
-  entryLines: {
-    [k: string]: unknown;
-  } & EntryLine[];
-  additionalProperties?: never;
-  [k: string]: unknown;
+  entryLines: EntryLine[];
 }
 export interface EntryLine {
   accountId: number;

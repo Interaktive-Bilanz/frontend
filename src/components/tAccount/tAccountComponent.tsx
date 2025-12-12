@@ -4,29 +4,60 @@ import React from "react";
 import { useInteractiveBalanceData } from "../../context/InteractiveBalanceDataContext";
 import { EntryLine } from "../../types/InteractiveBalanceData";
 
-const sumBookings = (lines:EntryLinesProps["lines"]) =>
+const sumBookings = (lines: EntryLinesProps["lines"]) =>
     lines.reduce((sum, item) => sum + item.line.amount, 0);
 
 export const TAccountComponent: React.FC<TAccountProps> = ({
     account,
 }) => {
 
-    const { interactiveBalanceData } = useInteractiveBalanceData();
+    const { interactiveBalanceData, draftEntry } = useInteractiveBalanceData();
 
     const journalEntries = interactiveBalanceData.journalEntries;
 
     const accountId = account.id;
 
-    const lines: EntryLinesProps["lines"] = journalEntries
-        ?.flatMap(entry =>
-            entry.entryLines
-                ?.filter(line => line.accountId === accountId)
-                .map(line => entry.id !== undefined ? { entryId: entry.id, line } : null)
-        )
-        .filter((x): x is { entryId: number; line: EntryLine } => x !== null) ?? [];
+    // const lines: EntryLinesProps["lines"] = journalEntries
+    //     ?.flatMap(entry =>
+    //         entry.entryLines
+    //             ?.filter(line => line.accountId === accountId)
+    //             .map(line => entry.id !== undefined ? { entryId: entry.id, line } : null)
+    //     )
+    //     .filter((x): x is { entryId: number; line: EntryLine } => x !== null) ?? [];
 
-    const debitLines = lines?.filter(l => l.line.entryType === "debit");
-    const creditLines = lines?.filter(l => l.line.entryType === "credit");
+    // const mergedWithDraftlines = lines.map(line =>
+    //     line.entryId === draftEntry?.id ? (() => {
+    //         const foundLine = draftEntry.entryLines.find(el => el.accountId === accountId);
+    //         if ( foundLine ) line.line = foundLine;
+    //         return line;
+    //     })() : line
+    // )
+
+    const lines: EntryLinesProps["lines"] = journalEntries
+        ?.flatMap(entry => {
+            if (!entry.entryLines) return [];
+
+            // Only consider the line for this account
+            const originalLine = entry.entryLines.find(line => line.accountId === accountId);
+
+            // If there's a draft for this entry
+            if (draftEntry?.id === entry.id) {
+                const draftLine = draftEntry.entryLines?.find(dl => dl.accountId === accountId);
+                // If draft line exists, render it
+                if (draftLine) {
+                    return [{ entryId: draftEntry.id!, line: draftLine }];
+                }
+                // If draftLine is undefined, the line was deleted => don't render
+                return [];
+            }
+
+            // If no draft exists for this entry, render the original line
+            if (originalLine) return [{ entryId: entry.id!, line: originalLine }];
+            return [];
+        }) ?? [];
+
+    const debitLines = lines.filter(l => l.line.entryType === "debit");
+    const creditLines = lines.filter(l => l.line.entryType === "credit");
 
     const sollSum = sumBookings(debitLines);
     const habenSum = sumBookings(creditLines)

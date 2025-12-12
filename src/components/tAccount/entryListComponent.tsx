@@ -20,7 +20,7 @@ export const BookingsListComponent: React.FC<EntryLinesProps> = ({
             <tbody>
                 {lines.map((l) => (
                     <tr
-                        className="align-top border-t boder-solid"
+                        className="cursor-pointer align-top border-t boder-solid transition-all duration-100 hover:scale-95"
                         key={l.entryId}
                         onClick={() => openWindow({ type: "JournalEntry", payload: { id: l.entryId } })}
                     >

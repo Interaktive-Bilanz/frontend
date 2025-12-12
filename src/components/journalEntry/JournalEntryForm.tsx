@@ -1,19 +1,70 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { JournalEntryProps } from "./JournalEntryForm.types";
-import { JournalEntry } from "../../types/InteractiveBalanceData";
+import { EntryLine, JournalEntry } from "../../types/InteractiveBalanceData";
 import { InteractiveBalanceData } from "../../types/InteractiveBalanceData";
 import { useInteractiveBalanceData } from "../../context/InteractiveBalanceDataContext";
+
+const sumLines = (lines: EntryLine[]) =>
+    lines.reduce((sum, item) => sum + item.amount, 0);
 
 
 export function JournalEntryForm({ entryId, onClose }: JournalEntryProps) {
 
-    const { interactiveBalanceData } = useInteractiveBalanceData();
+    const { interactiveBalanceData, draftEntry, setDraftEntry, cancelDraft, commitDraft } = useInteractiveBalanceData();
 
-    console.log(entryId);
+    const originalEntry = interactiveBalanceData.journalEntries?.find(e => e.id === entryId) ?? null;
 
-    const entry = interactiveBalanceData.journalEntries?.find(e => e.id === entryId);
+    const initializedRef = useRef(false);
+    useEffect(() => {
+        if (initializedRef.current) return;
+        initializedRef.current = true;
 
-    if (!entry) return <div>Entry not found</div>;
+        if (originalEntry) {
+            // create an independent copy so editing the draft won't mutate global state
+            setDraftEntry({
+                ...originalEntry,
+                entryLines: originalEntry.entryLines ? [...originalEntry.entryLines] : []
+            } as JournalEntry);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const currentEntry: JournalEntry | null = draftEntry ?? originalEntry;
+
+    useEffect(() => {
+        console.log("Draft updated:", draftEntry);
+    }, [draftEntry]);
+
+    const removeLine = (accountId: number) => {
+        if (!draftEntry?.entryLines) return;
+        setDraftEntry({
+            ...draftEntry,
+            entryLines: draftEntry.entryLines.filter(l => l.accountId !== accountId)
+        });
+    };
+
+    const handelCancel = () => {
+        cancelDraft();
+
+        if (originalEntry) {
+            setDraftEntry({
+                ...originalEntry,
+                entryLines: [...originalEntry.entryLines]
+            });
+        }
+    };
+
+    const handleCommit = () => {
+        commitDraft();
+    }
+
+    if (!currentEntry) return <div>Entry not found</div>;
+
+    const debitLines = currentEntry.entryLines.filter(l => l.entryType === "debit");
+    const debitSum = sumLines(debitLines);
+    const creditLines = currentEntry.entryLines.filter(l => l.entryType === "credit");
+    const creditSum = sumLines(creditLines);
+    const balance = debitSum - creditSum;
 
     return (
         <div className="max-w-2xl mx-auto my-2 rounded bg-white text-sm">
@@ -33,15 +84,19 @@ export function JournalEntryForm({ entryId, onClose }: JournalEntryProps) {
                             </tr>
                         </thead>
                         <tbody>
-                            {entry.entryLines?.filter(e => e.entryType === "debit").map((e) => (
-                                <tr>
-                                    <td className="px-1 py-0.5">{e.accountId}</td>
-                                    <td className="px-1 py-0.5">{e.amount}</td>
-                                    <td className="px-1 py-0.5 text-center">
-                                        <button className="px-1 py-0.5 rounded bg-red-100 hover:bg-red-200 text-xs">-</button>
-                                    </td>
-                                </tr>
-                            ))}
+                            {debitLines.map((e, i) => {
+                                const account = interactiveBalanceData.accounts.find(a => a.id === e.accountId);
+                                return (
+                                    <tr>
+                                        <td className="px-1 py-0.5">{e.accountId} {account?.label}</td>
+                                        <td className="px-1 py-0.5">{e.amount}</td>
+                                        <td className="px-1 py-0.5 text-center">
+                                            <button className="px-1 py-0.5 rounded bg-red-100 hover:bg-red-200 text-xs"
+                                                onClick={() => removeLine(e.accountId)}>-</button>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>
@@ -61,33 +116,43 @@ export function JournalEntryForm({ entryId, onClose }: JournalEntryProps) {
                             </tr>
                         </thead>
                         <tbody>
-                            {entry.entryLines?.filter(e => e.entryType === "credit").map((e) => (
-                                <tr>
-                                    <td className="px-1 py-0.5">{e.accountId}</td>
-                                    <td className="px-1 py-0.5">{e.amount}</td>
-                                    <td className="px-1 py-0.5 text-center">
-                                        <button className="px-1 py-0.5 rounded bg-red-100 hover:bg-red-200 text-xs">-</button>
-                                    </td>
-                                </tr>
-                            ))}
+                            {creditLines.map((e, i) => {
+                                const account = interactiveBalanceData.accounts.find(a => a.id === e.accountId);
+                                return (
+                                    <tr>
+                                        <td className="px-1 py-0.5">{e.accountId} {account?.label}</td>
+                                        <td className="px-1 py-0.5">{e.amount}</td>
+                                        <td className="px-1 py-0.5 text-center">
+                                            <button className="px-1 py-0.5 rounded bg-red-100 hover:bg-red-200 text-xs"
+                                                onClick={() => removeLine(e.accountId)}>-</button>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            {/* Betrag & Actions */}
-            <div className="flex items-center gap-2 mt-2 text-sm">
-                <div className="ml-auto font-semibold">Betrag</div>
-                <input
-                    className="border rounded px-1 py-0.5 text-xs w-20"
-                    placeholder="Betrag"
-                />
+            <div className="flex justify-between grid-cols-2 text-lg mt-2">
+                <div className={`text-lg font-semibold ${balance !== 0 ? 'text-red-600' : 'text-green-600'}`}>
+                    Sollsumme: {debitSum.toFixed(2)} €
+                </div>
+                <div className={`text-lg font-semibold ${balance !== 0 ? 'text-red-600' : 'text-green-600'}`}>
+                    Habensumme: {creditSum.toFixed(2)} €
+                </div>
             </div>
 
-            <div className="flex justify-end space-x-2 mt-2">
-                <button className="px-2 py-1 border rounded bg-gray-100 hover:bg-gray-200 text-xs">Abbrechen</button>
-                <button className="px-2 py-1 border rounded bg-yellow-200 hover:bg-yellow-300 text-xs font-semibold">Buchen!</button>
+            <div className="flex justify-center  text-lg mt-2">
+                <div className={`text-lg font-semibold ${balance !== 0 ? 'text-red-600' : 'text-green-600'}`}>Saldo: {(balance).toFixed(2)} €</div>
             </div>
-        </div>
+
+            {/* Betrag & Actions */}
+            <div className="flex justify-end space-x-2 mt-2">
+                <button className="px-2 py-1 border rounded bg-gray-100 hover:bg-gray-200 text-xs"
+                    onClick={() => handelCancel()}>Abbrechen</button>
+                <button className={`px-2 py-1 border rounded ${balance === 0 ? 'bg-yellow-200 hover:bg-yellow-300' : 'bg-gray-400 cursor-not-allowed'} text-xs font-semibold`} disabled={balance !== 0} onClick={() => handleCommit()}>Buchen!</button>
+            </div>
+        </div >
     );
 }

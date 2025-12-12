@@ -13,41 +13,14 @@
             "items": {
                 "$ref": "#/$defs/entryLine"
             },
-            "default": [],
-            "allOf": [
-                {
-                    "contains": {
-                        "type": "object",
-                        "properties": {
-                            "entryType": {
-                                "const": "debit"
-                            }
-                        },
-                        "required": [
-                            "entryType"
-                        ]
-                    },
-                    "minContains": 1
-                },
-                {
-                    "contains": {
-                        "type": "object",
-                        "properties": {
-                            "entryType": {
-                                "const": "credit"
-                            }
-                        },
-                        "required": [
-                            "entryType"
-                        ]
-                    },
-                    "minContains": 1
-                }
-            ]
-        },
-        "additionalProperties": false
+            "default": []
+        }
     },
-    "required": ["id", "entryLines"],
+    "additionalProperties": false,
+    "required": [
+        "id",
+        "entryLines"
+    ],
     "$defs": {
         "entryLine": {
             "type": "object",

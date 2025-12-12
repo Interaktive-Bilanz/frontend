@@ -23,7 +23,7 @@ export interface TAccountProps {
 
 export interface EntryLinesProps {
   lines: {
-    entryId: string,
+    entryId: number,
     line: EntryLine
   }[];
 }

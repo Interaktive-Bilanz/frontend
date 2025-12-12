@@ -51,7 +51,7 @@ export interface Account {
  * A journal entry with at least one debit-line and one credit-line
  */
 export interface JournalEntry {
-  id: string;
+  id: number;
   entryLines: EntryLine[];
 }
 export interface EntryLine {

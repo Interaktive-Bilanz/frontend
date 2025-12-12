@@ -6,8 +6,7 @@
     "type": "object",
     "properties": {
         "id": {
-            "type": "string",
-            "format": "^[0-9{4}$"
+            "type": "number"
         },
         "entryLines": {
             "type": "array",

@@ -28,12 +28,13 @@ const BilanzItem: React.FC<{
         <div className="ml-4">
           {position.accounts?.map((accountId, i) => {
             const account = accounts.find(a => a.id === accountId)
+            if (!account) return;
             return (<button
               key={i}
               className="mt-1 bg-green-100 hover:bg-green-400 border border-gray-300 rounded px-2 py-1 w-full text-left"
               onClick={() => openWindow({
                 type: "Account",
-                payload: account
+                payload: {id: accountId, label: account.label}
               })}
             >
               {accountId} {account?.label}

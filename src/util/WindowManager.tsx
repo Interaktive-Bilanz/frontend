@@ -28,7 +28,10 @@ interface WindowType {
 function generateTitle(data: WindowData) {
   switch (data.type) {
     case "Account": return `${data.payload.id} ${data.payload.label}`;
-    case "JournalEntry": return `Buchung ${data.payload.id}`;
+    case "JournalEntry": {
+      console.log(data.payload.id);
+      return `Buchung ${data.payload.id}`;
+    }
     default: return "No Title";
   }
 }
@@ -66,9 +69,14 @@ const WindowManager = () => {
 
       const sameTypeCount = prev.filter(w => w.data.type === windowData.type).length;
 
-      if (sameTypeCount >= maxWindowCounts[windowData.type]) return prev;
+      const existingWindow = prev.find((w) => w.title === generateTitle(windowData));
 
-      if (prev.some((w) => w.title === generateTitle(windowData))) return prev;
+      if (existingWindow) {
+        bringToFront(existingWindow.data);
+        return prev;
+      }
+
+      if (sameTypeCount >= maxWindowCounts[windowData.type]) return prev;
 
       const newWindow: WindowType = {
         x: 100 + prev.length * 200,
@@ -104,7 +112,6 @@ const WindowManager = () => {
       <div className="w-screen h-screen bg-gray-200 relative overflow-hidden">
         <div className="flex justify-center p-8">
           <BilanzComponent />
-          {/* <Buchungsformular></Buchungsformular> */}
         </div>
 
         {windows.map((w) => (
@@ -137,7 +144,7 @@ const WindowManager = () => {
               </button>
             </div>
             <div className="p-4 text-sm text-gray-700">
-              {w.data.type === "Account" && <TAccountComponent account={w.data.payload} />}
+              {w.data.type === "Account" && <TAccountComponent {...w.data.payload} />}
               {w.data.type === "JournalEntry" && <JournalEntryForm entryId={w.data.payload.id}/>}
             </div>
           </Rnd>

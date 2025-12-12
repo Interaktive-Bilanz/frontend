@@ -12,9 +12,9 @@ export const BookingsListComponent: React.FC<EntryLinesProps> = ({
         <table className="w-full border-collapse">
             <thead>
                 <tr className="text-left border-b border-solid">
-                    <th className="border-r border-solid">ID</th>
+                    <th className="border-r w-1/5 border-solid">ID</th>
                     {/* <th>Kommentar</th> */}
-                    <th className="border-l border-solid">Betrag</th>
+                    <th className="border-l w-4/5 border-solid">Betrag</th>
                 </tr>
             </thead>
             <tbody>

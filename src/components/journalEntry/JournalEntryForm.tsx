@@ -3,6 +3,7 @@ import { JournalEntryProps } from "./JournalEntryForm.types";
 import { EntryLine, JournalEntry } from "../../types/InteractiveBalanceData";
 import { InteractiveBalanceData } from "../../types/InteractiveBalanceData";
 import { useInteractiveBalanceData } from "../../context/InteractiveBalanceDataContext";
+import { useWindowManager } from "../../context/WindowManagerContext";
 
 const sumLines = (lines: EntryLine[]) =>
     lines.reduce((sum, item) => sum + item.amount, 0);
@@ -11,6 +12,7 @@ const sumLines = (lines: EntryLine[]) =>
 export function JournalEntryForm({ entryId, onClose }: JournalEntryProps) {
 
     const { interactiveBalanceData, draftEntry, setDraftEntry, cancelDraft, commitDraft } = useInteractiveBalanceData();
+    const { openWindow, closeWindow } = useWindowManager();
 
     const originalEntry = interactiveBalanceData.journalEntries?.find(e => e.id === entryId) ?? null;
 
@@ -55,7 +57,20 @@ export function JournalEntryForm({ entryId, onClose }: JournalEntryProps) {
     };
 
     const handleCommit = () => {
+        if (!draftEntry) return;
+
         commitDraft();
+
+        console.log(draftEntry);
+
+        console.log(draftEntry.entryLines);
+
+        if (!draftEntry.entryLines || draftEntry.entryLines.length === 0) {
+            closeWindow({
+                type: "JournalEntry",
+                payload: { id: draftEntry.id }
+            });
+        }
     }
 
     if (!currentEntry) return <div>Entry not found</div>;
@@ -87,7 +102,10 @@ export function JournalEntryForm({ entryId, onClose }: JournalEntryProps) {
                             {debitLines.map((e, i) => {
                                 const account = interactiveBalanceData.accounts.find(a => a.id === e.accountId);
                                 return (
-                                    <tr>
+                                    <tr className="cursor-pointer transition-all duration-100 hover:scale-95"
+                                        onClick={() => openWindow({
+                                            type: "Account", payload: { id: account?.id, label: account?.label }
+                                        })}>
                                         <td className="px-1 py-0.5">{e.accountId} {account?.label}</td>
                                         <td className="px-1 py-0.5">{e.amount}</td>
                                         <td className="px-1 py-0.5 text-center">
@@ -119,12 +137,18 @@ export function JournalEntryForm({ entryId, onClose }: JournalEntryProps) {
                             {creditLines.map((e, i) => {
                                 const account = interactiveBalanceData.accounts.find(a => a.id === e.accountId);
                                 return (
-                                    <tr>
+                                    <tr className="cursor-pointer transition-all duration-100 hover:scale-95"
+                                        onClick={() => openWindow({
+                                            type: "Account", payload: { id: account?.id, label: account?.label }
+                                        })}>
                                         <td className="px-1 py-0.5">{e.accountId} {account?.label}</td>
                                         <td className="px-1 py-0.5">{e.amount}</td>
                                         <td className="px-1 py-0.5 text-center">
                                             <button className="px-1 py-0.5 rounded bg-red-100 hover:bg-red-200 text-xs"
-                                                onClick={() => removeLine(e.accountId)}>-</button>
+                                                onClick={(event) => {
+                                                    //event.stopPropagation()
+                                                    removeLine(e.accountId);
+                                                }}>-</button>
                                         </td>
                                     </tr>
                                 );

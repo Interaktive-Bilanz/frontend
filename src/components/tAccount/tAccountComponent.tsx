@@ -8,14 +8,15 @@ const sumBookings = (lines: EntryLinesProps["lines"]) =>
     lines.reduce((sum, item) => sum + item.line.amount, 0);
 
 export const TAccountComponent: React.FC<TAccountProps> = ({
-    account,
+    id,
+    label
 }) => {
 
     const { interactiveBalanceData, draftEntry } = useInteractiveBalanceData();
 
     const journalEntries = interactiveBalanceData.journalEntries;
 
-    const accountId = account.id;
+    const accountId = id;
 
     // const lines: EntryLinesProps["lines"] = journalEntries
     //     ?.flatMap(entry =>

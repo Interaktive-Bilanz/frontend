@@ -17,7 +17,8 @@ export type TAccount = {
 };
 
 export interface TAccountProps {
-  account: Account;
+  id: number;
+  label: string;
 }
 
 export interface EntryLinesProps {

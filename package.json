@@ -1,5 +1,6 @@
 {
   "name": "frontend",
+  "homepage": "https://interaktive-bilanz.github.io/frontend/",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -22,6 +23,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist",
     "generate-types": "json2ts ./src/schemas/interactive_balance_data.schema.json -o ./src/types/InteractiveBalanceData.ts --cwd ./src/schemas"
   },
   "eslintConfig": {

@@ -24,7 +24,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist",
+    "deploy": "gh-pages -d build",
     "generate-types": "json2ts ./src/schemas/interactive_balance_data.schema.json -o ./src/types/InteractiveBalanceData.ts --cwd ./src/schemas"
   },
   "eslintConfig": {

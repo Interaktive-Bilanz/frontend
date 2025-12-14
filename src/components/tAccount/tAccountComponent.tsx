@@ -3,8 +3,9 @@ import { BookingsListComponent } from "./entryListComponent";
 import React from "react";
 import { useInteractiveBalanceData } from "../../context/InteractiveBalanceDataContext";
 import { EntryLine } from "../../types/InteractiveBalanceData";
+import { getAccountTotals } from "../../util/balanceCalculations";
 
-const sumBookings = (lines: EntryLinesProps["lines"]) =>
+const sumEntryLines = (lines: EntryLinesProps["lines"]) =>
     lines.reduce((sum, item) => sum + item.line.amount, 0);
 
 export const TAccountComponent: React.FC<TAccountProps> = ({
@@ -12,47 +13,24 @@ export const TAccountComponent: React.FC<TAccountProps> = ({
     label
 }) => {
 
-    const { interactiveBalanceData, draftEntry } = useInteractiveBalanceData();
+    const { interactiveBalanceData, draftEntry, accountTotals: accountSaldos } = useInteractiveBalanceData();
 
-    const journalEntries = interactiveBalanceData.journalEntries;
+    //const journalEntries = interactiveBalanceData.journalEntries;
+
+    const journalEntries = draftEntry
+        ? [
+            ...(interactiveBalanceData.journalEntries ?? []),
+            draftEntry,
+        ]
+        : interactiveBalanceData.journalEntries ?? [];
 
     const accountId = id;
 
-    // const lines: EntryLinesProps["lines"] = journalEntries
-    //     ?.flatMap(entry =>
-    //         entry.entryLines
-    //             ?.filter(line => line.accountId === accountId)
-    //             .map(line => entry.id !== undefined ? { entryId: entry.id, line } : null)
-    //     )
-    //     .filter((x): x is { entryId: number; line: EntryLine } => x !== null) ?? [];
-
-    // const mergedWithDraftlines = lines.map(line =>
-    //     line.entryId === draftEntry?.id ? (() => {
-    //         const foundLine = draftEntry.entryLines.find(el => el.accountId === accountId);
-    //         if ( foundLine ) line.line = foundLine;
-    //         return line;
-    //     })() : line
-    // )
-
     const lines: EntryLinesProps["lines"] = journalEntries
         ?.flatMap(entry => {
-            if (!entry.entryLines) return [];
 
-            // Only consider the line for this account
             const originalLine = entry.entryLines.find(line => line.accountId === accountId);
 
-            // If there's a draft for this entry
-            if (draftEntry?.id === entry.id) {
-                const draftLine = draftEntry.entryLines?.find(dl => dl.accountId === accountId);
-                // If draft line exists, render it
-                if (draftLine) {
-                    return [{ entryId: draftEntry.id!, line: draftLine }];
-                }
-                // If draftLine is undefined, the line was deleted => don't render
-                return [];
-            }
-
-            // If no draft exists for this entry, render the original line
             if (originalLine) return [{ entryId: entry.id!, line: originalLine }];
             return [];
         }) ?? [];
@@ -60,9 +38,13 @@ export const TAccountComponent: React.FC<TAccountProps> = ({
     const debitLines = lines.filter(l => l.line.entryType === "debit");
     const creditLines = lines.filter(l => l.line.entryType === "credit");
 
-    const sollSum = sumBookings(debitLines);
-    const habenSum = sumBookings(creditLines)
-    const sumDif = sollSum - habenSum;
+    console.log("debitLines changed: ", debitLines);
+
+    const accountTotals = getAccountTotals(accountSaldos, accountId);
+
+    const sollSum = accountTotals.debit;
+    const habenSum = accountTotals.credit;
+    const sumDif = accountTotals.balance;
     return (
         <div>
             <div className="flex justify-between">
@@ -72,9 +54,11 @@ export const TAccountComponent: React.FC<TAccountProps> = ({
             <div className="grid grid-cols-2 border-t-4 border-solid border-black">
                 <div className="pr-1 border-r-2 border-solid border-black w-full pb-1">
                     <BookingsListComponent lines={debitLines} />
+                    <span>id n+1 _____ _____</span>
                 </div>
                 <div className="pl-1 border-l-2 border-solid border-black w-full pb-1">
                     <BookingsListComponent lines={creditLines} />
+                    <span>id n+1 _____ _____</span>
                 </div>
             </div>
             <div className="grid grid-cols-2 border-t-2 border-solid border-gray-300 -mt-1">

@@ -1,16 +1,20 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { InteractiveBalanceData, JournalEntry } from "../types/InteractiveBalanceData";
 import { useLocalStorage } from "../hooks/useLocalStorage";
-import defaultDataJson from "../api/chat_gpt_example3.json"
+import defaultDataJson from "../api/chat_gpt_example4.json"
+import { calculateAccountTotals, AccountTotal } from "../util/balanceCalculations";
 
 interface InteractiveBalanceDataContextType {
   interactiveBalanceData: InteractiveBalanceData;
   setInteractiveBalanceData: React.Dispatch<React.SetStateAction<InteractiveBalanceData>>;
 
   draftEntry: JournalEntry | null;
-  setDraftEntry: (entry: JournalEntry | null) => void;
+  setDraftEntry: React.Dispatch<React.SetStateAction<JournalEntry | null>>;
+  //setDraftEntry: (entry: JournalEntry | null) => void;
   commitDraft: () => void;
   cancelDraft: () => void;
+
+  accountTotals: Record<string, AccountTotal>;
 }
 
 const InteractiveBalanceDataContext = createContext<InteractiveBalanceDataContextType | null>(null);
@@ -37,9 +41,7 @@ export const InteractiveBalanceDataProvider: React.FC<{ children: React.ReactNod
 
     setInteractiveBalanceData(prev => ({
       ...prev,
-      journalEntries: prev.journalEntries?.map(e =>
-        e.id === draftEntry.id ? draftEntry : e
-      ),
+      journalEntries: [...(prev.journalEntries ?? []), draftEntry]
     }));
 
     setDraftEntry(null);
@@ -49,8 +51,21 @@ export const InteractiveBalanceDataProvider: React.FC<{ children: React.ReactNod
     setDraftEntry(null);
   };
 
+  const accountTotals = useMemo(() => {
+
+    const entries = interactiveBalanceData.journalEntries ?? [];
+
+    const mergedEntries = draftEntry
+      ? [
+        ...entries.filter(e => e.id !== draftEntry.id),
+        draftEntry,
+      ] : entries;
+
+    return calculateAccountTotals(mergedEntries);
+  }, [interactiveBalanceData.journalEntries, draftEntry]);
+
   return (
-    <InteractiveBalanceDataContext.Provider value={{ interactiveBalanceData, setInteractiveBalanceData, draftEntry, setDraftEntry, commitDraft, cancelDraft }}>
+    <InteractiveBalanceDataContext.Provider value={{ interactiveBalanceData, setInteractiveBalanceData, draftEntry, setDraftEntry, commitDraft, cancelDraft, accountTotals: accountTotals }}>
       {children}
     </InteractiveBalanceDataContext.Provider>
   );

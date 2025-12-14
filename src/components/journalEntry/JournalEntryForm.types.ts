@@ -4,5 +4,6 @@ import { JournalEntry } from "../../types/InteractiveBalanceData";
 
 export interface JournalEntryProps {
     entryId?: number;
-    onClose?: () => void;
+    //onClose?: () => void;
+    isDraft?: boolean;
 }

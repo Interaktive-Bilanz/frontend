@@ -29,29 +29,33 @@ function generateTitle(data: WindowData) {
   switch (data.type) {
     case "Account": return `${data.payload.id} ${data.payload.label}`;
     case "JournalEntry": {
-      console.log(data.payload.id);
-      return `Buchung ${data.payload.id}`;
+      if (data.payload.id && data.payload.id != "Neue Buchung") {
+        return `Buchung ${data.payload.id}`;
+      } else {
+        return "Neue Buchung";
+      }
+      
     }
     default: return "No Title";
   }
 }
 
 const initialJournalEntry: WindowData = {
-    type: "JournalEntry",
-    payload: {
-      id: 1
-    },
-  };
+  type: "JournalEntry",
+  payload: {
+    id: 1
+  },
+};
 
-  const initialWindow: WindowType = {
-    x: 100,
-    y: 100,
-    width: 500,
-    height: 400,
-    title: "Initial Journal Entry",
-    data: initialJournalEntry,
-    zIndex: 1,
-  };
+const initialWindow: WindowType = {
+  x: 100,
+  y: 100,
+  width: 500,
+  height: 400,
+  title: "Initial Journal Entry",
+  data: initialJournalEntry,
+  zIndex: 1,
+};
 
 const WindowManager = () => {
   const [windows, setWindows] = useState<WindowType[]>([]);
@@ -93,7 +97,7 @@ const WindowManager = () => {
   };
 
   const closeWindow = (windowData: WindowData) => {
-    if (windowData.type === "JournalEntry") cancelDraft();
+    //if (windowData.type === "JournalEntry") cancelDraft();
     setWindows((prev) => prev.filter((w) => w.title !== generateTitle(windowData)));
   };
 
@@ -109,7 +113,16 @@ const WindowManager = () => {
 
   return (
     <WindowManagerContext.Provider value={{ openWindow, closeWindow, bringToFront }}>
-      <div className="w-screen h-screen bg-gray-200 relative overflow-hidden">
+      <div className="w-screen p-4 h-screen bg-gray-200 relative overflow-hidden">
+        <button
+          className="bg-green-500 hover:bg-green-700 px-2 py-1 rounded"
+          onClick={() => {openWindow({
+            type: "JournalEntry",
+            payload: {
+              isDraft: true,
+            }
+          })}}>
+          Neuer Buchungssatz</button>
         <div className="flex justify-center p-8">
           <BilanzComponent />
         </div>
@@ -144,8 +157,8 @@ const WindowManager = () => {
               </button>
             </div>
             <div className="p-4 text-sm text-gray-700">
-              {w.data.type === "Account" && <TAccountComponent {...w.data.payload} />}
-              {w.data.type === "JournalEntry" && <JournalEntryForm entryId={w.data.payload.id}/>}
+              {w.data.type === "Account" && <TAccountComponent key={w.data.payload.id} {...w.data.payload} />}
+              {w.data.type === "JournalEntry" && <JournalEntryForm key={w.data.payload.id ?? "new"} entryId={w.data.payload.id} isDraft={w.data.payload.isDraft}/>}
             </div>
           </Rnd>
         ))}

@@ -7,7 +7,7 @@
     "properties": {
         "id": {
             "type": "string",
-            "format": "^[0-9{4}$"
+            "format": "^[0-9]{4}$"
         },
         "label": {
             "type": "string"

@@ -8,6 +8,8 @@ export const BookingsListComponent: React.FC<EntryLinesProps> = ({
 
     const { openWindow } = useWindowManager()
 
+    console.log("lines changes: ", lines);
+
     return (
         <table className="w-full border-collapse">
             <thead>
@@ -18,10 +20,10 @@ export const BookingsListComponent: React.FC<EntryLinesProps> = ({
                 </tr>
             </thead>
             <tbody>
-                {lines.map((l) => (
+                {lines.map((l, index) => (
                     <tr
                         className="cursor-pointer align-top border-t boder-solid transition-all duration-100 hover:scale-95"
-                        key={l.entryId}
+                        key={index}
                         onClick={() => openWindow({ type: "JournalEntry", payload: { id: l.entryId } })}
                     >
                         <td className="whitespace-nowrap border-r border-solid">{l.entryId}</td>

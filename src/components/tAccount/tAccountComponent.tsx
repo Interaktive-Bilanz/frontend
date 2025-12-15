@@ -29,9 +29,16 @@ export const TAccountComponent: React.FC<TAccountProps> = ({
     const lines: EntryLinesProps["lines"] = journalEntries
         ?.flatMap(entry => {
 
-            const originalLine = entry.entryLines.find(line => line.accountId === accountId);
+            const isDraft = entry === draftEntry;
 
-            if (originalLine) return [{ entryId: entry.id!, line: originalLine }];
+            const matchingLine = entry.entryLines.find(line => line.accountId === accountId);
+
+            if (matchingLine) return [{
+                entryId: entry.id!,
+                description: entry.description,
+                line: matchingLine,
+                draft: isDraft
+            }];
             return [];
         }) ?? [];
 
@@ -53,12 +60,10 @@ export const TAccountComponent: React.FC<TAccountProps> = ({
             </div>
             <div className="grid grid-cols-2 border-t-4 border-solid border-black">
                 <div className="pr-1 border-r-2 border-solid border-black w-full pb-1">
-                    <BookingsListComponent lines={debitLines} />
-                    <span>id n+1 _____ _____</span>
+                    <BookingsListComponent lines={debitLines} accountId={accountId} type="debit" />
                 </div>
                 <div className="pl-1 border-l-2 border-solid border-black w-full pb-1">
-                    <BookingsListComponent lines={creditLines} />
-                    <span>id n+1 _____ _____</span>
+                    <BookingsListComponent lines={creditLines} accountId={accountId} type="credit" />
                 </div>
             </div>
             <div className="grid grid-cols-2 border-t-2 border-solid border-gray-300 -mt-1">

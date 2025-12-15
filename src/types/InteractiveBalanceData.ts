@@ -52,6 +52,7 @@ export interface Account {
  */
 export interface JournalEntry {
   id: number;
+  description: string;
   entryLines: EntryLine[];
 }
 export interface EntryLine {

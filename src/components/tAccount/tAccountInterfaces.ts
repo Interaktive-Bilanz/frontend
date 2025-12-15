@@ -22,10 +22,14 @@ export interface TAccountProps {
 }
 
 export interface EntryLinesProps {
+  accountId: string;
   lines: {
     entryId: number,
-    line: EntryLine
+    description: string,
+    line: EntryLine,
+    draft: boolean
   }[];
+  type: "credit" | "debit";
 }
 
 export interface BookingsListProps {

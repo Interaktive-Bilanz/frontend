@@ -15,8 +15,10 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
     const { openWindow, closeWindow } = useWindowManager();
     const [selectedDebitAccount, setSelectedDebitAccount] = useState("");
     const [selectedCreditAccount, setSelectedCreditAccount] = useState("");
-    const [newLineAmount, setNewLineAmount] = useState("");
-    const amountAsNumber = Number(newLineAmount);
+    const [newDebitLineAmount, setNewDebitLineAmount] = useState("");
+    const [newCreditLineAmount, setNewCreditLineAmount] = useState("");
+    const debitAmountAsNumber = Number(newDebitLineAmount);
+    const creditAmountAsNumber = Number(newCreditLineAmount);
 
 
     const originalEntry = interactiveBalanceData.journalEntries?.find(e => e.id === entryId) ?? null;
@@ -38,7 +40,8 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
 
         setDraftEntry({
             id: newId,
-            entryLines: [],
+            description: "",
+            entryLines: []
         });
     }, [isDraft, draftEntry, interactiveBalanceData.journalEntries, setDraftEntry])
 
@@ -52,6 +55,7 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
     }
 
     const currentEntry = isDraft ? draftEntry! : originalEntry!;
+
     const removeLine = (accountId: string) => {
         if (!draftEntry?.entryLines) return;
         setDraftEntry({
@@ -63,6 +67,10 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
     const addLine = (accountId: string, amount: number, entryType: "credit" | "debit") => {
         if (!draftEntry) return;
 
+        const account = interactiveBalanceData.accounts.find(a => a.id === accountId);
+
+        if (!account || amount <= 0) return;
+
         setDraftEntry(prev => ({
             ...prev!,
             entryLines: [...(prev!.entryLines ?? []), {
@@ -73,14 +81,23 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
         }
         ));
 
-        const account = interactiveBalanceData.accounts.find(a => a.id === accountId);
-
         openWindow({
             type: "Account", payload: {
                 id: account?.id,
                 label: account?.label
             }
-        })
+        });
+
+        switch (entryType) {
+            case "credit":
+                setSelectedCreditAccount("");
+                setNewCreditLineAmount("");
+                break;
+            case "debit":
+                setSelectedDebitAccount("");
+                setNewDebitLineAmount("");
+                break;
+        }
     }
 
     const handelCancel = () => {
@@ -138,7 +155,21 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
 
     return (
         <div className="max-w-2xl mx-auto my-2 rounded bg-white text-sm">
-            <div className="flex gap-4">
+            {isDraft &&
+                <textarea
+                    name="description"
+                    className="border w-full min-h-12"
+                    value={currentEntry?.description ?? ""}
+                    onChange={e =>
+                        setDraftEntry(prev =>
+                            prev
+                                ? { ...prev, description: e.target.value }
+                                : prev)} />
+            }
+            {!isDraft &&
+                <span className="text-lg">{currentEntry.description}</span>
+            }
+            <div className="flex gap-4 pt-4">
                 {/* Soll-Konten Table */}
                 <div className="flex-1">
                     <div className="flex items-center mb-1">
@@ -148,66 +179,67 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
                     <table className="w-full table-fixed border divide-y text-xs">
                         <thead className="bg-yellow-50">
                             <tr>
-                                <th className="w-3/5 px-1 py-0.5 text-left">Konto</th>
-                                <th className="w-1/5 px-1 py-0.5 text-left">Betrag</th>
-                                <th className="w-1/5" />
+                                <th className="w-[50%] px-1 py-0.5 text-left">Konto</th>
+                                <th className="w-[35%] px-1 py-0.5 text-left">Betrag</th>
+                                <th className="w-[15%]" />
                             </tr>
                         </thead>
                         <tbody>
                             {debitLines.map((e, i) => {
                                 const account = interactiveBalanceData.accounts.find(a => a.id === e.accountId);
                                 return (
-                                    <tr className="cursor-pointer transition-all duration-100 hover:scale-95"
+                                    <tr className="cursor-pointer transition-all border duration-100 hover:scale-95"
                                         onClick={() => openWindow({
                                             type: "Account", payload: { id: account?.id, label: account?.label }
                                         })}>
                                         <td className="px-1 py-0.5">{e.accountId} {account?.label}</td>
-                                        <td className="px-1 py-0.5">{e.amount}</td>
+                                        <td className="px-1 py-0.5">{e.amount} €</td>
                                         {isDraft &&
-                                        <td className="px-1 py-0.5 text-center">
-                                            <button className="px-2 py-0.5 rounded bg-red-100 hover:bg-red-200 text-xs"
-                                                onClick={() => removeLine(e.accountId)}>-</button>
-                                        </td>
+                                            <td className="px-1 py-0.5 text-center">
+                                                <button className="px-2 py-0.5 rounded bg-red-100 hover:bg-red-200 text-xs"
+                                                    onClick={() => removeLine(e.accountId)}>-</button>
+                                            </td>
                                         }
                                     </tr>
                                 );
                             })}
                             {isDraft &&
-                            <tr>
-                                <td className="px-1 py-0.5">
-                                    <select
-                                        className="w-full text-xs"
-                                        value={selectedDebitAccount}
-                                        onChange={e => setSelectedDebitAccount(e.target.value)}
-                                    >
-                                        <option value="">Konto auswählen</option>
-                                        {interactiveBalanceData.accounts
-                                            .filter(a => !usedAccountIds.has(a.id))
-                                            .map(a => (
-                                                <option key={a.id} value={a.id}>
-                                                    {a.id} {a.label}
-                                                </option>
-                                            ))}
-                                    </select>
-                                </td>
+                                <tr>
+                                    <td className="px-1 py-0.5">
+                                        <select
+                                            className="w-full text-xs"
+                                            value={selectedDebitAccount}
+                                            onChange={e => setSelectedDebitAccount(e.target.value)}
+                                        >
+                                            <option value="">Konto auswählen</option>
+                                            {interactiveBalanceData.accounts
+                                                .filter(a => !usedAccountIds.has(a.id))
+                                                .map(a => (
+                                                    <option key={a.id} value={a.id}>
+                                                        {a.id} {a.label}
+                                                    </option>
+                                                ))}
+                                        </select>
+                                    </td>
 
-                                <td className="px-1 py-0.5">
-                                    <input
-                                        className="w-full text-xs"
-                                        type="text"
-                                        onChange={e => setNewLineAmount(e.target.value)}
-                                    />
-                                </td>
+                                    <td className="px-1 py-0.5">
+                                        <input
+                                            className="w-full border text-xs"
+                                            type="text"
+                                            value={newDebitLineAmount}
+                                            onChange={e => setNewDebitLineAmount(e.target.value)}
+                                        />
+                                    </td>
 
-                                <td className="px-1 py-0.5 text-center">
-                                    <button
-                                        className="px-2 py-0.5 rounded bg-green-100 hover:bg-green-200 text-xs"
-                                        onClick={() => addLine(selectedDebitAccount, amountAsNumber, "debit")}
-                                    >
-                                        +
-                                    </button>
-                                </td>
-                            </tr>
+                                    <td className="px-1 py-0.5 text-center">
+                                        <button
+                                            className="px-2 py-0.5 rounded bg-green-100 hover:bg-green-200 text-xs"
+                                            onClick={() => addLine(selectedDebitAccount, debitAmountAsNumber, "debit")}
+                                        >
+                                            +
+                                        </button>
+                                    </td>
+                                </tr>
                             }
                         </tbody>
                     </table>
@@ -222,21 +254,21 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
                     <table className="w-full table-fixed border divide-y text-xs">
                         <thead className="bg-yellow-50">
                             <tr>
-                                <th className="w-3/5 px-1 py-0.5 text-left">Konto</th>
-                                <th className="w-1/5 px-1 py-0.5 text-left">Betrag</th>
-                                <th className="w-1/5" />
+                                <th className="w-[50%] px-1 py-0.5 text-left">Konto</th>
+                                <th className="w-[35%] px-1 py-0.5 text-left">Betrag</th>
+                                <th className="w-[15%]" />
                             </tr>
                         </thead>
                         <tbody>
                             {creditLines.map((e, i) => {
                                 const account = interactiveBalanceData.accounts.find(a => a.id === e.accountId);
                                 return (
-                                    <tr className="cursor-pointer transition-all duration-100 hover:scale-95"
+                                    <tr className="cursor-pointer border transition-all duration-100 hover:scale-95"
                                         onClick={() => openWindow({
                                             type: "Account", payload: { id: account?.id, label: account?.label }
                                         })}>
                                         <td className="px-1 py-0.5">{e.accountId} {account?.label}</td>
-                                        <td className="px-1 py-0.5">{e.amount}</td>
+                                        <td className="px-1 py-0.5">{e.amount} €</td>
                                         {isDraft &&
                                             <td className="px-1 py-0.5 text-center">
                                                 <button className="px-2 py-0.5 rounded bg-red-100 hover:bg-red-200 text-xs"
@@ -250,41 +282,42 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
                                 );
                             })}
                             {isDraft &&
-                            <tr>
-                                <td className="px-1 py-0.5">
-                                    <select
-                                        className="w-full text-xs"
-                                        value={selectedCreditAccount}
-                                        onChange={e => setSelectedCreditAccount(e.target.value)}
-                                    >
-                                        <option value="">Konto auswählen</option>
-                                        {interactiveBalanceData.accounts
-                                            .filter(a => !usedAccountIds.has(a.id))
-                                            .map(a => (
-                                                <option key={a.id} value={a.id}>
-                                                    {a.id} {a.label}
-                                                </option>
-                                            ))}
-                                    </select>
-                                </td>
+                                <tr>
+                                    <td className="px-1 py-0.5">
+                                        <select
+                                            className="w-full text-xs"
+                                            value={selectedCreditAccount}
+                                            onChange={e => setSelectedCreditAccount(e.target.value)}
+                                        >
+                                            <option value="">Konto auswählen</option>
+                                            {interactiveBalanceData.accounts
+                                                .filter(a => !usedAccountIds.has(a.id))
+                                                .map(a => (
+                                                    <option key={a.id} value={a.id}>
+                                                        {a.id} {a.label}
+                                                    </option>
+                                                ))}
+                                        </select>
+                                    </td>
 
-                                <td className="px-1 py-0.5">
-                                    <input
-                                        className="w-full text-xs"
-                                        type="text"
-                                        onChange={e => setNewLineAmount(e.target.value)}
-                                    />
-                                </td>
+                                    <td className="px-1 py-0.5">
+                                        <input
+                                            className="w-full border text-xs"
+                                            type="text"
+                                            value={newCreditLineAmount}
+                                            onChange={e => setNewCreditLineAmount(e.target.value)}
+                                        />
+                                    </td>
 
-                                <td className="px-1 py-0.5 text-center">
-                                    <button
-                                        className="px-2 py-0.5 rounded bg-green-100 hover:bg-green-200 text-xs"
-                                        onClick={() => addLine(selectedCreditAccount, amountAsNumber, "credit")}
-                                    >
-                                        +
-                                    </button>
-                                </td>
-                            </tr>
+                                    <td className="px-1 py-0.5 text-center">
+                                        <button
+                                            className="px-2 py-0.5 rounded bg-green-100 hover:bg-green-200 text-xs"
+                                            onClick={() => addLine(selectedCreditAccount, creditAmountAsNumber, "credit")}
+                                        >
+                                            +
+                                        </button>
+                                    </td>
+                                </tr>
                             }
                         </tbody>
                     </table>

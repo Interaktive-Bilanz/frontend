@@ -15,6 +15,9 @@ export const BookingsListComponent: React.FC<EntryLinesProps> = ({
     const amountAsNumber = Number(newEntryLineAmount);
 
     const addLine = (amount: number) => {
+
+        if (amount <= 0) return;
+        
         if (!draftEntry) {
             const highestId = (interactiveBalanceData.journalEntries ?? []).reduce(
                 (max, entry) => Math.max(max, entry.id),

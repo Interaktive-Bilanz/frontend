@@ -44,7 +44,9 @@ const BilanzItem: React.FC<{
         className="bg-white hover:bg-blue-100 border border-gray-300 rounded px-2 py-1 w-full text-left"
         onClick={() => setOpen(!open)}
       >
-        {position.label} - Saldo {displaypositionBalance} €
+        <div className="flex justify-between">
+        <div>{position.label}</div> <div>{displaypositionBalance.toFixed(2)} €</div>
+        </div>
       </button>
 
       {open && (
@@ -60,7 +62,9 @@ const BilanzItem: React.FC<{
                 payload: {id: accountId, label: account.label}
               })}
             >
-              {accountId} {account?.label} - Saldo {Math.abs(getAccountTotals(accountTotals, accountId).balance)} €
+              <div className="flex justify-between gap-2">
+              <div>{accountId} {account?.label}</div><div className="text-nowrap">{Math.abs(getAccountTotals(accountTotals, accountId).balance).toFixed(2)} €</div>
+              </div>
             </button>);
           })}
 

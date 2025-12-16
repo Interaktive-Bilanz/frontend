@@ -40,7 +40,7 @@ const BilanzComponent = () => {
           positions={balanceSheet.assets}
         />
         <div className="p-4">
-          <span className={`text-lg font-semibold ${balancesMatch ? 'text-green-600' : 'text-red-600'}`}>Summe {Math.abs(assetsBalanceSum)} €</span>
+          <span className={`text-lg font-semibold ${balancesMatch ? 'text-green-600' : 'text-red-600'}`}>Summe {Math.abs(assetsBalanceSum).toFixed(2)} €</span>
         </div>
       </div>
       <div className="w-1/2">
@@ -49,7 +49,7 @@ const BilanzComponent = () => {
           positions={balanceSheet.liabilitiesAndEquity}
         />
         <div className="p-4">
-          <span className={`text-lg font-semibold ${balancesMatch ? 'text-green-600' : 'text-red-600'}`}>Summe {Math.abs(liabilitiesEquityBalanceSum)} €</span>
+          <span className={`text-lg font-semibold ${balancesMatch ? 'text-green-600' : 'text-red-600'}`}>Summe {Math.abs(liabilitiesEquityBalanceSum).toFixed(2)} €</span>
         </div>
       </div>
     </div>

@@ -11,14 +11,22 @@
     "accounts": {
       "description": "List of all accounts",
       "type": "array",
-      "items": {"$ref": "account.schema.json"}
+      "items": {
+        "$ref": "account.schema.json"
+      }
     },
     "journalEntries": {
       "description": "List of all journal Entries",
       "type": "array",
-      "items": {"$ref": "journal_entry.schema.json"}
+      "items": {
+        "$ref": "journal_entry.schema.json"
+      }
     }
   },
   "additionalProperties": false,
-  "required": ["balanceSheet", "accounts", "journalEntries"]
+  "required": [
+    "balanceSheet",
+    "accounts",
+    "journalEntries"
+  ]
 }

@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "./balance_sheet.schema.json",
+    "$id": "balance_sheet.schema.json",
     "title": "Balance Sheet",
     "description": "The balance sheet holding the structure of accounts, sums and balance",
     "type": "object",
@@ -34,7 +34,7 @@
                     "type": "array",
                     "items": {
                         "type": "string",
-                        "format": "^[0-9{4}$"
+                        "pattern": "^[0-9]{4}$"
                     }
                 },
                 "positions": {

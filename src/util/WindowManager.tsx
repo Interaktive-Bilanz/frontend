@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Rnd } from "react-rnd";
 import BilanzComponent from "../components/bilanz/BilanzComponent";
 import { TAccountComponent } from "../components/tAccount/tAccountComponent";
@@ -7,8 +7,9 @@ import { Account } from "../types/InteractiveBalanceData";
 import Buchungsformular from "../components/buchungssatz/Formular";
 import { WindowManagerContext } from "../context/WindowManagerContext";
 import { JournalEntryForm } from "../components/journalEntry/JournalEntryForm";
+import { FileHandlerComponent } from "../components/fileHandler/FileHandlerComponent";
 
-type WindowContentType = "Account" | "JournalEntry";
+type WindowContentType = "Account" | "JournalEntry" | "FileHandeling";
 
 export interface WindowData {
   type: WindowContentType;
@@ -34,37 +35,33 @@ function generateTitle(data: WindowData) {
       } else {
         return "Neue Buchung";
       }
-      
+
+    }
+    case "FileHandeling": {
+      return "File Handeling";
     }
     default: return "No Title";
   }
 }
 
-const initialJournalEntry: WindowData = {
-  type: "JournalEntry",
-  payload: {
-    id: 1
-  },
-};
-
-const initialWindow: WindowType = {
-  x: 100,
-  y: 100,
-  width: 500,
-  height: 400,
-  title: "Initial Journal Entry",
-  data: initialJournalEntry,
-  zIndex: 1,
-};
-
 const WindowManager = () => {
   const [windows, setWindows] = useState<WindowType[]>([]);
   const [topZ, setTopZ] = useState(1);
   const { cancelDraft } = useInteractiveBalanceData()
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [minHeight, setMinHeight] = useState<number>(0);
+
+  useEffect(() => {
+    if (contentRef.current) {
+      const rect = contentRef.current.getBoundingClientRect();
+      setMinHeight(rect.height); // set min height to current content height
+    }
+  }, [windows]); // run whenever windows array changes or content changes
 
   const maxWindowCounts: Record<WindowContentType, number> = {
     "Account": 3,
     "JournalEntry": 1,
+    "FileHandeling": 1,
   }
 
   const openWindow = (windowData: WindowData) => {
@@ -113,35 +110,50 @@ const WindowManager = () => {
 
   return (
     <WindowManagerContext.Provider value={{ openWindow, closeWindow, bringToFront }}>
-      <div className="w-screen p-4 h-screen bg-gray-200 relative overflow-hidden">
-        <button
-          className="bg-green-500 hover:bg-green-700 px-2 py-1 rounded"
-          onClick={() => {openWindow({
-            type: "JournalEntry",
-            payload: {
-              isDraft: true,
-            }
-          })}}>
-          Neuer Buchungssatz</button>
-        <div className="flex justify-center p-8">
-          <BilanzComponent />
+      <div className="w-screen h-screen bg-gray-200 relative overflow-hidden p-4">
+        {/* Top bar or main content container */}
+        <div className="">
+          {/* Left column: buttons */}
+          <div className="space-x-2 flex-1 flex justify-center">
+            <button
+              className="bg-green-500 hover:bg-green-700 px-2 py-1 rounded w-60"
+              onClick={() =>
+                openWindow({ type: "JournalEntry", payload: { isDraft: true } })
+              }
+            >
+              Neuer Buchungssatz
+            </button>
+            <button
+              className="bg-green-500 hover:bg-green-700 px-2 py-1 rounded w-60"
+              onClick={() =>
+                openWindow({ type: "FileHandeling", payload: {} })
+              }
+            >
+              Up-/Download
+            </button>
+          </div>
+
+          {/* Center column: balance sheet */}
+          <div className="flex-1 flex justify-center items-start p-8">
+            <BilanzComponent />
+          </div>
         </div>
 
+        {/* Floating windows */}
         {windows.map((w) => (
           <Rnd
             key={w.title}
             default={{
               x: w.x,
               y: w.y,
-              width: w.width,
+              width: w.data.type === "FileHandeling" ? "auto" : w.width,
               height: "auto",
             }}
-            minWidth={550}
-            minHeight={400}
+            minWidth={w.data.type === "FileHandeling" ? 400 : 550}
+            minHeight={w.data.type === "FileHandeling" ? 250 : 400}
+            enableResizing={w.data.type !== "FileHandeling"}
             bounds="window"
-            style={{
-              zIndex: w.zIndex,
-            }}
+            style={{ zIndex: w.zIndex }}
             onMouseDown={() => bringToFront(w.data)}
             dragHandleClassName="window-drag-handle"
             cancel=".clickable, button, input, select, textarea"
@@ -157,13 +169,25 @@ const WindowManager = () => {
               </button>
             </div>
             <div className="p-4 text-sm text-gray-700">
-              {w.data.type === "Account" && <TAccountComponent key={w.data.payload.id} {...w.data.payload} />}
-              {w.data.type === "JournalEntry" && <JournalEntryForm key={w.data.payload.id ?? "new"} entryId={w.data.payload.id} isDraft={w.data.payload.isDraft}/>}
+              {w.data.type === "Account" && (
+                <TAccountComponent key={w.data.payload.id} {...w.data.payload} />
+              )}
+              {w.data.type === "JournalEntry" && (
+                <JournalEntryForm
+                  key={w.data.payload.id ?? "new"}
+                  entryId={w.data.payload.id}
+                  isDraft={w.data.payload.isDraft}
+                />
+              )}
+              {w.data.type === "FileHandeling" && (
+                <FileHandlerComponent key={w.data.type} />
+              )}
             </div>
           </Rnd>
         ))}
       </div>
     </WindowManagerContext.Provider>
+
   );
 };
 

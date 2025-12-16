@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "./journal_entry.schema.json",
+    "$id": "journal_entry.schema.json",
     "title": "Journal Entry",
     "description": "A journal entry with at least one debit-line and one credit-line",
     "type": "object",
@@ -31,7 +31,7 @@
             "properties": {
                 "accountId": {
                     "type": "string",
-                    "format": "^[0-9{4}$"
+                    "pattern": "^[0-9]{4}$"
                 },
                 "amount": {
                     "type": "number"

@@ -1,22 +1,22 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "./interactive_balance_data.schema.json",
+  "$id": "interactive_balance_data.schema.json",
   "title": "Interactive Balance Data",
   "description": "Interactive balance data with accounts, journal entries and the balance sheet structure",
   "type": "object",
   "properties": {
     "balanceSheet": {
-      "$ref": "./balance_sheet.schema.json"
+      "$ref": "balance_sheet.schema.json"
     },
     "accounts": {
       "description": "List of all accounts",
       "type": "array",
-      "items": {"$ref": "./account.schema.json"}
+      "items": {"$ref": "account.schema.json"}
     },
     "journalEntries": {
       "description": "List of all journal Entries",
       "type": "array",
-      "items": {"$ref": "./journal_entry.schema.json"}
+      "items": {"$ref": "journal_entry.schema.json"}
     }
   },
   "additionalProperties": false,

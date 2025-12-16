@@ -196,7 +196,7 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
                                         <td className="px-1 py-0.5">{e.amount} €</td>
                                         {isDraft &&
                                             <td className="px-1 py-0.5 text-center">
-                                                <button className="px-2 py-0.5 rounded bg-red-100 hover:bg-red-200 text-xs"
+                                                <button className="px-2 py-0.5 rounded bg-red-100 hover:bg-red-200 text-sm"
                                                     onClick={() => removeLine(e.accountId)}>-</button>
                                             </td>
                                         }
@@ -233,7 +233,7 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
 
                                     <td className="px-1 py-0.5 text-center">
                                         <button
-                                            className="px-2 py-0.5 rounded bg-green-100 hover:bg-green-200 text-xs"
+                                            className="px-2 py-0.5 rounded bg-green-100 hover:bg-green-200 text-sm"
                                             onClick={() => addLine(selectedDebitAccount, debitAmountAsNumber, "debit")}
                                         >
                                             +
@@ -271,7 +271,7 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
                                         <td className="px-1 py-0.5">{e.amount} €</td>
                                         {isDraft &&
                                             <td className="px-1 py-0.5 text-center">
-                                                <button className="px-2 py-0.5 rounded bg-red-100 hover:bg-red-200 text-xs"
+                                                <button className="px-2 py-0.5 rounded bg-red-100 hover:bg-red-200 text-sm"
                                                     onClick={(event) => {
                                                         //event.stopPropagation()
                                                         removeLine(e.accountId);
@@ -311,7 +311,7 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
 
                                     <td className="px-1 py-0.5 text-center">
                                         <button
-                                            className="px-2 py-0.5 rounded bg-green-100 hover:bg-green-200 text-xs"
+                                            className="px-2 py-0.5 rounded bg-green-100 hover:bg-green-200 text-sm"
                                             onClick={() => addLine(selectedCreditAccount, creditAmountAsNumber, "credit")}
                                         >
                                             +

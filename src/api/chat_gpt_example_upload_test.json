@@ -54,7 +54,7 @@
       "description": "Kauf von Maschinen auf Bankkredit",
       "entryLines": [
         { "accountId": "1010", "amount": 30000, "entryType": "debit" },
-        { "accountId": "2100", "amount": 30000, "entryType": "credit" }
+        { "accountId": "5555", "amount": 30000, "entryType": "credit" }
       ]
     },
     {

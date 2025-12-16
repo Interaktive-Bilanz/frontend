@@ -97,7 +97,7 @@ export const BookingsListComponent: React.FC<EntryLinesProps> = ({
                         <td className="whitespace-nowrap text-right border-l border-solid">{l.line.amount.toFixed(2)} €</td>
                         <td>
                             {l.draft &&
-                                <button className="px-2 py-0.5 rounded bg-red-100 hover:bg-red-200 text-xs"
+                                <button className="px-2 py-0.5 rounded bg-red-100 hover:bg-red-200 text-sm"
                                     onClick={() => removeLine()}>-</button>
                             }
                         </td>
@@ -115,7 +115,7 @@ export const BookingsListComponent: React.FC<EntryLinesProps> = ({
                         </td>
                         <td>
                             <button
-                                className="px-2 py-0.5 rounded bg-green-100 hover:bg-green-200 text-xs"
+                                className="px-2 py-0.5 rounded bg-green-100 hover:bg-green-200 text-sm"
                                 onClick={() => addLine(amountAsNumber)}
                             >+</button>
                         </td>

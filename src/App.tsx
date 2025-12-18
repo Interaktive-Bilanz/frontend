@@ -11,6 +11,7 @@ const App = () => {
       <ToastContainer
         position="bottom-right"
         autoClose={ 4000}
+        theme="colored"
       />
       <Workspace>
         <WindowManager></WindowManager>

@@ -1,16 +1,26 @@
 import React, { useState } from "react";
 import { useInteractiveBalanceData } from "../../context/InteractiveBalanceDataContext";
 import { validateJson } from "../../util/validateJson";
+import WindowManager from "../../util/WindowManager";
+import { useWindowManager, WindowManagerContext } from "../../context/WindowManagerContext";
+import { toast } from 'react-toastify';
 
 export function FileHandlerComponent() {
     const { interactiveBalanceData, setInteractiveBalanceData } = useInteractiveBalanceData();
     const [uploadedFile, setUploadedFile] = useState<File | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const { closeAllWindowsExcept } = useWindowManager();
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setErrorMessage(null);
         if (!e.target.files?.[0]) {
             setErrorMessage("Keine Datei gefunden");
+            toast.error(
+                <>
+                    Upload fehlgeschlagen <br />
+                    Keine Datei gefunden
+                </>
+            );
             return;
         };
         setUploadedFile(e.target.files[0]);
@@ -27,6 +37,12 @@ export function FileHandlerComponent() {
             const fileContent = e.target?.result?.toString();
             if (!fileContent) {
                 setErrorMessage("Keine Datei gefunden");
+                toast.error(
+                    <>
+                        Upload fehlgeschlagen <br />
+                        Keine Datei gefunden
+                    </>
+                );
                 return;
             };
 
@@ -36,6 +52,12 @@ export function FileHandlerComponent() {
             } catch (err) {
                 console.error("Invalid JSON:", err);
                 setErrorMessage("Fehler beim Parsing des JSON-String");
+                toast.error(
+                    <>
+                        Upload fehlgeschlagen <br />
+                        Fehler beim Parsing des JSON-String
+                    </>
+                );
                 return;
             }
 
@@ -43,11 +65,29 @@ export function FileHandlerComponent() {
             if (!objectValid) {
                 console.error("Validation errors:", validateJson.errors);
                 setErrorMessage("JSON-Format ist nicht zulässig");
+                toast.error(
+                    <div>
+                        Upload fehlgeschlagen <br />
+                        Format nicht zulässig <br />
+                        {/* <ul>
+                            {validateJson.errors?.map((err, i) => (
+                                <li key={i}>{err.message}</li>
+                            ))}
+                        </ul> */}
+                    </div>
+                );
                 return;
             }
 
             setInteractiveBalanceData(projectObject);
+
+            closeAllWindowsExcept({
+                type: "FileHandeling",
+                payload: {}
+            });
+
             console.log("Successfully loaded project:", projectObject);
+            toast.success("Upload erfolgreich!");
         };
     };
 
@@ -67,6 +107,7 @@ export function FileHandlerComponent() {
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
+        toast.success("Downsload erfolgreich!");
     }
 
     return (

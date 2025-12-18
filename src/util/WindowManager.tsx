@@ -94,9 +94,18 @@ const WindowManager = () => {
   };
 
   const closeWindow = (windowData: WindowData) => {
+
     //if (windowData.type === "JournalEntry") cancelDraft();
     setWindows((prev) => prev.filter((w) => w.title !== generateTitle(windowData)));
   };
+
+  const closeAllWindowsExcept = (windowData: WindowData | null) => {
+    if (windowData) {
+      setWindows((prev) => prev.filter((w) => w.title === generateTitle(windowData)));
+    } else {
+      setWindows([]);
+    }
+  }
 
   const bringToFront = (windowData: WindowData) => {
     setWindows(prev => {
@@ -109,7 +118,7 @@ const WindowManager = () => {
   };
 
   return (
-    <WindowManagerContext.Provider value={{ openWindow, closeWindow, bringToFront }}>
+    <WindowManagerContext.Provider value={{ openWindow, closeWindow, closeAllWindowsExcept, bringToFront }}>
       <div className="w-screen h-screen bg-gray-200 relative overflow-hidden p-4">
         {/* Top bar or main content container */}
         <div className="">

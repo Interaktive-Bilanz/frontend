@@ -4,6 +4,7 @@ import { WindowData } from "../util/WindowManager";
 interface WindowManagerContextType {
     openWindow: (data: WindowData) => void;
     closeWindow: (data: WindowData) => void;
+    closeAllWindowsExcept: (data: WindowData | null) => void;
     bringToFront: (data: WindowData) => void;
 }
 

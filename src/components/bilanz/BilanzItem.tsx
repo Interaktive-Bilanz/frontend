@@ -4,8 +4,8 @@ import { useInteractiveBalanceData } from "../../context/InteractiveBalanceDataC
 import { useWindowManager } from "../../context/WindowManagerContext";
 import { AccountTotal, getAccountTotals } from "../../util/balanceCalculations";
 
-export function calculatePositionSaldo (
-  position:Position,
+export function calculatePositionSaldo(
+  position: Position,
   accountTotals: Record<string, AccountTotal>
 ): number {
   let sum = 0;
@@ -45,7 +45,7 @@ const BilanzItem: React.FC<{
         onClick={() => setOpen(!open)}
       >
         <div className="flex justify-between">
-        <div>{position.label}</div> <div>{displaypositionBalance.toFixed(2)} €</div>
+          <div>{position.label}</div> <div>{displaypositionBalance.toFixed(2)} €</div>
         </div>
       </button>
 
@@ -57,14 +57,36 @@ const BilanzItem: React.FC<{
             return (<button
               key={i}
               className="mt-1 bg-green-100 hover:bg-green-400 border border-gray-300 rounded px-2 py-1 w-full text-left"
+              lang="de"
               onClick={() => openWindow({
                 type: "Account",
-                payload: {id: accountId, label: account.label}
+                payload: { id: accountId, label: account.label }
               })}
             >
-              <div className="flex justify-between gap-2">
-              <div>{accountId} {account?.label}</div><div className="text-nowrap">{Math.abs(getAccountTotals(accountTotals, accountId).balance).toFixed(2)} €</div>
+              <div className="grid grid-cols-[1fr_auto] gap-2 items-start">
+                <div
+                  lang="de"
+                  className="min-w-0 hyphens-auto"
+                >
+                  <span className="break-words">
+                    {accountId} {account?.label}
+                  </span>
+                  {/* <span className="inline-flex flex-wrap items-baseline">
+                    <span className="whitespace-nowrap mr-1">
+                      {accountId}
+                    </span>
+
+                    <span className="break-words">
+                      {account?.label}
+                    </span>
+                  </span> */}
+                </div>
+
+                <div className="text-nowrap">
+                  {Math.abs(getAccountTotals(accountTotals, accountId).balance).toFixed(2)} €
+                </div>
               </div>
+
             </button>);
           })}
 

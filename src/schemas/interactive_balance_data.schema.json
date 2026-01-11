@@ -1,10 +1,14 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "interactive_balance_data.schema.json",
+  "version": "1.0.0",
   "title": "Interactive Balance Data",
   "description": "Interactive balance data with accounts, journal entries and the balance sheet structure",
   "type": "object",
   "properties": {
+    "schemaVersion": {
+            "type": "string"
+        },
     "balanceSheet": {
       "$ref": "balance_sheet.schema.json"
     },

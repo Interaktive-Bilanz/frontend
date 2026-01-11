@@ -1,6 +1,7 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "balance_sheet.schema.json",
+    "version": "1.0.0",
     "title": "Balance Sheet",
     "description": "The balance sheet holding the structure of accounts, sums and balance",
     "type": "object",

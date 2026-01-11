@@ -3,6 +3,7 @@ import { Position } from "../../types/InteractiveBalanceData";
 import { useInteractiveBalanceData } from "../../context/InteractiveBalanceDataContext";
 import { useWindowManager } from "../../context/WindowManagerContext";
 import { AccountTotal, getAccountTotals } from "../../util/balanceCalculations";
+import { useTeacherMode } from "../../context/TeacherModeContext";
 
 export function calculatePositionSaldo(
   position: Position,
@@ -37,6 +38,8 @@ const BilanzItem: React.FC<{
 
   const displaypositionBalance = Math.abs(positionBalance);
 
+  const { teacherMode } = useTeacherMode();
+
 
   return (
     <div className={`ml-${level} mt-1`}>
@@ -51,6 +54,16 @@ const BilanzItem: React.FC<{
 
       {open && (
         <div className="ml-4">
+          {teacherMode &&
+            <div className="flex">
+              <button className="bg-green-500 hover:bg-green-700 px-1 py-1 mt-1 mr-1 rounded mt">
+                + Position
+              </button>
+              <button className="bg-green-500 hover:bg-green-700 px-1 py-1  mt-1 mr-1 rounded">
+                + Konto
+              </button>
+            </div>
+          }
           {position.accounts?.map((accountId, i) => {
             const account = accounts.find(a => a.id === accountId)
             if (!account) return;

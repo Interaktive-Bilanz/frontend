@@ -9,6 +9,7 @@
  * Interactive balance data with accounts, journal entries and the balance sheet structure
  */
 export interface InteractiveBalanceData {
+  schemaVersion?: string;
   balanceSheet: BalanceSheet;
   /**
    * List of all accounts

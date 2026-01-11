@@ -16,7 +16,7 @@ const App = () => {
           theme="colored"
         />
         <Workspace>
-          <WindowManager></WindowManager>
+          <WindowManager/>
         </Workspace>
       </InteractiveBalanceDataProvider>
     </TeacherModeProvider>

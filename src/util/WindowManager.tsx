@@ -10,9 +10,7 @@ import { JournalEntryForm } from "../components/journalEntry/JournalEntryForm";
 import { FileHandlerComponent } from "../components/fileHandler/FileHandlerComponent";
 import { useTeacherMode } from "../context/TeacherModeContext";
 import { toast } from "react-toastify";
-import CodeMirror from "@uiw/react-codemirror";
-import { json } from "@codemirror/lang-json";
-import { validateJson } from "./validateJson";
+import JsonEditor from "../components/bilanz/JsonEditorComponent";
 
 type WindowContentType = "Account" | "JournalEntry" | "FileHandeling";
 
@@ -57,7 +55,6 @@ const WindowManager = () => {
   const [minHeight, setMinHeight] = useState<number>(0);
   const { teacherMode } = useTeacherMode();
   const { interactiveBalanceData, setInteractiveBalanceData } = useInteractiveBalanceData();
-  const [teacherModeDraft, setTeacherModeDraft] = useState(JSON.stringify(interactiveBalanceData, null, 4));
 
   useEffect(() => {
     if (contentRef.current) {
@@ -65,29 +62,6 @@ const WindowManager = () => {
       setMinHeight(rect.height); // set min height to current content height
     }
   }, [windows]); // run whenever windows array changes or content changes
-
-  useEffect(() => {
-    if (teacherMode) {
-      try {
-        const parsedJson: unknown = JSON.parse(teacherModeDraft);
-
-        //console.log("parsed");
-
-        const isValid = validateJson(parsedJson);
-        if (!isValid) return;
-
-        //console.log("valid");
-
-        // NOW we can safely assert the type
-        setInteractiveBalanceData(parsedJson as unknown as InteractiveBalanceData);
-        //toast.success("Änderung erfolgreich")
-        //console.log("success");
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-  }, [teacherModeDraft])
 
   const maxWindowCounts: Record<WindowContentType, number> = {
     "Account": 3,
@@ -177,15 +151,8 @@ const WindowManager = () => {
           <div className={"flex-1 flex items-start p-8 h-full " + (teacherMode ? "justify-evenly" : "justify-center")}>
             <BilanzComponent />
             {teacherMode &&
-              <div className="w-1/2">
-                <CodeMirror
-                  value={teacherModeDraft}
-                  height="90vh"
-                  width="full"
-                  extensions={[json()]}
-                  onChange={(value) => setTeacherModeDraft(value)}
-                  theme="light"
-                />
+              <div className="w-1/2 h-90vh">
+                <JsonEditor/>
               </div>
             }
           </div>

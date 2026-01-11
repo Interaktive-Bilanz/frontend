@@ -12,12 +12,11 @@ export const TeacherModeProvider: React.FC<{ children: React.ReactNode }> = ({ c
     const [teacherMode, setTeacherMode] = useState(false);
 
     const toggleTeacherMode = useCallback(() => {
-        setTeacherMode(prev => {
-            const next = !prev;
-            toast(next ? "Teacher mode enabled" : "Teacher mode disabled");
-            return next;
-        });
-    }, []);
+        const newValue = !teacherMode;
+        setTeacherMode(newValue);
+        toast(newValue ? "Teacher mode enabled" : "Teacher mode disabled");
+        return newValue;
+    }, [teacherMode]);
 
     useEffect(() => {
         const handler = (e: KeyboardEvent) => {

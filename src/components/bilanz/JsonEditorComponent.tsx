@@ -1,12 +1,14 @@
 import CodeMirror from "@uiw/react-codemirror";
+import { EditorView } from "@uiw/react-codemirror";
 import { json } from "@codemirror/lang-json";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { indentUnit } from "@codemirror/language";
 import { useInteractiveBalanceData } from "../../context/InteractiveBalanceDataContext";
 import { validateJson } from "../../util/validateJson";
 import { InteractiveBalanceData } from "../../types/InteractiveBalanceData";
 import { useDebounce } from "../../hooks/useDebounce";
+import { ensurePositionIds } from "../../util/addIdsToPositions";
 
 const JsonEditor = () => {
     const { interactiveBalanceData, setInteractiveBalanceData } = useInteractiveBalanceData();
@@ -15,6 +17,7 @@ const JsonEditor = () => {
     const [editorKey, setEditorKey] = useState(0);
     const debouncedEditorValue = useDebounce(editorValue, 500);
     const [validationState, setValidationState] = useState<'valid' | 'invalid-json' | 'invalid-schema'>('valid');
+
 
     // reload editor value on external change of interactiveBalanceData
     useEffect(() => {
@@ -42,7 +45,8 @@ const JsonEditor = () => {
             const isValid = validateJson(parsedEditorValue);
 
             if (isValid) {
-                setInteractiveBalanceData(parsedEditorValue as unknown as InteractiveBalanceData);
+                const dataWithIds = ensurePositionIds(parsedEditorValue as unknown as InteractiveBalanceData);
+                setInteractiveBalanceData(dataWithIds);
                 setValidationState('valid');
             } else {
                 setValidationState('invalid-schema');

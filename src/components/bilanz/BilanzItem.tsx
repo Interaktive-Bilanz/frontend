@@ -4,6 +4,7 @@ import { useInteractiveBalanceData } from "../../context/InteractiveBalanceDataC
 import { useWindowManager } from "../../context/WindowManagerContext";
 import { AccountTotal, getAccountTotals } from "../../util/balanceCalculations";
 import { useTeacherMode } from "../../context/TeacherModeContext";
+import { v4 as uuidv4 } from "uuid";
 
 export function calculatePositionSaldo(
   position: Position,
@@ -28,7 +29,7 @@ const BilanzItem: React.FC<{
 }> = ({ position, level = 0 }) => {
   const [open, setOpen] = useState(false);
 
-  const { interactiveBalanceData, accountTotals } = useInteractiveBalanceData();
+  const { interactiveBalanceData, setInteractiveBalanceData, updatePositionLabel, addNewPositionTo, accountTotals, addNewAccountTo } = useInteractiveBalanceData();
 
   const accounts = interactiveBalanceData.accounts;
 
@@ -40,67 +41,151 @@ const BilanzItem: React.FC<{
 
   const { teacherMode } = useTeacherMode();
 
+  const [editLabel, setEditLabel] = useState(false);
+  const [labelDraft, setLabelDraft] = useState(position.label);
+  const [newAccountId, setNewAccountId] = useState("")
+
 
   return (
     <div className={`ml-${level} mt-1`}>
-      <button
-        className="bg-white hover:bg-blue-100 border border-gray-300 rounded px-2 py-1 w-full text-left"
-        onClick={() => setOpen(!open)}
-      >
-        <div className="flex justify-between">
-          <div>{position.label}</div> <div>{displaypositionBalance.toFixed(2)} €</div>
+      <div className="flex">
+        <div
+          role="button"
+          tabIndex={0}
+          className="bg-white hover:bg-blue-100 border border-gray-300 rounded px-2 py-1 w-full text-left cursor-pointer"
+          onClick={() => setOpen(!open)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              setOpen(!open);
+            }
+          }}
+        >
+          <div className="flex justify-between items-center">
+            {editLabel ?
+              <div className="min-w-0 hyphens-auto flex-1">
+                <input
+                  type="text"
+                  className="h-5 px-1 text-sm border border-gray-300 rounded box-border"
+                  value={labelDraft}
+                  onClick={(e) => e.stopPropagation()}
+                  onChange={(e) => {
+                    setLabelDraft(e.target.value);
+                  }} />
+              </div> :
+              <div className="min-w-0 hyphens-auto flex-1">{position.label}</div>
+
+            }
+            {teacherMode &&
+              <div>
+                {editLabel ?
+                  <button className="bg-transparent hover:bg-gray-100 mr-1 px-1 py-1 rounded" onClick={(e) => {
+                    e.stopPropagation();
+                    updatePositionLabel(String(position.id), labelDraft)
+                    setEditLabel(false);
+                  }}>&#x2705;</button> :
+                  <button className="bg-transparent hover:bg-gray-100 mr-1 px-1 py-1 rounded" onClick={(e) => {
+                    e.stopPropagation();
+                    setEditLabel(true);
+                  }}>&#x270E;</button>
+                }
+                <button className="bg-transparent hover:bg-gray-100 mr-1 px-1 py-1 rounded" onClick={(e) => {
+                  e.stopPropagation();
+                }}>&#x274C;</button>
+              </div>
+            }
+            <div className="text-nowrap whitespace-nowrap ml-2">{displaypositionBalance.toFixed(2)} €</div>
+          </div>
         </div>
-      </button>
+      </div >
+
+
 
       {open && (
         <div className="ml-4">
           {teacherMode &&
             <div className="flex">
-              <button className="bg-green-500 hover:bg-green-700 px-1 py-1 mt-1 mr-1 rounded mt">
+              <button
+                className="bg-green-500 hover:bg-green-700 px-1 py-1 mt-1 mr-1 rounded"
+                onClick={(e) => addNewPositionTo(String(position.id))}>
                 + Position
               </button>
-              <button className="bg-green-500 hover:bg-green-700 px-1 py-1  mt-1 mr-1 rounded">
-                + Konto
-              </button>
+              <div
+                role="button"
+                tabIndex={0}
+                className="flex items-center bg-green-500 hover:bg-green-700 px-1 py-1 mt-1 mr-1 rounded gap-1"
+                onClick={() => addNewAccountTo(String(position.id), newAccountId)}
+              >
+                <span>+ Konto</span>
+
+                <select
+                  className="h-5 w-20 text-sm rounded"
+                  onClick={(e) => e.stopPropagation()}
+                  onChange={(e) => {
+                    setNewAccountId(e.target.value);
+                  }}>
+                  {accounts.map((a) => (
+                    <option value={a.id}>{a.id} {a.label}</option>
+                  )
+                  )}
+                </select>
+              </div>
+              {/* <button
+                className="bg-green-500 hover:bg-green-700 px-1 py-1 mt-1 mr-1 rounded"
+                onClick={() => addNewAccountTo(String(position.id), newAccountId)}>
+                <div className="flex items-center">
+                  + Konto
+                  <select name="" id=""></select>
+                  <input
+                    value={newAccountId}
+                    type="text"
+                    size={4}
+                    maxLength={4}
+                    placeholder="1234"
+                    pattern="[0-9]{4}"
+                    className="ml-1 h-5 px-1 text-sm border border-gray-300 rounded box-border text-center"
+                    onClick={(e) => e.stopPropagation()}
+                    onChange={(e) => {
+                      const value = e.target.value.replace('/[^0-9]/g', '');
+                      if (value.length <= 4) setNewAccountId(value);
+                    }}
+                  />
+                </div>
+              </button> */}
             </div>
           }
           {position.accounts?.map((accountId, i) => {
             const account = accounts.find(a => a.id === accountId)
             if (!account) return;
-            return (<button
-              key={i}
-              className="mt-1 bg-green-100 hover:bg-green-400 border border-gray-300 rounded px-2 py-1 w-full text-left"
-              lang="de"
-              onClick={() => openWindow({
-                type: "Account",
-                payload: { id: accountId, label: account.label }
-              })}
-            >
-              <div className="grid grid-cols-[1fr_auto] gap-2 items-start">
-                <div
+            return (
+              <div className="flex">
+                <button
+                  key={i}
+                  className="mt-1 bg-green-100 hover:bg-green-400 border border-gray-300 rounded px-2 py-1 w-full text-left"
                   lang="de"
-                  className="min-w-0 hyphens-auto"
+                  onClick={() => openWindow({
+                    type: "Account",
+                    payload: { id: accountId, label: account.label }
+                  })}
                 >
-                  <span className="break-words">
-                    {accountId} {account?.label}
-                  </span>
-                  {/* <span className="inline-flex flex-wrap items-baseline">
-                    <span className="whitespace-nowrap mr-1">
-                      {accountId}
+                  <div className="flex justify-between items-center">
+                    <div
+                      lang="de"
+                      className="min-w-0 hyphens-auto break-words"
+                    >
+                      {accountId} {account?.label}
+                    </div>
+                    {teacherMode &&
+                      <button className="bg-transparent hover:bg-gray-100 mr-1 px-1 py-1 rounded" onClick={(e) => {
+                        e.stopPropagation();
+                      }}>&#x274C;</button>}
+                    <span className="text-nowrap whitespace-nowrap">
+                      {Math.abs(getAccountTotals(accountTotals, accountId).balance).toFixed(2)} €
                     </span>
+                  </div>
 
-                    <span className="break-words">
-                      {account?.label}
-                    </span>
-                  </span> */}
-                </div>
-
-                <div className="text-nowrap">
-                  {Math.abs(getAccountTotals(accountTotals, accountId).balance).toFixed(2)} €
-                </div>
-              </div>
-
-            </button>);
+                </button>
+              </div>);
           })}
 
           {position.positions?.map((child, i) => (
@@ -112,7 +197,7 @@ const BilanzItem: React.FC<{
           ))}
         </div>
       )}
-    </div>
+    </div >
   );
 };
 

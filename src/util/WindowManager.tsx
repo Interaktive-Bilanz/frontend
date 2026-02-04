@@ -148,7 +148,7 @@ const WindowManager = () => {
           </div>
 
           {/* Center column: balance sheet */}
-          <div className={"flex-1 flex items-start p-8 h-full " + (teacherMode ? "justify-evenly" : "justify-center")}>
+          <div className={"flex-1 flex items-start p-8 h-full " + (teacherMode ? "justify-evenly gap-4" : "justify-center")}>
             <BilanzComponent />
             {teacherMode &&
               <div className="w-1/2 h-90vh">

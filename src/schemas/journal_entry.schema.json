@@ -1,7 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "journal_entry.schema.json",
-    "version": "1.0.0",
     "title": "Journal Entry",
     "description": "A journal entry with at least one debit-line and one credit-line",
     "type": "object",

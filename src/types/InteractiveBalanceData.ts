@@ -27,13 +27,28 @@ export interface BalanceSheet {
   /**
    * List of all positions and accounts on the assets side
    */
-  assets: Position[];
+  assets: {
+    /**
+     * List of account ids directly assigned to this position
+     */
+    accounts?: string[];
+    positions?: Position[];
+    [k: string]: unknown;
+  };
   /**
    * List of all positions and accounts on the liabilities and equity side
    */
-  liabilitiesAndEquity: Position[];
+  liabilitiesAndEquity: {
+    /**
+     * List of account ids directly assigned to this position
+     */
+    accounts?: string[];
+    positions?: Position[];
+    [k: string]: unknown;
+  };
 }
 export interface Position {
+  id?: string;
   label: string;
   /**
    * List of account ids directly assigned to this position

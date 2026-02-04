@@ -1,84 +1,167 @@
 {
   "balanceSheet": {
-    "assets": [
-      {
-        "label": "Anlagevermögen",
-        "accounts": ["1000", "1010"],
-        "positions": []
-      },
-      {
-        "label": "Umlaufvermögen",
-        "accounts": ["1200", "1210"],
-        "positions": []
-      },
-      {
-        "label": "Liquide Mittel",
-        "accounts": ["1400"],
-        "positions": []
-      }
-    ],
-    "liabilitiesAndEquity": [
-      {
-        "label": "Eigenkapital",
-        "accounts": ["2000"],
-        "positions": []
-      },
-      {
-        "label": "Fremdkapital",
-        "accounts": ["2100", "2200"],
-        "positions": []
-      }
-    ]
+    "assets": {
+      "positions": [
+        {
+          "label": "Anlagevermögen",
+          "accounts": [
+            "1000",
+            "1010"
+          ],
+          "positions": []
+        },
+        {
+          "label": "Umlaufvermögen",
+          "accounts": [
+            "1200",
+            "1210"
+          ],
+          "positions": []
+        },
+        {
+          "label": "Liquide Mittel",
+          "accounts": [
+            "1400"
+          ],
+          "positions": []
+        }
+      ],
+      "accounts": []
+    },
+    "liabilitiesAndEquity": {
+      "positions": [
+        {
+          "label": "Eigenkapital",
+          "accounts": [
+            "2000"
+          ],
+          "positions": []
+        },
+        {
+          "label": "Fremdkapital",
+          "accounts": [
+            "2100",
+            "2200"
+          ],
+          "positions": []
+        }
+      ],
+      "accounts": []
+    }
   },
   "accounts": [
-    { "id": "1000", "label": "Grundstücke und Gebäude" },
-    { "id": "1010", "label": "Maschinen und Anlagen" },
-    { "id": "1200", "label": "Forderungen aus Lieferungen und Leistungen" },
-    { "id": "1210", "label": "Vorräte" },
-    { "id": "1400", "label": "Bankguthaben" },
-    { "id": "2000", "label": "Eigenkapital" },
-    { "id": "2100", "label": "Verbindlichkeiten gegenüber Banken" },
-    { "id": "2200", "label": "Lieferantenverbindlichkeiten" }
+    {
+      "id": "1000",
+      "label": "Grundstücke und Gebäude"
+    },
+    {
+      "id": "1010",
+      "label": "Maschinen und Anlagen"
+    },
+    {
+      "id": "1200",
+      "label": "Forderungen aus Lieferungen und Leistungen"
+    },
+    {
+      "id": "1210",
+      "label": "Vorräte"
+    },
+    {
+      "id": "1400",
+      "label": "Bankguthaben"
+    },
+    {
+      "id": "2000",
+      "label": "Eigenkapital"
+    },
+    {
+      "id": "2100",
+      "label": "Verbindlichkeiten gegenüber Banken"
+    },
+    {
+      "id": "2200",
+      "label": "Lieferantenverbindlichkeiten"
+    }
   ],
   "journalEntries": [
     {
       "id": 1,
       "description": "Einlage des Gesellschafters zur Finanzierung von Grundstücken",
       "entryLines": [
-        { "accountId": "1000", "amount": 50000, "entryType": "debit" },
-        { "accountId": "2000", "amount": 50000, "entryType": "credit" }
+        {
+          "accountId": "1000",
+          "amount": 50000,
+          "entryType": "debit"
+        },
+        {
+          "accountId": "2000",
+          "amount": 50000,
+          "entryType": "credit"
+        }
       ]
     },
     {
       "id": 2,
       "description": "Kauf von Maschinen auf Bankkredit",
       "entryLines": [
-        { "accountId": "1010", "amount": 30000, "entryType": "debit" },
-        { "accountId": "2100", "amount": 30000, "entryType": "credit" }
+        {
+          "accountId": "1010",
+          "amount": 30000,
+          "entryType": "debit"
+        },
+        {
+          "accountId": "2100",
+          "amount": 30000,
+          "entryType": "credit"
+        }
       ]
     },
     {
       "id": 3,
       "description": "Warenkauf auf Ziel vom Lieferanten",
       "entryLines": [
-        { "accountId": "1200", "amount": 10000, "entryType": "debit" },
-        { "accountId": "2200", "amount": 10000, "entryType": "credit" }
+        {
+          "accountId": "1200",
+          "amount": 10000,
+          "entryType": "debit"
+        },
+        {
+          "accountId": "2200",
+          "amount": 10000,
+          "entryType": "credit"
+        }
       ]
     },
     {
       "id": 4,
       "description": "Erhöhung der Vorräte durch Eigenkapitalfinanzierung",
       "entryLines": [
-        { "accountId": "1210", "amount": 5000, "entryType": "debit" },
-        { "accountId": "2000", "amount": 5000, "entryType": "credit" }
+        {
+          "accountId": "1210",
+          "amount": 5000,
+          "entryType": "debit"
+        },
+        {
+          "accountId": "2000",
+          "amount": 5000,
+          "entryType": "credit"
+        }
       ]
     },
     {
       "id": 5,
       "description": "Zufluss von Bankguthaben aus Darlehensaufnahme",
       "entryLines": [
-        { "accountId": "1400", "amount": 15000, "entryType": "debit" },
-        { "accountId": "2100", "amount": 15000, "entryType": "credit" }
+        {
+          "accountId": "1400",
+          "amount": 15000,
+          "entryType": "debit"
+        },
+        {
+          "accountId": "2100",
+          "amount": 15000,
+          "entryType": "credit"
+        }
       ]
     }
   ]

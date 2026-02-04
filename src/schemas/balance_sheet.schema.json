@@ -1,23 +1,48 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "balance_sheet.schema.json",
-    "version": "1.0.0",
     "title": "Balance Sheet",
     "description": "The balance sheet holding the structure of accounts, sums and balance",
     "type": "object",
     "properties": {
         "assets": {
             "description": "List of all positions and accounts on the assets side",
-            "type": "array",
-            "items": {
-                "$ref": "#/$defs/position"
+            "type": "object",
+            "properties": {
+                "accounts": {
+                    "description": "List of account ids directly assigned to this position",
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "pattern": "^[0-9]{4}$"
+                    }
+                },
+                "positions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/position"
+                    }
+                }
             }
         },
         "liabilitiesAndEquity": {
             "description": "List of all positions and accounts on the liabilities and equity side",
-            "type": "array",
-            "items": {
-                "$ref": "#/$defs/position"
+            "type": "object",
+            "properties": {
+                "accounts": {
+                    "description": "List of account ids directly assigned to this position",
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "pattern": "^[0-9]{4}$"
+                    }
+                },
+                "positions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/position"
+                    }
+                }
             }
         }
     },
@@ -27,6 +52,9 @@
         "position": {
             "type": "object",
             "properties": {
+                "id": {
+                    "type": "string"
+                },
                 "label": {
                     "type": "string"
                 },

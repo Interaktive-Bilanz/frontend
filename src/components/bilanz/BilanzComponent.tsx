@@ -21,11 +21,11 @@ const BilanzComponent = () => {
   let assetsBalanceSum = 0;
   let liabilitiesEquityBalanceSum = 0;
 
-  for (const position of balanceSheet.assets ?? []) {
+  for (const position of balanceSheet.assets.positions ?? []) {
     assetsBalanceSum += calculatePositionSaldo(position, accountTotals) ?? 0;
   }
 
-  for (const position of balanceSheet.liabilitiesAndEquity ?? []) {
+  for (const position of balanceSheet.liabilitiesAndEquity.positions ?? []) {
     liabilitiesEquityBalanceSum += calculatePositionSaldo(position, accountTotals) ?? 0;
   }
 
@@ -33,11 +33,12 @@ const BilanzComponent = () => {
 
 
   return (
-    <div className="flex w-1/3 bg-white border-black border rounded-md border-double">
+    <div className="flex w-2/5 bg-white border-black border rounded-md border-double">
       <div className="w-1/2">
         <BilanzColumn
           title="Aktiva"
-          positions={balanceSheet.assets}
+          positions={balanceSheet.assets.positions}
+          accounts={balanceSheet.assets.accounts}
         />
         <div className="p-4">
           <span className={`text-lg font-semibold ${balancesMatch ? 'text-green-600' : 'text-red-600'}`}>Summe {Math.abs(assetsBalanceSum).toFixed(2)} €</span>
@@ -46,7 +47,8 @@ const BilanzComponent = () => {
       <div className="w-1/2">
         <BilanzColumn
           title="Passiva"
-          positions={balanceSheet.liabilitiesAndEquity}
+          positions={balanceSheet.liabilitiesAndEquity.positions}
+          accounts={balanceSheet.liabilitiesAndEquity.accounts}
         />
         <div className="p-4">
           <span className={`text-lg font-semibold ${balancesMatch ? 'text-green-600' : 'text-red-600'}`}>Summe {Math.abs(liabilitiesEquityBalanceSum).toFixed(2)} €</span>

@@ -3,10 +3,12 @@ import { BilanzProps } from "./BilanzInterfaces";
 import { useInteractiveBalanceData } from "../../context/InteractiveBalanceDataContext";
 import { useTeacherMode } from "../../context/TeacherModeContext";
 import { v4 as uuidv4 } from "uuid";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ValueScope } from "ajv/dist/compile/codegen";
 import { useWindowManager } from "../../context/WindowManagerContext";
 import { getAccountTotals } from "../../util/balanceCalculations";
+import { getAssigendAccountIds } from "../../util/getAssignedAccountIds";
+import { toast } from "react-toastify";
 
 const BilanzColumn: React.FC<BilanzProps> = ({
   title,
@@ -15,10 +17,27 @@ const BilanzColumn: React.FC<BilanzProps> = ({
 }) => {
   let sum = 0;
 
-  const { accountTotals, interactiveBalanceData, setInteractiveBalanceData, addNewAccountTo } = useInteractiveBalanceData();
+  const { accountTotals, interactiveBalanceData, setInteractiveBalanceData, addAccountTo } = useInteractiveBalanceData();
   const { teacherMode } = useTeacherMode();
-  const [newAccountId, setNewAccountId] = useState("")
   const { openWindow } = useWindowManager();
+
+  const assigendAccountIds = useMemo(() => {
+      return getAssigendAccountIds(interactiveBalanceData.balanceSheet);
+    }, [interactiveBalanceData.balanceSheet]);
+  
+    const unassignedAccounts = useMemo(() => {
+      return interactiveBalanceData.accounts.filter(a => !assigendAccountIds.has(a.id));
+    }, [interactiveBalanceData.accounts, assigendAccountIds]);
+  
+    const [newAccountId, setNewAccountId] = useState(unassignedAccounts.length > 0 ? unassignedAccounts[0].id : "");
+  
+    useEffect(() => {
+      if (unassignedAccounts.length > 0) {
+        setNewAccountId(unassignedAccounts[0].id);
+      } else {
+        setNewAccountId("");
+      }
+    }, [unassignedAccounts]);
 
   for (const position of positions ?? []) {
     sum += calculatePositionSaldo(position, accountTotals) ?? 0;
@@ -60,30 +79,40 @@ const BilanzColumn: React.FC<BilanzProps> = ({
       <h2 className="text-xl font-bold mb-4">{title}</h2>
       {teacherMode &&
         <div className="flex">
-          <button className="bg-green-500 hover:bg-green-700 px-1 py-1 mr-1 rounded mt" onClick={addPosition}>
+          <button className="bg-green-500 hover:bg-green-700 px-1 py-1 mt-1 mr-1 rounded" onClick={addPosition}>
             + Position
           </button>
-          <button
-            className="bg-green-500 hover:bg-green-700 px-1 py-1 mr-1 rounded"
-            onClick={() => addNewAccountTo(title === "Aktiva" ? "assets" : "liabilitiesAndEquity", newAccountId)}>
-            <div className="flex items-center">
-              + Konto
-              <input
-                value={newAccountId}
-                type="text"
-                size={4}
-                maxLength={4}
-                placeholder="1234"
-                pattern="[0-9]{4}"
-                className="ml-1 h-5 px-1 text-sm border border-gray-300 rounded box-border text-center"
-                onClick={(e) => e.stopPropagation()}
-                onChange={(e) => {
-                  const value = e.target.value.replace('/[^0-9]/g', '');
-                  if (value.length <= 4) setNewAccountId(value);
-                }}
-              />
-            </div>
-          </button>
+          <div
+            role="button"
+            tabIndex={0}
+            className="flex items-center bg-green-500 hover:bg-green-700 px-1 py-1 mt-1 mr-1 rounded gap-1"
+            onClick={() => {
+              if (newAccountId) {
+                addAccountTo(title === "Aktiva" ? "assets" : "liabilitiesAndEquity", newAccountId);
+              } else {
+                toast.info("Bitte ein Konto auswählen.");
+              }
+            }}
+          >
+            <span>+ Konto</span>
+
+            <select
+              className="h-5 w-20 text-sm rounded"
+              onClick={(e) => {
+                if (unassignedAccounts.length === 0) toast.info("Kein verfügbares Konto. Bitte weitere Konten anlegen.");
+                e.stopPropagation()
+              }}
+              onChange={(e) => {
+                setNewAccountId(e.target.value);
+              }}
+              // disabled={unassignedAccounts.length === 0}
+            >
+              {unassignedAccounts.length > 0 ? unassignedAccounts.map((a) => (
+                <option key={a.id} value={a.id}>{a.id} {a.label}</option>
+              )
+              ) : <option key={"noAccAvailable"} className="text-xs"></option>}
+            </select>
+          </div>
 
         </div>
       }

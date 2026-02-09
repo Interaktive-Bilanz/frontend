@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Position } from "../../types/InteractiveBalanceData";
 import { useInteractiveBalanceData } from "../../context/InteractiveBalanceDataContext";
 import { useWindowManager } from "../../context/WindowManagerContext";
 import { AccountTotal, getAccountTotals } from "../../util/balanceCalculations";
 import { useTeacherMode } from "../../context/TeacherModeContext";
 import { v4 as uuidv4 } from "uuid";
+import { getAssigendAccountIds } from "../../util/getAssignedAccountIds";
+import { toast } from "react-toastify";
 
 export function calculatePositionSaldo(
   position: Position,
@@ -29,7 +31,7 @@ const BilanzItem: React.FC<{
 }> = ({ position, level = 0 }) => {
   const [open, setOpen] = useState(false);
 
-  const { interactiveBalanceData, setInteractiveBalanceData, updatePositionLabel, addNewPositionTo, accountTotals, addNewAccountTo } = useInteractiveBalanceData();
+  const { interactiveBalanceData, setInteractiveBalanceData, updatePositionLabel, addNewPositionTo, accountTotals, addAccountTo } = useInteractiveBalanceData();
 
   const accounts = interactiveBalanceData.accounts;
 
@@ -43,7 +45,24 @@ const BilanzItem: React.FC<{
 
   const [editLabel, setEditLabel] = useState(false);
   const [labelDraft, setLabelDraft] = useState(position.label);
-  const [newAccountId, setNewAccountId] = useState("")
+
+  const assigendAccountIds = useMemo(() => {
+    return getAssigendAccountIds(interactiveBalanceData.balanceSheet);
+  }, [interactiveBalanceData.balanceSheet]);
+
+  const unassignedAccounts = useMemo(() => {
+    return interactiveBalanceData.accounts.filter(a => !assigendAccountIds.has(a.id));
+  }, [interactiveBalanceData.accounts, assigendAccountIds]);
+
+  const [newAccountId, setNewAccountId] = useState(unassignedAccounts.length > 0 ? unassignedAccounts[0].id : "");
+
+  useEffect(() => {
+    if (unassignedAccounts.length > 0) {
+      setNewAccountId(unassignedAccounts[0].id);
+    } else {
+      setNewAccountId("");
+    }
+  }, [unassignedAccounts]);
 
 
   return (
@@ -107,27 +126,41 @@ const BilanzItem: React.FC<{
             <div className="flex">
               <button
                 className="bg-green-500 hover:bg-green-700 px-1 py-1 mt-1 mr-1 rounded"
-                onClick={(e) => addNewPositionTo(String(position.id))}>
+                onClick={(e) =>
+                  addNewPositionTo(String(position.id))}
+              >
                 + Position
               </button>
               <div
                 role="button"
                 tabIndex={0}
                 className="flex items-center bg-green-500 hover:bg-green-700 px-1 py-1 mt-1 mr-1 rounded gap-1"
-                onClick={() => addNewAccountTo(String(position.id), newAccountId)}
+                onClick={() => {
+                  if (newAccountId) {
+                    addAccountTo(String(position.id), newAccountId);
+                  } else {
+                    toast.info("Bitte ein Konto auswählen.");
+                  }
+                }}
               >
                 <span>+ Konto</span>
 
                 <select
                   className="h-5 w-20 text-sm rounded"
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={(e) => {
+                    if (unassignedAccounts.length === 0) toast.info("Kein verfügbares Konto. Bitte weitere Konten anlegen.");
+                    e.stopPropagation()
+                    
+                  }}
                   onChange={(e) => {
                     setNewAccountId(e.target.value);
-                  }}>
-                  {accounts.map((a) => (
-                    <option value={a.id}>{a.id} {a.label}</option>
+                  }}
+                  // disabled={unassignedAccounts.length === 0}
+                >
+                  {unassignedAccounts.length > 0 ? unassignedAccounts.map((a) => (
+                    <option key={a.id} value={a.id}>{a.id} {a.label}</option>
                   )
-                  )}
+                  ) : <option key={"noAccAvailable"} className="text-xs"></option>}
                 </select>
               </div>
               {/* <button

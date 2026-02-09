@@ -23,7 +23,7 @@ interface InteractiveBalanceDataContextType {
 
   addNewAccount: (accountId: string) => void;
 
-  addNewAccountTo: (positionId: string, accountId: string) => void;
+  addAccountTo: (positionId: string, accountId: string) => void;
 
   accountTotals: Record<string, AccountTotal>;
 }
@@ -114,6 +114,7 @@ export const InteractiveBalanceDataProvider: React.FC<{ children: React.ReactNod
 
   const addAccountTo = (positionId: string, accountId: string) => {
     try {
+      console.log("account ID to add: ", accountId);
       if (!interactiveBalanceData.accounts.find(a => a.id === accountId)) addNewAccount(accountId);
 
       setInteractiveBalanceData(draft => {
@@ -179,7 +180,7 @@ export const InteractiveBalanceDataProvider: React.FC<{ children: React.ReactNod
   }, [interactiveBalanceData.journalEntries, draftEntry]);
 
   return (
-    <InteractiveBalanceDataContext.Provider value={{ interactiveBalanceData, setInteractiveBalanceData, draftEntry, setDraftEntry, commitDraft, cancelDraft, accountTotals: accountTotals, updatePositionLabel, addNewPositionTo, addNewAccount, addNewAccountTo: addAccountTo }}>
+    <InteractiveBalanceDataContext.Provider value={{ interactiveBalanceData, setInteractiveBalanceData, draftEntry, setDraftEntry, commitDraft, cancelDraft, accountTotals: accountTotals, updatePositionLabel, addNewPositionTo, addNewAccount, addAccountTo: addAccountTo }}>
       {children}
     </InteractiveBalanceDataContext.Provider>
   );

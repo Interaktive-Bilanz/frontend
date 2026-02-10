@@ -17,27 +17,27 @@ const BilanzColumn: React.FC<BilanzProps> = ({
 }) => {
   let sum = 0;
 
-  const { accountTotals, interactiveBalanceData, setInteractiveBalanceData, addAccountTo } = useInteractiveBalanceData();
+  const { accountTotals, interactiveBalanceData, setInteractiveBalanceData, addAccountTo, removeAccountFrom } = useInteractiveBalanceData();
   const { teacherMode } = useTeacherMode();
   const { openWindow } = useWindowManager();
 
   const assigendAccountIds = useMemo(() => {
-      return getAssigendAccountIds(interactiveBalanceData.balanceSheet);
-    }, [interactiveBalanceData.balanceSheet]);
-  
-    const unassignedAccounts = useMemo(() => {
-      return interactiveBalanceData.accounts.filter(a => !assigendAccountIds.has(a.id));
-    }, [interactiveBalanceData.accounts, assigendAccountIds]);
-  
-    const [newAccountId, setNewAccountId] = useState(unassignedAccounts.length > 0 ? unassignedAccounts[0].id : "");
-  
-    useEffect(() => {
-      if (unassignedAccounts.length > 0) {
-        setNewAccountId(unassignedAccounts[0].id);
-      } else {
-        setNewAccountId("");
-      }
-    }, [unassignedAccounts]);
+    return getAssigendAccountIds(interactiveBalanceData.balanceSheet);
+  }, [interactiveBalanceData.balanceSheet]);
+
+  const unassignedAccounts = useMemo(() => {
+    return interactiveBalanceData.accounts.filter(a => !assigendAccountIds.has(a.id));
+  }, [interactiveBalanceData.accounts, assigendAccountIds]);
+
+  const [newAccountId, setNewAccountId] = useState(unassignedAccounts.length > 0 ? unassignedAccounts[0].id : "");
+
+  useEffect(() => {
+    if (unassignedAccounts.length > 0) {
+      setNewAccountId(unassignedAccounts[0].id);
+    } else {
+      setNewAccountId("");
+    }
+  }, [unassignedAccounts]);
 
   for (const position of positions ?? []) {
     sum += calculatePositionSaldo(position, accountTotals) ?? 0;
@@ -105,7 +105,7 @@ const BilanzColumn: React.FC<BilanzProps> = ({
               onChange={(e) => {
                 setNewAccountId(e.target.value);
               }}
-              // disabled={unassignedAccounts.length === 0}
+            // disabled={unassignedAccounts.length === 0}
             >
               {unassignedAccounts.length > 0 ? unassignedAccounts.map((a) => (
                 <option key={a.id} value={a.id}>{a.id} {a.label}</option>
@@ -120,31 +120,35 @@ const BilanzColumn: React.FC<BilanzProps> = ({
       {accounts?.map((accountId, i) => {
         const account = interactiveBalanceData.accounts.find(a => a.id === accountId)
         if (!account) return;
-        return (<button
-          key={i}
-          className="mt-1 bg-green-100 hover:bg-green-400 border border-gray-300 rounded px-2 py-1 w-full text-left"
-          lang="de"
-          onClick={() => openWindow({
-            type: "Account",
-            payload: { id: accountId, label: account.label }
-          })}
-        >
-          <div className="grid grid-cols-[1fr_auto] gap-2 items-start">
-            <div
-              lang="de"
-              className="min-w-0 hyphens-auto"
-            >
-              <span className="break-words">
+        return (<div className="flex">
+          <button
+            key={i}
+            className="mt-1 bg-green-100 hover:bg-green-400 border border-gray-300 rounded px-2 py-1 w-full text-left"
+            lang="de"
+            onClick={() => openWindow({
+              type: "Account",
+              payload: { id: accountId, label: account.label }
+            })}
+          >
+            <div className="flex justify-between items-center">
+              <div
+                lang="de"
+                className="min-w-0 hyphens-auto break-words"
+              >
                 {accountId} {account?.label}
+              </div>
+              {teacherMode &&
+                <button className="bg-transparent hover:bg-gray-100 mr-1 px-1 py-1 rounded" onClick={(e) => {
+                  e.stopPropagation();
+                  removeAccountFrom(title === "Aktiva" ? "assets" : "liabilitiesAndEquity", accountId);
+                }}>&#x274C;</button>}
+              <span className="text-nowrap whitespace-nowrap">
+                {Math.abs(getAccountTotals(accountTotals, accountId).balance).toFixed(2)} €
               </span>
             </div>
 
-            <span className="text-nowrap whitespace-nowrap">
-              {Math.abs(getAccountTotals(accountTotals, accountId).balance).toFixed(2)} €
-            </span>
-          </div>
-
-        </button>);
+          </button>
+        </div>);
       })}
 
       {positions?.map((position, i) => (

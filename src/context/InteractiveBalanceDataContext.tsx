@@ -21,9 +21,13 @@ interface InteractiveBalanceDataContextType {
 
   addNewPositionTo: (positionId: string) => void;
 
+  deletePosition: (positionId: string) => void;
+
   addNewAccount: (accountId: string) => void;
 
   addAccountTo: (positionId: string, accountId: string) => void;
+
+  removeAccountFrom: (positionId: string, accountId: string) => void;
 
   accountTotals: Record<string, AccountTotal>;
 }
@@ -93,6 +97,24 @@ export const InteractiveBalanceDataProvider: React.FC<{ children: React.ReactNod
     });
   };
 
+
+  const deletePosition = (positionId: string) => {
+    setInteractiveBalanceData(draft => {
+      const findAndDelete = (positions: Position[]) => {
+        for (const position of positions) {
+          if (position.id === positionId) {
+            positions.splice(positions.findIndex(p => p.id === positionId), 1);
+          } else {
+            findAndDelete(position.positions);
+          }
+        }
+      };
+
+      findAndDelete(draft.balanceSheet.assets.positions as Position[]);
+      findAndDelete(draft.balanceSheet.liabilitiesAndEquity.positions as Position[]);
+    })
+  }
+
   const addNewAccount = (accountId: string) => {
 
 
@@ -147,10 +169,42 @@ export const InteractiveBalanceDataProvider: React.FC<{ children: React.ReactNod
           findAndAdd(draft.balanceSheet.liabilitiesAndEquity.positions as Position[]);
         };
       });
-    } catch (e) {}
+    } catch (e) { }
 
 
   };
+
+  const removeAccountFrom = (positionId: string, accountId: string) => {
+    setInteractiveBalanceData(draft => {
+
+      if (positionId === "assets") {
+        const index = draft.balanceSheet.assets.accounts?.findIndex((id) => id === accountId);
+        if (index != -1) {
+          draft.balanceSheet.assets.accounts?.splice(Number(index), 1);
+        } else toast.error("Konto nicht enthalten");
+      } else if (positionId === "liabilitiesAndEquity") {
+        const index = draft.balanceSheet.liabilitiesAndEquity.accounts?.findIndex((id) => id === accountId);
+        if (index != -1) {
+          draft.balanceSheet.liabilitiesAndEquity.accounts?.splice(Number(index), 1);
+        } else toast.error("Konto nicht enthalten");
+      } else {
+        const findAndRemove = (positions: Position[]) => {
+          for (const position of positions) {
+            if (position.id === positionId) {
+              position.accounts.splice(position.accounts.findIndex((id) => id === accountId), 1);
+            } else {
+              findAndRemove(position.positions);
+            };
+          };
+        };
+
+        findAndRemove(draft.balanceSheet.assets.positions as Position[]);
+        findAndRemove(draft.balanceSheet.liabilitiesAndEquity.positions as Position[]);
+      }
+
+
+    })
+  }
 
   const commitDraft = () => {
     if (!draftEntry) return;
@@ -180,7 +234,7 @@ export const InteractiveBalanceDataProvider: React.FC<{ children: React.ReactNod
   }, [interactiveBalanceData.journalEntries, draftEntry]);
 
   return (
-    <InteractiveBalanceDataContext.Provider value={{ interactiveBalanceData, setInteractiveBalanceData, draftEntry, setDraftEntry, commitDraft, cancelDraft, accountTotals: accountTotals, updatePositionLabel, addNewPositionTo, addNewAccount, addAccountTo: addAccountTo }}>
+    <InteractiveBalanceDataContext.Provider value={{ interactiveBalanceData, setInteractiveBalanceData, draftEntry, setDraftEntry, commitDraft, cancelDraft, accountTotals, updatePositionLabel, addNewPositionTo, addNewAccount, addAccountTo, deletePosition, removeAccountFrom }}>
       {children}
     </InteractiveBalanceDataContext.Provider>
   );

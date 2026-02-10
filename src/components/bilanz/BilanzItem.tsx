@@ -31,7 +31,7 @@ const BilanzItem: React.FC<{
 }> = ({ position, level = 0 }) => {
   const [open, setOpen] = useState(false);
 
-  const { interactiveBalanceData, setInteractiveBalanceData, updatePositionLabel, addNewPositionTo, accountTotals, addAccountTo } = useInteractiveBalanceData();
+  const { interactiveBalanceData, setInteractiveBalanceData, updatePositionLabel, addNewPositionTo, accountTotals, addAccountTo, deletePosition, removeAccountFrom } = useInteractiveBalanceData();
 
   const accounts = interactiveBalanceData.accounts;
 
@@ -110,6 +110,7 @@ const BilanzItem: React.FC<{
                 }
                 <button className="bg-transparent hover:bg-gray-100 mr-1 px-1 py-1 rounded" onClick={(e) => {
                   e.stopPropagation();
+                  deletePosition(String(position.id));
                 }}>&#x274C;</button>
               </div>
             }
@@ -211,6 +212,7 @@ const BilanzItem: React.FC<{
                     {teacherMode &&
                       <button className="bg-transparent hover:bg-gray-100 mr-1 px-1 py-1 rounded" onClick={(e) => {
                         e.stopPropagation();
+                        removeAccountFrom(String(position.id), accountId)
                       }}>&#x274C;</button>}
                     <span className="text-nowrap whitespace-nowrap">
                       {Math.abs(getAccountTotals(accountTotals, accountId).balance).toFixed(2)} €

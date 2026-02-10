@@ -2,6 +2,7 @@ import BilanzColumn from "./BilanzColumn";
 import { InteractiveBalanceData } from "../../types/InteractiveBalanceData";
 import { useInteractiveBalanceData } from "../../context/InteractiveBalanceDataContext";
 import { calculatePositionSaldo } from "./BilanzItem";
+import { calculateAccountTotals, getAccountTotals } from "../../util/balanceCalculations";
 
 const BilanzComponent = () => {
   // const [data, setData] = useState<BilanzData>({
@@ -24,9 +25,15 @@ const BilanzComponent = () => {
   for (const position of balanceSheet.assets.positions ?? []) {
     assetsBalanceSum += calculatePositionSaldo(position, accountTotals) ?? 0;
   }
+  for (const account of balanceSheet.assets.accounts ?? []) {
+    assetsBalanceSum += getAccountTotals(accountTotals, account).balance;
+  }
 
   for (const position of balanceSheet.liabilitiesAndEquity.positions ?? []) {
     liabilitiesEquityBalanceSum += calculatePositionSaldo(position, accountTotals) ?? 0;
+  }
+  for (const account of balanceSheet.liabilitiesAndEquity.accounts ?? []) {
+    liabilitiesEquityBalanceSum += getAccountTotals(accountTotals, account).balance;
   }
 
   const balancesMatch = Math.abs(assetsBalanceSum) === Math.abs(liabilitiesEquityBalanceSum);

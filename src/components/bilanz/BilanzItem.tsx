@@ -1,12 +1,15 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Position } from "../../types/InteractiveBalanceData";
 import { useInteractiveBalanceData } from "../../context/InteractiveBalanceDataContext";
 import { useWindowManager } from "../../context/WindowManagerContext";
 import { AccountTotal, getAccountTotals } from "../../util/balanceCalculations";
 import { useTeacherMode } from "../../context/TeacherModeContext";
-import { v4 as uuidv4 } from "uuid";
 import { getAssigendAccountIds } from "../../util/getAssignedAccountIds";
 import { toast } from "react-toastify";
+import { SortableContext, useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import SortableAccountItem from "../sortable/SortableAccountItems";
+import { useDragContext } from "../../context/DragContext";
 
 export function calculatePositionSaldo(
   position: Position,
@@ -27,11 +30,14 @@ export function calculatePositionSaldo(
 
 const BilanzItem: React.FC<{
   position: Position;
+  parentId: string;
   level?: number;
-}> = ({ position, level = 0 }) => {
+}> = ({ position, parentId, level = 0 }) => {
   const [open, setOpen] = useState(false);
 
   const { interactiveBalanceData, setInteractiveBalanceData, updatePositionLabel, addNewPositionTo, accountTotals, addAccountTo, deletePosition, removeAccountFrom } = useInteractiveBalanceData();
+
+  const { dropIndicator } = useDragContext();
 
   const accounts = interactiveBalanceData.accounts;
 
@@ -64,14 +70,49 @@ const BilanzItem: React.FC<{
     }
   }, [unassignedAccounts]);
 
+  const nodeRef = useRef<HTMLDivElement>(null);
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging
+  } = useSortable({
+    id: position.id!,
+    data: {
+      type: 'position',
+      positionId: position.id,
+      parentId: parentId,
+      getRect: () => nodeRef.current?.getBoundingClientRect()
+    }
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
 
   return (
+    // <div style={style} className={`ml-${level} mt-1`}>
     <div className={`ml-${level} mt-1`}>
+      {dropIndicator?.targetId === position.id && dropIndicator!.intent === 'before' && (
+        <div className="h-1 bg-blue-400 rounded mx-2" />
+      )}
       <div className="flex">
         <div
           role="button"
+          ref={(el) => {
+            setNodeRef(el);
+            (nodeRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
+          }}
           tabIndex={0}
-          className="bg-white hover:bg-blue-100 border border-gray-300 rounded px-2 py-1 w-full text-left cursor-pointer"
+          className={`bg-white hover:bg-blue-100 border border-gray-300 rounded px-2 py-1 w-full text-left cursor-pointer ${dropIndicator?.targetId === position.id && dropIndicator!.intent === 'inside'
+            ? 'ring-2 ring-blue-400' : ''
+            }`}
           onClick={() => setOpen(!open)}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
@@ -81,6 +122,16 @@ const BilanzItem: React.FC<{
           }}
         >
           <div className="flex justify-between items-center">
+            {teacherMode && (
+              <span
+                {...attributes}
+                {...listeners}
+                className="cursor-grab mr-2"
+                onClick={(e) => e.stopPropagation()}
+              >
+                ⋮⋮
+              </span>
+            )}
             {editLabel ?
               <div className="min-w-0 hyphens-auto flex-1">
                 <input
@@ -117,7 +168,10 @@ const BilanzItem: React.FC<{
             <div className="text-nowrap whitespace-nowrap ml-2">{displaypositionBalance.toFixed(2)} €</div>
           </div>
         </div>
-      </div >
+      </div>
+      {dropIndicator?.targetId === position.id && dropIndicator!.intent === 'after' && (
+        <div className="h-1 bg-blue-400 rounded mx-2" />
+      )}
 
 
 
@@ -151,12 +205,12 @@ const BilanzItem: React.FC<{
                   onClick={(e) => {
                     if (unassignedAccounts.length === 0) toast.info("Kein verfügbares Konto. Bitte weitere Konten anlegen.");
                     e.stopPropagation()
-                    
+
                   }}
                   onChange={(e) => {
                     setNewAccountId(e.target.value);
                   }}
-                  // disabled={unassignedAccounts.length === 0}
+                // disabled={unassignedAccounts.length === 0}
                 >
                   {unassignedAccounts.length > 0 ? unassignedAccounts.map((a) => (
                     <option key={a.id} value={a.id}>{a.id} {a.label}</option>
@@ -188,48 +242,40 @@ const BilanzItem: React.FC<{
               </button> */}
             </div>
           }
-          {position.accounts?.map((accountId, i) => {
-            const account = accounts.find(a => a.id === accountId)
-            if (!account) return;
-            return (
-              <div className="flex">
-                <button
-                  key={i}
-                  className="mt-1 bg-green-100 hover:bg-green-400 border border-gray-300 rounded px-2 py-1 w-full text-left"
-                  lang="de"
-                  onClick={() => openWindow({
+          <SortableContext items={position.accounts ?? []}>
+            {position.accounts?.map((accountId) => {
+              const account = accounts.find(a => a.id === accountId)
+              if (!account) return;
+              return (
+                <SortableAccountItem
+                  key={accountId}
+                  accountId={accountId}
+                  account={account}
+                  teacherMode={teacherMode}
+                  parentId={position.id!}
+                  onRemove={() => removeAccountFrom(
+                    position.id!,
+                    accountId
+                  )}
+                  onOpen={() => openWindow({
                     type: "Account",
                     payload: { id: accountId, label: account.label }
                   })}
-                >
-                  <div className="flex justify-between items-center">
-                    <div
-                      lang="de"
-                      className="min-w-0 hyphens-auto break-words"
-                    >
-                      {accountId} {account?.label}
-                    </div>
-                    {teacherMode &&
-                      <button className="bg-transparent hover:bg-gray-100 mr-1 px-1 py-1 rounded" onClick={(e) => {
-                        e.stopPropagation();
-                        removeAccountFrom(String(position.id), accountId)
-                      }}>&#x274C;</button>}
-                    <span className="text-nowrap whitespace-nowrap">
-                      {Math.abs(getAccountTotals(accountTotals, accountId).balance).toFixed(2)} €
-                    </span>
-                  </div>
+                />
+              )
+            })}
+          </SortableContext>
 
-                </button>
-              </div>);
-          })}
-
-          {position.positions?.map((child, i) => (
-            <BilanzItem
-              key={i}
-              position={child}
-              level={level + 1}
-            />
-          ))}
+          <SortableContext items={position.positions.map(p => p.id!) ?? []}>
+            {position.positions?.map((childpos) => (
+              <BilanzItem
+                key={childpos.id}
+                position={childpos}
+                parentId={position.id!}
+                level={level + 1}
+              />
+            ))}
+          </SortableContext>
         </div>
       )}
     </div >

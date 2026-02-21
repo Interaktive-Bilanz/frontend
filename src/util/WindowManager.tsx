@@ -11,6 +11,7 @@ import { FileHandlerComponent } from "../components/fileHandler/FileHandlerCompo
 import { useTeacherMode } from "../context/TeacherModeContext";
 import { toast } from "react-toastify";
 import JsonEditor from "../components/bilanz/JsonEditorComponent";
+import { DragProvider } from "../context/DragContext";
 
 type WindowContentType = "Account" | "JournalEntry" | "FileHandeling";
 
@@ -149,10 +150,12 @@ const WindowManager = () => {
 
           {/* Center column: balance sheet */}
           <div className={"flex-1 flex items-start p-8 h-full " + (teacherMode ? "justify-evenly gap-4" : "justify-center")}>
-            <BilanzComponent />
+            <DragProvider>
+              <BilanzComponent />
+            </DragProvider>
             {teacherMode &&
               <div className="w-1/2 h-90vh">
-                <JsonEditor/>
+                <JsonEditor />
               </div>
             }
           </div>

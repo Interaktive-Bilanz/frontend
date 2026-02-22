@@ -37,7 +37,9 @@ const BilanzItem: React.FC<{
 
   const { interactiveBalanceData, setInteractiveBalanceData, updatePositionLabel, addNewPositionTo, accountTotals, addAccountTo, deletePosition, removeAccountFrom } = useInteractiveBalanceData();
 
-  const { dropIndicator } = useDragContext();
+  const { dropIndicator, openPositionId, toggleOpenPositionId } = useDragContext();
+
+  const isOpen = openPositionId.has(position.id!);
 
   const accounts = interactiveBalanceData.accounts;
 
@@ -85,6 +87,7 @@ const BilanzItem: React.FC<{
       type: 'position',
       positionId: position.id,
       parentId: parentId,
+      label: position.label,
       getRect: () => nodeRef.current?.getBoundingClientRect()
     }
   });
@@ -113,11 +116,11 @@ const BilanzItem: React.FC<{
           className={`bg-white hover:bg-blue-100 border border-gray-300 rounded px-2 py-1 w-full text-left cursor-pointer ${dropIndicator?.targetId === position.id && dropIndicator!.intent === 'inside'
             ? 'ring-2 ring-blue-400' : ''
             }`}
-          onClick={() => setOpen(!open)}
+          onClick={() => toggleOpenPositionId(position.id!)}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
-              setOpen(!open);
+              toggleOpenPositionId(position.id!);
             }
           }}
         >
@@ -175,7 +178,7 @@ const BilanzItem: React.FC<{
 
 
 
-      {open && (
+      {isOpen && (
         <div className="ml-4">
           {teacherMode &&
             <div className="flex">

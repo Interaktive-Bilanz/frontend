@@ -10,15 +10,41 @@ type DropIndicator = {
 type DragContextType = {
     dropIndicator: DropIndicator;
     setDropIndicator: React.Dispatch<React.SetStateAction<DropIndicator>>;
+    openPositionId: Set<string>;
+    addOpenPositionId: (id: string) => void;
+    clearOpenPositionIds: () => void;
+    toggleOpenPositionId: (id: string) => void;
+    setOpenPositionIds: React.Dispatch<React.SetStateAction<Set<string>>>;
 };
 
 const DragContext = createContext<DragContextType | null>(null);
 
 export const DragProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [dropIndicator, setDropIndicator] = useState<DropIndicator>(null);
+    const [openPositionId, setOpenPositionIds] = useState<Set<string>>(new Set());
+
+    const addOpenPositionId = (id: string) => {
+        setOpenPositionIds(prev => new Set(prev).add(id));
+    };
+
+    const clearOpenPositionIds = () => {
+        setOpenPositionIds(new Set());
+    };
+
+    const toggleOpenPositionId = (id: string) => {
+        setOpenPositionIds(prev => {
+            const next = new Set(prev);
+            if (next.has(id)) {
+                next.delete(id);
+            } else {
+                next.add(id);
+            }
+            return next;
+        });
+    };
 
     return (
-        <DragContext.Provider value={{ dropIndicator, setDropIndicator }}>
+        <DragContext.Provider value={{ dropIndicator, setDropIndicator, openPositionId, setOpenPositionIds, addOpenPositionId, clearOpenPositionIds, toggleOpenPositionId }}>
             {children}
         </DragContext.Provider>
     );

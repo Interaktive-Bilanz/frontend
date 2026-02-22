@@ -92,9 +92,9 @@ export const BookingsListComponent: React.FC<EntryLinesProps> = ({
                         key={index}
                         onClick={() => openWindow({ type: "JournalEntry", payload: { isDraft: l.draft, id: l.draft ? "Neue Buchung" : l.entryId } })}
                     >
-                        <td className="whitespace-nowrap border-r border-solid">{l.draft ? "Neu" : l.entryId}</td>
+                        <td className="whitespace-nowrap border-r border-solid text-center align-middle">{l.draft ? "Neu" : l.entryId}</td>
                         <td className="text-xs break-words">{l.description}</td>
-                        <td className="whitespace-nowrap text-right border-l border-solid">{l.line.amount.toFixed(2)} €</td>
+                        <td className="whitespace-nowrap text-end align-middle border-l border-solid">{l.line.amount.toFixed(2)} €</td>
                         <td>
                             {l.draft &&
                                 <button className="px-2 py-0.5 rounded bg-red-100 hover:bg-red-200 text-sm"

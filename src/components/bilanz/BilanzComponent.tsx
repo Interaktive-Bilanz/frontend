@@ -3,8 +3,8 @@ import { InteractiveBalanceData, Position } from "../../types/InteractiveBalance
 import { useInteractiveBalanceData } from "../../context/InteractiveBalanceDataContext";
 import { calculatePositionSaldo } from "./BilanzItem";
 import { calculateAccountTotals, getAccountTotals } from "../../util/balanceCalculations";
-import { DndContext, DragEndEvent, DragOverEvent, pointerWithin } from "@dnd-kit/core";
-import { useState } from "react";
+import { DndContext, DragEndEvent, DragOverEvent, Over, pointerWithin, DragOverlay } from "@dnd-kit/core";
+import { useEffect, useRef, useState } from "react";
 import { useDragContext } from "../../context/DragContext";
 
 const BilanzComponent = () => {
@@ -16,6 +16,41 @@ const BilanzComponent = () => {
   const { interactiveBalanceData, accountTotals, reorderAccountsInPosition, reorderPositionsInPosition,
     moveAccount, movePosition
   } = useInteractiveBalanceData();
+
+  const { dropIndicator, setDropIndicator, addOpenPositionId, clearOpenPositionIds, setOpenPositionIds } = useDragContext();
+
+  const [activeData, setActiveData] = useState<{ type: string, label: string } | null>(null);
+
+  const pointerRef = useRef({ x: 0, y: 0 });
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [overId, setOverId] = useState<string | null>(null);
+  const overRectRef = useRef<DOMRect | null>(null);
+  const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hoverTargetRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const handler = (e: PointerEvent) => {
+      pointerRef.current = { x: e.clientX, y: e.clientY };
+
+      if (activeId && overId && overRectRef.current) {
+        const rect = overRectRef.current;
+        const relativeY = (e.clientY - rect.top) / rect.height;
+        const intent = relativeY < 0.3 ? 'before' : relativeY > 0.7 ? 'after' : 'inside';
+        setDropIndicator({ targetId: overId, intent });
+      }
+      if (overId && overId !== hoverTargetRef.current) {
+        // moved to a new item, clear any existing timer
+        if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+        hoverTargetRef.current = overId;
+
+        hoverTimerRef.current = setTimeout(() => {
+          addOpenPositionId(overId);
+        }, 1000);
+      }
+    };
+    window.addEventListener('pointermove', handler);
+    return () => window.removeEventListener('pointermove', handler);
+  }, [activeId, overId]);
 
   const balanceSheet = interactiveBalanceData.balanceSheet;
 
@@ -43,9 +78,8 @@ const BilanzComponent = () => {
 
   const balancesMatch = Math.abs(assetsBalanceSum) === Math.abs(liabilitiesEquityBalanceSum);
 
-  const { dropIndicator, setDropIndicator } = useDragContext();
-
   const handleDragEnd = (event: DragEndEvent) => {
+    const intent = getDropIntent(event.over);
     const { active, over } = event;
 
     if (!over || active.id === over.id) return;
@@ -59,39 +93,34 @@ const BilanzComponent = () => {
     if (draggedType === "position") {
 
       if (droppedOnType === "position") {
-        const dropIntent = getDropIntent(event);
-        console.log(`Drop intent: ${dropIntent}`);
+        console.log(`Drop intent: ${intent}`);
 
-        if (dropIntent === 'before' || dropIntent === 'after') {
+        if (intent === 'before' || intent === 'after') {
           if (sourceParentId === targetParentId) {
             const ids = getPositionIdsForParent(sourceParentId);
             const activeIndex = ids.indexOf(String(active.id));
             const overIndex = ids.indexOf(String(over.id));
-            const insertIndex = dropIntent === 'after' ? overIndex + 1 : overIndex;
+            const insertIndex = intent === 'after' ? overIndex + 1 : overIndex;
             console.log(`Reordering in ${targetParentId}`);
             reorderPositionsInPosition(sourceParentId, activeIndex, insertIndex);
-            return;
           } else {
             console.log(`Moving to ${targetParentId}`);
             movePosition(String(active.id), sourceParentId, targetParentId);
             const ids = getPositionIdsForParent(targetParentId);
             const activeIndex = ids.indexOf(String(active.id));
             const overIndex = ids.indexOf(String(over.id));
-            const insertIndex = dropIntent === 'after' ? overIndex + 1 : overIndex;
+            const insertIndex = intent === 'after' ? overIndex + 1 : overIndex;
             console.log(`Reordering in ${targetParentId}`);
             reorderPositionsInPosition(targetParentId, activeIndex, insertIndex);
           }
         } else {
           console.log(`Moving to ${over.id}`);
           movePosition(String(active.id), sourceParentId, String(over.id));
-          return;
         }
       } else if (droppedOnType === "column") {
         movePosition(String(active.id), sourceParentId, String(over.id));
-        return;
       } else if (droppedOnType === "account" && active.id != targetParentId) {
         movePosition(String(active.id), sourceParentId, targetParentId);
-        return;
       }
 
     }
@@ -119,10 +148,9 @@ const BilanzComponent = () => {
         }
       } else {
         if (droppedOnType === "position") {
-          const dropIntent = getDropIntent(event);
-          if (dropIntent === "before" || dropIntent === "after") {
+          if (intent === "before" || intent === "after") {
             moveAccount(accountId, sourceParentId, targetParentId);
-          } else if (dropIntent === "inside") {
+          } else if (intent === "inside") {
             moveAccount(accountId, sourceParentId, String(targetId));
           }
         } else if (droppedOnType === "column") {
@@ -131,20 +159,42 @@ const BilanzComponent = () => {
         }
       };
     }
+
+    let ancestors: string[] = [];
+
+    const allPositions = [
+      ...balanceSheet.assets.positions as Position[],
+      ...balanceSheet.liabilitiesAndEquity.positions as Position[]
+    ];
+    try {
+      console.log('targetId:', targetId);
+      console.log('droppedOnType:', droppedOnType);
+      console.log('targetParentId:', targetParentId);
+      console.log('allPositions ids:', allPositions.map(p => p.id));
+      ancestors = getAncestorIds(
+        droppedOnType === "account" || (droppedOnType === "position" && intent != "inside") ? targetParentId : String(targetId),
+        allPositions
+      ) ?? [];
+      console.log('ancestors:', ancestors);
+    }
+    catch (e) {
+      console.log(e);
+    }
+
+    const idsToKeepOpen = new Set([
+      ...ancestors,
+      droppedOnType === "account" || (droppedOnType === "position" && intent != "inside") ? targetParentId : String(targetId)
+    ]);
+
+    // instead of clearOpenPositionIds()
+    setOpenPositionIds(idsToKeepOpen);
+
   };
 
-  function getDropIntent(event: DragEndEvent | DragOverEvent): 'before' | 'inside' | 'after' {
-    const rect = event.over?.data.current?.getRect?.();
-    console.log('rect:', rect);
-    console.log('activatorEvent:', event.activatorEvent);
-    console.log('delta:', event.delta);
+  function getDropIntent(over: Over | null): 'before' | 'inside' | 'after' {
+    const rect = over?.rect;
     if (!rect) return 'inside';
-
-    const pointerY = (event.activatorEvent as PointerEvent).clientY + event.delta.y;
-
-    const relativeY = (pointerY - rect.top) / rect.height;
-    console.log('relativeY:', relativeY);
-
+    const relativeY = (pointerRef.current.y - rect.top) / rect.height;
     if (relativeY < 0.3) return 'before';
     if (relativeY > 0.7) return 'after';
     return 'inside';
@@ -178,6 +228,15 @@ const BilanzComponent = () => {
       }
       return positionIds;
     }
+  }
+
+  function getAncestorIds(targetId: string, positions: Position[], acc: string[] = []): string[] | null {
+    for (const pos of positions) {
+      if (pos.id === targetId) return acc;
+      const found = getAncestorIds(targetId, pos.positions ?? [], [...acc, pos.id!]);
+      if (found) return found;
+    }
+    return null;
   }
 
   function getAccountIdsForPosition(positionId: string): string[] {
@@ -217,14 +276,33 @@ const BilanzComponent = () => {
   return (
     <DndContext
       collisionDetection={pointerWithin}
-      onDragOver={(event) => {
-        if (!event.over) { setDropIndicator(null); return; }
-        const intent = getDropIntent(event);
-        setDropIndicator({ targetId: String(event.over.id), intent });
+      onDragStart={(e) => {
+        setActiveId(String(e.active.id));
+        setActiveData({
+          type: e.active.data.current?.type,
+          label: e.active.data.current?.label
+        });
       }}
-      onDragEnd={(event) => {
+      onDragOver={(e) => {
+        if (!e.over) {
+          setOverId(null);
+          setDropIndicator(null);
+          overRectRef.current = null;
+          return;
+        }
+        setOverId(String(e.over.id));
+        overRectRef.current = e.over.rect as unknown as DOMRect;
+        const intent = getDropIntent(e.over);
+        setDropIndicator({ targetId: String(e.over.id), intent });
+      }}
+      onDragEnd={(e) => {
+        if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+        hoverTargetRef.current = null;
+
+        setActiveId(null);
+        setOverId(null);
         setDropIndicator(null);
-        handleDragEnd(event);
+        handleDragEnd(e);
       }}
     >
       <div className="flex w-2/5 bg-white border-black border rounded-md border-double">
@@ -248,6 +326,13 @@ const BilanzComponent = () => {
             <span className={`text-lg font-semibold ${balancesMatch ? 'text-green-600' : 'text-red-600'}`}>Summe {Math.abs(liabilitiesEquityBalanceSum).toFixed(2)} €</span>
           </div>
         </div>
+        <DragOverlay>
+          {activeData && (
+            <div className="bg-white border border-gray-400 rounded px-2 py-1 shadow-lg opacity-90">
+              {activeData.label}
+            </div>
+          )}
+        </DragOverlay>
       </div>
     </DndContext>
   );

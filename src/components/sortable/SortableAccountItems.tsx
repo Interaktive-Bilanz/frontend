@@ -37,6 +37,7 @@ const SortableAccountItem: React.FC<SortableAccountItemProps> = ({
     data: {
         type: 'account',
         accountId: accountId,
+        label: account.label,
         parentId: parentId
     },
     disabled: !teacherMode

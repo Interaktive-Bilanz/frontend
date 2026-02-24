@@ -1,10 +1,10 @@
-name: Close linked issues on merge to dev
+name: Close linked issues on merge to development
 
 on:
   pull_request:
     types: [closed]
     branches:
-      - dev
+      - development
 
 jobs:
   close-issues:
@@ -46,6 +46,6 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: issueNumber,
-                body: `Closed via PR #${context.payload.pull_request.number} merged into \`dev\`.`
+                body: `Closed via PR #${context.payload.pull_request.number} merged into \`development\`.`
               });
             }

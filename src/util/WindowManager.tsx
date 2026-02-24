@@ -100,9 +100,8 @@ const WindowManager = () => {
   };
 
   const closeWindow = (windowData: WindowData) => {
-
-    //if (windowData.type === "JournalEntry") cancelDraft();
-    setWindows((prev) => prev.filter((w) => w.title !== generateTitle(windowData)));
+    const title = generateTitle(windowData);
+    setWindows((prev) => prev.filter((w) => w.title !== title));
   };
 
   const closeAllWindowsExcept = (windowData: WindowData | null) => {
@@ -182,7 +181,11 @@ const WindowManager = () => {
             cancel=".clickable, button, input, select, textarea"
             className="border border-gray-700 bg-white shadow-lg absolute flex flex-col"
           >
-            <div className="window-drag-handle bg-gray-800 text-white px-3 py-2 flex justify-between items-center cursor-move">
+            <div className={`window-drag-handle 
+              ${w.data.type === "Account" ? "bg-green-400 text-gray-800" : ""} 
+              ${w.data.type === "JournalEntry" ? "bg-yellow-100 text-gray-800" : ""} 
+              ${w.data.type != "JournalEntry" && w.data.type != "Account" ? "bg-gray-800 text-white" : ""} 
+              px-3 py-2 flex justify-between items-center cursor-move`}>
               <span>{w.title}</span>
               <button
                 onClick={() => closeWindow(w.data)}

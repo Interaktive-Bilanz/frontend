@@ -37,9 +37,9 @@ const BilanzItem: React.FC<{
 
   const { interactiveBalanceData, setInteractiveBalanceData, updatePositionLabel, addNewPositionTo, accountTotals, addAccountTo, deletePosition, removeAccountFrom } = useInteractiveBalanceData();
 
-  const { dropIndicator, openPositionId, toggleOpenPositionId } = useDragContext();
+  const { dropIndicator, openPositionIds, toggleOpenPositionId } = useDragContext();
 
-  const isOpen = openPositionId.has(position.id!);
+  const isOpen = openPositionIds.has(position.id!);
 
   const accounts = interactiveBalanceData.accounts;
 

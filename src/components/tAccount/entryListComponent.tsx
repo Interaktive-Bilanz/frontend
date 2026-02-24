@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { BookingsListProps, EntryLinesProps } from "./tAccountInterfaces";
 import { useWindowManager } from "../../context/WindowManagerContext";
 import { useInteractiveBalanceData } from "../../context/InteractiveBalanceDataContext";
+import { toast } from "react-toastify";
 
 export const BookingsListComponent: React.FC<EntryLinesProps> = ({
     accountId,
@@ -17,6 +18,11 @@ export const BookingsListComponent: React.FC<EntryLinesProps> = ({
     const addLine = (amount: number) => {
 
         if (amount <= 0) return;
+
+        if (Number.isNaN(amount)) {
+            toast.error("Bitte einen gültigen Betrag eingeben.");
+            return;
+        }
         
         if (!draftEntry) {
             const highestId = (interactiveBalanceData.journalEntries ?? []).reduce(

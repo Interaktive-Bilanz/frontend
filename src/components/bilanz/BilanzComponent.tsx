@@ -17,13 +17,14 @@ const BilanzComponent = () => {
     moveAccount, movePosition
   } = useInteractiveBalanceData();
 
-  const { dropIndicator, setDropIndicator, addOpenPositionId, clearOpenPositionIds, setOpenPositionIds } = useDragContext();
+  const { dropIndicator, setDropIndicator, addOpenPositionId, clearOpenPositionIds, setOpenPositionIds, openPositionIds } = useDragContext();
 
   const [activeData, setActiveData] = useState<{ type: string, label: string } | null>(null);
 
   const pointerRef = useRef({ x: 0, y: 0 });
   const [activeId, setActiveId] = useState<string | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
+  const [openBeforeDragIds, setOpenBeforeDragIds] = useState<Set<string>>(new Set());
   const overRectRef = useRef<DOMRect | null>(null);
   const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hoverTargetRef = useRef<string | null>(null);
@@ -167,26 +168,21 @@ const BilanzComponent = () => {
       ...balanceSheet.liabilitiesAndEquity.positions as Position[]
     ];
     try {
-      console.log('targetId:', targetId);
-      console.log('droppedOnType:', droppedOnType);
-      console.log('targetParentId:', targetParentId);
-      console.log('allPositions ids:', allPositions.map(p => p.id));
       ancestors = getAncestorIds(
         droppedOnType === "account" || (droppedOnType === "position" && intent != "inside") ? targetParentId : String(targetId),
         allPositions
       ) ?? [];
-      console.log('ancestors:', ancestors);
     }
     catch (e) {
       console.log(e);
     }
 
     const idsToKeepOpen = new Set([
+      ...Array.from(openBeforeDragIds),
       ...ancestors,
       droppedOnType === "account" || (droppedOnType === "position" && intent != "inside") ? targetParentId : String(targetId)
     ]);
 
-    // instead of clearOpenPositionIds()
     setOpenPositionIds(idsToKeepOpen);
 
   };
@@ -277,6 +273,7 @@ const BilanzComponent = () => {
     <DndContext
       collisionDetection={pointerWithin}
       onDragStart={(e) => {
+        setOpenBeforeDragIds(openPositionIds);
         setActiveId(String(e.active.id));
         setActiveData({
           type: e.active.data.current?.type,

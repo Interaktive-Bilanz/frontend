@@ -4,6 +4,7 @@ import { EntryLine, JournalEntry } from "../../types/InteractiveBalanceData";
 import { InteractiveBalanceData } from "../../types/InteractiveBalanceData";
 import { useInteractiveBalanceData } from "../../context/InteractiveBalanceDataContext";
 import { useWindowManager } from "../../context/WindowManagerContext";
+import { toast } from "react-toastify";
 
 const sumLines = (lines: EntryLine[]) =>
     lines.reduce((sum, item) => sum + item.amount, 0);
@@ -57,10 +58,17 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
     const currentEntry = isDraft ? draftEntry! : originalEntry!;
 
     const removeLine = (accountId: string) => {
+        const account = interactiveBalanceData.accounts.find(a => a.id === accountId);
+
         if (!draftEntry?.entryLines) return;
         setDraftEntry({
             ...draftEntry,
             entryLines: draftEntry.entryLines.filter(l => l.accountId !== accountId)
+        });
+
+        closeWindow({
+            type: "Account",
+            payload: { id: account?.id, label: account?.label }
         });
     };
 
@@ -70,6 +78,11 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
         const account = interactiveBalanceData.accounts.find(a => a.id === accountId);
 
         if (!account || amount <= 0) return;
+
+        if (Number.isNaN(amount)) {
+            toast.error("Bitte einen gültigen Betrag eingeben.");
+            return;
+        }
 
         setDraftEntry(prev => ({
             ...prev!,
@@ -82,7 +95,8 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
         ));
 
         openWindow({
-            type: "Account", payload: {
+            type: "Account",
+            payload: {
                 id: account?.id,
                 label: account?.label
             }
@@ -120,6 +134,17 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
     const handleCommit = () => {
         if (!draftEntry) return;
 
+        if (balance !== 0) {
+            toast.error("Ungültige Buchung. Saldo muss 0,00 betragen.");
+            return;
+        } else if (draftEntry?.entryLines.length === 0) {
+            toast.error("Ungültige Buchung. Keine Buchungszeilen eingetrage.");
+            return;
+        } else if (draftEntry?.description.length === 0) {
+            toast.error("Ungültige Buchung. Keine Buchungssatz eingetragen.");
+            return;
+        }
+
         commitDraft();
 
         closeWindow({
@@ -156,7 +181,7 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
     return (
         <div className="max-w-2xl mx-auto my-2 rounded bg-white text-sm">
             {isDraft &&
-                <textarea
+                <textarea placeholder="Bitte Geschäftsvorfall eintragen"
                     name="description"
                     className="border w-full min-h-12"
                     value={currentEntry?.description ?? ""}
@@ -185,19 +210,24 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
                             </tr>
                         </thead>
                         <tbody>
-                            {debitLines.map((e, i) => {
-                                const account = interactiveBalanceData.accounts.find(a => a.id === e.accountId);
+                            {debitLines.map((debitLine, i) => {
+                                const account = interactiveBalanceData.accounts.find(a => a.id === debitLine.accountId);
                                 return (
-                                    <tr className="cursor-pointer transition-all border duration-100 hover:scale-95"
-                                        onClick={() => openWindow({
-                                            type: "Account", payload: { id: account?.id, label: account?.label }
-                                        })}>
-                                        <td className="px-1 py-0.5">{e.accountId} {account?.label}</td>
-                                        <td className="px-1 py-0.5">{e.amount} €</td>
+                                    <tr key={i} className="cursor-pointer transition-all border duration-100 hover:scale-95"
+                                        onClick={() =>
+                                            openWindow({
+                                                type: "Account",
+                                                payload: { id: account?.id, label: account?.label }
+                                            })}>
+                                        <td className="px-1 py-0.5">{debitLine.accountId} {account?.label}</td>
+                                        <td className="px-1 py-0.5">{debitLine.amount} €</td>
                                         {isDraft &&
                                             <td className="px-1 py-0.5 text-center">
                                                 <button className="px-2 py-0.5 rounded bg-red-100 hover:bg-red-200 text-sm"
-                                                    onClick={() => removeLine(e.accountId)}>-</button>
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        removeLine(debitLine.accountId);
+                                                    }}>-</button>
                                             </td>
                                         }
                                     </tr>
@@ -260,21 +290,23 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
                             </tr>
                         </thead>
                         <tbody>
-                            {creditLines.map((e, i) => {
-                                const account = interactiveBalanceData.accounts.find(a => a.id === e.accountId);
+                            {creditLines.map((creditLine, i) => {
+                                const account = interactiveBalanceData.accounts.find(a => a.id === creditLine.accountId);
                                 return (
-                                    <tr className="cursor-pointer border transition-all duration-100 hover:scale-95"
-                                        onClick={() => openWindow({
-                                            type: "Account", payload: { id: account?.id, label: account?.label }
-                                        })}>
-                                        <td className="px-1 py-0.5">{e.accountId} {account?.label}</td>
-                                        <td className="px-1 py-0.5">{e.amount} €</td>
+                                    <tr key={`entryLine-${i}`} className="cursor-pointer border transition-all duration-100 hover:scale-95"
+                                        onClick={() =>
+                                            openWindow({
+                                                type: "Account", payload: { id: account?.id, label: account?.label }
+                                            })
+                                        }>
+                                        <td className="px-1 py-0.5">{creditLine.accountId} {account?.label}</td>
+                                        <td className="px-1 py-0.5">{creditLine.amount} €</td>
                                         {isDraft &&
                                             <td className="px-1 py-0.5 text-center">
                                                 <button className="px-2 py-0.5 rounded bg-red-100 hover:bg-red-200 text-sm"
-                                                    onClick={(event) => {
-                                                        //event.stopPropagation()
-                                                        removeLine(e.accountId);
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        removeLine(creditLine.accountId);
                                                     }}>-</button>
                                             </td>
                                         }
@@ -342,7 +374,7 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
                 <div className="flex justify-end space-x-2 mt-2">
                     <button className="px-2 py-1 border rounded bg-gray-100 hover:bg-gray-200 text-xs"
                         onClick={() => handelCancel()}>Abbrechen</button>
-                    <button className={`px-2 py-1 border rounded ${balance === 0 && draftEntry?.entryLines.length != 0 ? 'bg-yellow-200 hover:bg-yellow-300' : 'bg-gray-400 cursor-not-allowed'} text-xs font-semibold`} disabled={balance !== 0 || draftEntry?.entryLines.length === 0} onClick={() => handleCommit()}>Buchen!</button>
+                    <button className={`px-2 py-1 border rounded ${balance === 0 && draftEntry?.entryLines.length != 0 && draftEntry?.description.length != 0 ? 'bg-yellow-200 hover:bg-yellow-300' : 'bg-gray-400 '} text-xs font-semibold`} onClick={() => handleCommit()}>Buchen!</button>
                 </div>
             }
         </div >

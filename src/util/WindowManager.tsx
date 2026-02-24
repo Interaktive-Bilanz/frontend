@@ -12,6 +12,7 @@ import { toast } from "react-toastify";
 import JsonEditor from "../components/bilanz/JsonEditorComponent";
 import { DragProvider } from "../context/DragContext";
 import { AppMode, hasAccess, useAppMode } from "../context/AppModeContex";
+import { Sidebar } from "../components/sidebar/Sidebar";
 
 type WindowContentType = "Account" | "JournalEntry" | "FileHandeling";
 
@@ -124,33 +125,10 @@ const WindowManager = () => {
 
   return (
     <WindowManagerContext.Provider value={{ openWindow, closeWindow, closeAllWindowsExcept, bringToFront }}>
+      <Sidebar></Sidebar>
       <div className="w-screen h-screen bg-gray-200 relative overflow-hidden p-1">
-        <div className="">
+        <div>
           {isTeacherFromUrl && <div className="flex justify-center my-1"><div className="text-white font-bold bg-red-500 rounded-md px-2 py-1">Teacher Mode</div></div>}
-          <div className="space-x-2 flex-1 flex justify-center">
-            <button
-              className="bg-green-500 hover:bg-green-700 px-2 py-1 rounded w-60"
-              onClick={() =>
-                openWindow({ type: "JournalEntry", payload: { isDraft: true } })
-              }
-            >
-              Neuer Buchungssatz
-            </button>
-            <button
-              className="bg-green-500 hover:bg-green-700 px-2 py-1 rounded w-60"
-              onClick={() =>
-                openWindow({ type: "FileHandeling", payload: {} })
-              }
-            >
-              Up-/Download
-            </button>
-            <select
-              onChange={(e) => setAppMode(e.target.value as AppMode)}>
-              <option value="standard" selected={appMode === "standard"}>Standard</option>
-              <option value="edit" selected={appMode === "edit"}>Edit</option>
-              {isTeacherFromUrl && <option value="teacher" selected={appMode === "teacher"}>Teacher</option>}
-            </select>
-          </div>
 
           <div className={"flex-1 flex items-start p-8 h-full " + (hasAccess(appMode, "teacher") ? "justify-evenly gap-4" : "justify-center")}>
             <DragProvider>

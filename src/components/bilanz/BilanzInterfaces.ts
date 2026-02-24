@@ -1,4 +1,4 @@
-import { Position } from "../../types/InteractiveBalanceData";
+import { Account, Position } from "../../types/InteractiveBalanceData";
 
 // Leaf Konto
 export type Konto = {
@@ -22,15 +22,15 @@ export type BilanzNode = {
 // Props for React components
 export type BilanzProps = {
   title: string;
-  //posten: BilanzNode[];
-  positions?: Position[]; // child nodes
-  konto?: Konto[]; // leaf accounts
-  openTAccWindow: (title: string) => void;
+  positions?: Position[];
+  accounts?: string[];
 };
 
 // Optional: Column type for backend
 export type BilanzColumn = {
-  posten: BilanzNode[];
+  title: string;
+  positions?: Position[];
+  accounts?: Account[];
 };
 
 // Full backend object

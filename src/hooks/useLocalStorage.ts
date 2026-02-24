@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
+import { useImmer } from 'use-immer';
 
-export function useLocalStorage<T>(key: string, defaultValue: T) {
-    const [value, setValue] = useState<T>(() => {
+export function useLocalStorage<T>(key: string, defaultValue: T, overwrite = false) {
+    const [value, setValue] = useImmer<T>(() => {
+        if (overwrite) return defaultValue;
         const json = window.localStorage.getItem(key);
         return json ? (JSON.parse(json) as T) : defaultValue;
     });

@@ -1,57 +1,37 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "./journal_entry.schema.json",
+    "$id": "journal_entry.schema.json",
     "title": "Journal Entry",
     "description": "A journal entry with at least one debit-line and one credit-line",
     "type": "object",
     "properties": {
         "id": {
-            "type": "integer"
+            "type": "number"
+        },
+        "description": {
+            "type": "string"
         },
         "entryLines": {
             "type": "array",
             "items": {
                 "$ref": "#/$defs/entryLine"
             },
-            "allOf": [
-                {
-                    "contains": {
-                        "type": "object",
-                        "properties": {
-                            "entryType": {
-                                "const": "debit"
-                            }
-                        },
-                        "required": [
-                            "entryType"
-                        ]
-                    },
-                    "minContains": 1
-                },
-                {
-                    "contains": {
-                        "type": "object",
-                        "properties": {
-                            "entryType": {
-                                "const": "credit"
-                            }
-                        },
-                        "required": [
-                            "entryType"
-                        ]
-                    },
-                    "minContains": 1
-                }
-            ]
-        },
-        "additionalProperties": false
+            "default": []
+        }
     },
+    "additionalProperties": false,
+    "required": [
+        "id",
+        "description",
+        "entryLines"
+    ],
     "$defs": {
         "entryLine": {
             "type": "object",
             "properties": {
                 "accountId": {
-                    "type": "integer"
+                    "type": "string",
+                    "pattern": "^[0-9]{4}$"
                 },
                 "amount": {
                     "type": "number"

@@ -1,0 +1,255 @@
+{
+    "balanceSheet": {
+        "assets": [
+            {
+                "label": "Anlagevermögen",
+                "accounts": [
+                    "0300",
+                    "0400"
+                ],
+                "positions": [
+                    {
+                        "label": "Sachanlagen",
+                        "accounts": [
+                            "0300"
+                        ],
+                        "positions": []
+                    },
+                    {
+                        "label": "Finanzanlagen",
+                        "accounts": [
+                            "0400"
+                        ],
+                        "positions": []
+                    }
+                ]
+            },
+            {
+                "label": "Umlaufvermögen",
+                "accounts": [
+                    "1000",
+                    "1200",
+                    "1400"
+                ],
+                "positions": [
+                    {
+                        "label": "Vorräte",
+                        "accounts": [
+                            "1000"
+                        ],
+                        "positions": []
+                    },
+                    {
+                        "label": "Forderungen",
+                        "accounts": [
+                            "1200"
+                        ],
+                        "positions": []
+                    },
+                    {
+                        "label": "Bank und Kasse",
+                        "accounts": [
+                            "1400"
+                        ],
+                        "positions": []
+                    }
+                ]
+            }
+        ],
+        "liabilitiesAndEquity": [
+            {
+                "label": "Eigenkapital",
+                "accounts": [
+                    "3000"
+                ],
+                "positions": []
+            },
+            {
+                "label": "Fremdkapital",
+                "accounts": [
+                    "3100",
+                    "3300"
+                ],
+                "positions": [
+                    {
+                        "label": "Verbindlichkeiten aus Lieferungen",
+                        "accounts": [
+                            "3100"
+                        ],
+                        "positions": []
+                    },
+                    {
+                        "label": "Sonstige Verbindlichkeiten",
+                        "accounts": [
+                            "3300"
+                        ],
+                        "positions": []
+                    }
+                ]
+            }
+        ]
+    },
+    "accounts": [
+        {
+            "id": "0300",
+            "label": "Gebäude"
+        },
+        {
+            "id": "0400",
+            "label": "Beteiligungen"
+        },
+        {
+            "id": "1000",
+            "label": "Rohstoffe"
+        },
+        {
+            "id": "1200",
+            "label": "Forderungen aus Lieferungen"
+        },
+        {
+            "id": "1400",
+            "label": "Bank"
+        },
+        {
+            "id": "3000",
+            "label": "Eigenkapital"
+        },
+        {
+            "id": "3100",
+            "label": "Verbindlichkeiten L+L"
+        },
+        {
+            "id": "3300",
+            "label": "Sonstige Verbindlichkeiten"
+        },
+        {
+            "id": "1600",
+            "label": "Forderungen Kunden"
+        },
+        {
+            "id": "5000",
+            "label": "Erlöse"
+        },
+        {
+            "id": "6000",
+            "label": "Aufwendungen Material"
+        }
+    ],
+    "journalEntries": [
+        {
+            "id": 1,
+            "entryLines": [
+                {
+                    "accountId": "1000",
+                    "amount": 5000,
+                    "entryType": "debit"
+                },
+                {
+                    "accountId": "1400",
+                    "amount": 5000,
+                    "entryType": "credit"
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "entryLines": [
+                {
+                    "accountId": "1200",
+                    "amount": 2000,
+                    "entryType": "debit"
+                },
+                {
+                    "accountId": "1000",
+                    "amount": 2000,
+                    "entryType": "credit"
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "entryLines": [
+                {
+                    "accountId": "0300",
+                    "amount": 10000,
+                    "entryType": "debit"
+                },
+                {
+                    "accountId": "1400",
+                    "amount": 10000,
+                    "entryType": "credit"
+                }
+            ]
+        },
+        {
+            "id": 4,
+            "entryLines": [
+                {
+                    "accountId": "1400",
+                    "amount": 3000,
+                    "entryType": "debit"
+                },
+                {
+                    "accountId": "3100",
+                    "amount": 2000,
+                    "entryType": "credit"
+                },
+                {
+                    "accountId": "3300",
+                    "amount": 1000,
+                    "entryType": "credit"
+                }
+            ]
+        },
+        {
+            "id": 5,
+            "entryLines": [
+                {
+                    "accountId": "6000",
+                    "amount": 1500,
+                    "entryType": "debit"
+                },
+                {
+                    "accountId": "1000",
+                    "amount": 1500,
+                    "entryType": "credit"
+                }
+            ]
+        },
+        {
+            "id": 6,
+            "entryLines": [
+                {
+                    "accountId": "1400",
+                    "amount": 4000,
+                    "entryType": "debit"
+                },
+                {
+                    "accountId": "1200",
+                    "amount": 4000,
+                    "entryType": "credit"
+                }
+            ]
+        },
+        {
+            "id": 7,
+            "entryLines": [
+                {
+                    "accountId": "5000",
+                    "amount": 6000,
+                    "entryType": "credit"
+                },
+                {
+                    "accountId": "1400",
+                    "amount": 4000,
+                    "entryType": "debit"
+                },
+                {
+                    "accountId": "1600",
+                    "amount": 2000,
+                    "entryType": "debit"
+                }
+            ]
+        }
+    ]
+}

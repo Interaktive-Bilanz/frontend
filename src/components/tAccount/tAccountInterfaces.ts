@@ -17,14 +17,19 @@ export type TAccount = {
 };
 
 export interface TAccountProps {
-  account: Account;
+  id: string;
+  label: string;
 }
 
 export interface EntryLinesProps {
+  accountId: string;
   lines: {
     entryId: number,
-    line: EntryLine
+    description: string,
+    line: EntryLine,
+    draft: boolean
   }[];
+  type: "credit" | "debit";
 }
 
 export interface BookingsListProps {

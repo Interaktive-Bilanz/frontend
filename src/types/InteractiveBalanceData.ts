@@ -6,9 +6,10 @@
  */
 
 /**
- * Interactive balance data with accounts, bookings and the balance sheet structure
+ * Interactive balance data with accounts, journal entries and the balance sheet structure
  */
 export interface InteractiveBalanceData {
+  schemaVersion?: string;
   balanceSheet: BalanceSheet;
   /**
    * List of all accounts
@@ -17,7 +18,7 @@ export interface InteractiveBalanceData {
   /**
    * List of all journal Entries
    */
-  journalEntries?: JournalEntry[];
+  journalEntries: JournalEntry[];
 }
 /**
  * The balance sheet holding the structure of accounts, sums and balance
@@ -26,40 +27,52 @@ export interface BalanceSheet {
   /**
    * List of all positions and accounts on the assets side
    */
-  assets: Position[];
+  assets: {
+    /**
+     * List of account ids directly assigned to this position
+     */
+    accounts?: string[];
+    positions?: Position[];
+    [k: string]: unknown;
+  };
   /**
    * List of all positions and accounts on the liabilities and equity side
    */
-  liabilitiesAndEquity: Position[];
+  liabilitiesAndEquity: {
+    /**
+     * List of account ids directly assigned to this position
+     */
+    accounts?: string[];
+    positions?: Position[];
+    [k: string]: unknown;
+  };
 }
 export interface Position {
+  id?: string;
   label: string;
   /**
    * List of account ids directly assigned to this position
    */
-  accounts?: number[];
-  positions?: Position[];
+  accounts: string[];
+  positions: Position[];
 }
 /**
  * Account in the balance sheet
  */
 export interface Account {
-  id: number;
-  label?: string;
+  id: string;
+  label: string;
 }
 /**
  * A journal entry with at least one debit-line and one credit-line
  */
 export interface JournalEntry {
-  id?: number;
-  entryLines?: {
-    [k: string]: unknown;
-  } & EntryLine[];
-  additionalProperties?: never;
-  [k: string]: unknown;
+  id: number;
+  description: string;
+  entryLines: EntryLine[];
 }
 export interface EntryLine {
-  accountId: number;
+  accountId: string;
   amount: number;
   entryType: "credit" | "debit";
 }

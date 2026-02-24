@@ -3,13 +3,13 @@ import { Position } from "../../types/InteractiveBalanceData";
 import { useInteractiveBalanceData } from "../../context/InteractiveBalanceDataContext";
 import { useWindowManager } from "../../context/WindowManagerContext";
 import { AccountTotal, getAccountTotals } from "../../util/balanceCalculations";
-import { useTeacherMode } from "../../context/TeacherModeContext";
 import { getAssigendAccountIds } from "../../util/getAssignedAccountIds";
 import { toast } from "react-toastify";
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import SortableAccountItem from "../sortable/SortableAccountItems";
 import { useDragContext } from "../../context/DragContext";
+import { hasAccess, useAppMode } from "../../context/AppModeContex";
 
 export function calculatePositionSaldo(
   position: Position,
@@ -49,7 +49,7 @@ const BilanzItem: React.FC<{
 
   const displaypositionBalance = Math.abs(positionBalance);
 
-  const { teacherMode } = useTeacherMode();
+  const { appMode } = useAppMode();
 
   const [editLabel, setEditLabel] = useState(false);
   const [labelDraft, setLabelDraft] = useState(position.label);
@@ -125,7 +125,7 @@ const BilanzItem: React.FC<{
           }}
         >
           <div className="flex justify-between items-center">
-            {teacherMode && (
+            {hasAccess(appMode, "edit") && (
               <span
                 {...attributes}
                 {...listeners}
@@ -149,7 +149,7 @@ const BilanzItem: React.FC<{
               <div className="min-w-0 hyphens-auto flex-1">{position.label}</div>
 
             }
-            {teacherMode &&
+            {hasAccess(appMode, "edit") &&
               <div>
                 {editLabel ?
                   <button className="bg-transparent hover:bg-gray-100 mr-1 px-1 py-1 rounded" onClick={(e) => {
@@ -180,7 +180,7 @@ const BilanzItem: React.FC<{
 
       {isOpen && (
         <div className="ml-4">
-          {teacherMode &&
+          {hasAccess(appMode, "edit") &&
             <div className="flex">
               <button
                 className="bg-green-500 hover:bg-green-700 px-1 py-1 mt-1 mr-1 rounded"
@@ -254,7 +254,7 @@ const BilanzItem: React.FC<{
                   key={accountId}
                   accountId={accountId}
                   account={account}
-                  teacherMode={teacherMode}
+                  teacherMode={hasAccess(appMode, "edit")}
                   parentId={position.id!}
                   onRemove={() => removeAccountFrom(
                     position.id!,

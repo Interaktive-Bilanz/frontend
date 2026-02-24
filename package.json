@@ -1,8 +1,13 @@
 {
   "name": "frontend",
+  "homepage": "https://interaktive-bilanz.github.io/frontend/",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@codemirror/lang-json": "^6.0.2",
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
@@ -11,17 +16,26 @@
     "@types/node": "^16.18.126",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
+    "@uiw/react-codemirror": "^4.25.4",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "gh-pages": "^6.3.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-scripts": "5.0.1",
+    "react-rnd": "^10.5.2",
+    "react-toastify": "^11.0.5",
     "typescript": "^4.9.5",
+    "use-immer": "^0.11.0",
+    "uuid": "^13.0.0",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
+    "generate-types": "json2ts ./src/schemas/interactive_balance_data.schema.json -o ./src/types/InteractiveBalanceData.ts --cwd ./src/schemas"
   },
   "eslintConfig": {
     "extends": [
@@ -42,8 +56,16 @@
     ]
   },
   "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/uuid": "^10.0.0",
+    "@vitejs/plugin-react": "^5.1.2",
     "autoprefixer": "^10.4.14",
+    "babel-plugin-react-compiler": "^1.0.0",
+    "json-schema-to-typescript": "^15.0.4",
     "postcss": "^8.4.24",
-    "tailwindcss": "^3.3.0"
+    "prettier": "3.6.2",
+    "tailwindcss": "^3.3.0",
+    "typescript": "^5.6.0",
+    "vite": "^7.2.7"
   }
 }

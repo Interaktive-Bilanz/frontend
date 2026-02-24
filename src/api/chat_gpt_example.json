@@ -1,0 +1,105 @@
+{
+  "balanceSheet": {
+    "assets": [
+      {
+        "label": "Current Assets",
+        "accounts": [],
+        "positions": [
+          {
+            "label": "Cash",
+            "accounts": [100, 101],
+            "positions": []
+          },
+          {
+            "label": "Bank",
+            "accounts": [102, 103],
+            "positions": []
+          }
+        ]
+      },
+      {
+        "label": "Fixed Assets",
+        "accounts": [],
+        "positions": [
+          {
+            "label": "Equipment",
+            "accounts": [104],
+            "positions": []
+          },
+          {
+            "label": "Vehicles",
+            "accounts": [105, 106],
+            "positions": []
+          }
+        ]
+      }
+    ],
+    "liabilitiesAndEquity": [
+      {
+        "label": "Liabilities",
+        "accounts": [200],
+        "positions": [
+          {
+            "label": "Accounts Payable",
+            "accounts": [201, 202],
+            "positions": []
+          },
+          {
+            "label": "Short-Term Loans",
+            "accounts": [203],
+            "positions": []
+          }
+        ]
+      },
+      {
+        "label": "Equity",
+        "accounts": [300], 
+        "positions": [
+          {
+            "label": "Owner's Equity",
+            "accounts": [301],
+            "positions": []
+          }
+        ]
+      }
+    ]
+  },
+  "accounts": [
+    { "id": 100, "label": "Petty Cash" },
+    { "id": 101, "label": "Cash on Hand" },
+    { "id": 102, "label": "Bank Checking" },
+    { "id": 103, "label": "Bank Savings" },
+    { "id": 104, "label": "Equipment" },
+    { "id": 105, "label": "Vehicles - Cars" },
+    { "id": 106, "label": "Vehicles - Trucks" },
+    { "id": 200, "label": "Liabilities - General" },
+    { "id": 201, "label": "Accounts Payable - Vendor A" },
+    { "id": 202, "label": "Accounts Payable - Vendor B" },
+    { "id": 203, "label": "Short-Term Loan" },
+    { "id": 300, "label": "Equity - Capital" },
+    { "id": 301, "label": "Retained Earnings" }
+  ],
+  "journalEntries": [
+    {
+      "id": 1,
+      "entryLines": [
+        { "accountId": 101, "amount": 500, "entryType": "debit" },
+        { "accountId": 201, "amount": 500, "entryType": "credit" }
+      ]
+    },
+    {
+      "id": 2,
+      "entryLines": [
+        { "accountId": 102, "amount": 1200, "entryType": "debit" },
+        { "accountId": 203, "amount": 1200, "entryType": "credit" }
+      ]
+    },
+    {
+      "id": 3,
+      "entryLines": [
+        { "accountId": 104, "amount": 2000, "entryType": "debit" },
+        { "accountId": 300, "amount": 2000, "entryType": "credit" }
+      ]
+    }
+  ]
+}

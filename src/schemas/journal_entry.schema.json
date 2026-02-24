@@ -1,0 +1,54 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "journal_entry.schema.json",
+    "title": "Journal Entry",
+    "description": "A journal entry with at least one debit-line and one credit-line",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "number"
+        },
+        "description": {
+            "type": "string"
+        },
+        "entryLines": {
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/entryLine"
+            },
+            "default": []
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "id",
+        "description",
+        "entryLines"
+    ],
+    "$defs": {
+        "entryLine": {
+            "type": "object",
+            "properties": {
+                "accountId": {
+                    "type": "string",
+                    "pattern": "^[0-9]{4}$"
+                },
+                "amount": {
+                    "type": "number"
+                },
+                "entryType": {
+                    "enum": [
+                        "credit",
+                        "debit"
+                    ]
+                }
+            },
+            "required": [
+                "accountId",
+                "amount",
+                "entryType"
+            ],
+            "additionalProperties": false
+        }
+    }
+}

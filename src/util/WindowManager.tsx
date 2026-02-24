@@ -8,10 +8,10 @@ import Buchungsformular from "../components/buchungssatz/Formular";
 import { WindowManagerContext } from "../context/WindowManagerContext";
 import { JournalEntryForm } from "../components/journalEntry/JournalEntryForm";
 import { FileHandlerComponent } from "../components/fileHandler/FileHandlerComponent";
-import { useTeacherMode } from "../context/TeacherModeContext";
 import { toast } from "react-toastify";
 import JsonEditor from "../components/bilanz/JsonEditorComponent";
 import { DragProvider } from "../context/DragContext";
+import { AppMode, hasAccess, useAppMode } from "../context/AppModeContex";
 
 type WindowContentType = "Account" | "JournalEntry" | "FileHandeling";
 
@@ -54,7 +54,7 @@ const WindowManager = () => {
   const { cancelDraft } = useInteractiveBalanceData()
   const contentRef = useRef<HTMLDivElement>(null);
   const [minHeight, setMinHeight] = useState<number>(0);
-  const { teacherMode } = useTeacherMode();
+  const { appMode, isTeacherFromUrl, setAppMode } = useAppMode();
   const { interactiveBalanceData, setInteractiveBalanceData } = useInteractiveBalanceData();
 
   useEffect(() => {
@@ -124,10 +124,9 @@ const WindowManager = () => {
 
   return (
     <WindowManagerContext.Provider value={{ openWindow, closeWindow, closeAllWindowsExcept, bringToFront }}>
-      <div className="w-screen h-screen bg-gray-200 relative overflow-hidden p-4">
-        {/* Top bar or main content container */}
+      <div className="w-screen h-screen bg-gray-200 relative overflow-hidden p-1">
         <div className="">
-          {/* Left column: buttons */}
+          {isTeacherFromUrl && <div className="flex justify-center my-1"><div className="text-white font-bold bg-red-500 rounded-md px-2 py-1">Teacher Mode</div></div>}
           <div className="space-x-2 flex-1 flex justify-center">
             <button
               className="bg-green-500 hover:bg-green-700 px-2 py-1 rounded w-60"
@@ -145,14 +144,19 @@ const WindowManager = () => {
             >
               Up-/Download
             </button>
+            <select
+              onChange={(e) => setAppMode(e.target.value as AppMode)}>
+              <option value="standard" selected={appMode === "standard"}>Standard</option>
+              <option value="edit" selected={appMode === "edit"}>Edit</option>
+              {isTeacherFromUrl && <option value="teacher" selected={appMode === "teacher"}>Teacher</option>}
+            </select>
           </div>
 
-          {/* Center column: balance sheet */}
-          <div className={"flex-1 flex items-start p-8 h-full " + (teacherMode ? "justify-evenly gap-4" : "justify-center")}>
+          <div className={"flex-1 flex items-start p-8 h-full " + (hasAccess(appMode, "teacher") ? "justify-evenly gap-4" : "justify-center")}>
             <DragProvider>
               <BilanzComponent />
             </DragProvider>
-            {teacherMode &&
+            {hasAccess(appMode, "teacher") &&
               <div className="w-1/2 h-90vh">
                 <JsonEditor />
               </div>
@@ -160,7 +164,6 @@ const WindowManager = () => {
           </div>
         </div>
 
-        {/* Floating windows */}
         {windows.map((w) => (
           // add the json editor here?
           <Rnd

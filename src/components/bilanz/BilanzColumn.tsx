@@ -1,7 +1,6 @@
 import BilanzItem, { calculatePositionSaldo } from "./BilanzItem";
 import { BilanzProps } from "./BilanzInterfaces";
 import { useInteractiveBalanceData } from "../../context/InteractiveBalanceDataContext";
-import { useTeacherMode } from "../../context/TeacherModeContext";
 import { v4 as uuidv4 } from "uuid";
 import { useEffect, useMemo, useState } from "react";
 import { ValueScope } from "ajv/dist/compile/codegen";
@@ -12,6 +11,7 @@ import { toast } from "react-toastify";
 import { DndContext, DragEndEvent, useDroppable } from "@dnd-kit/core";
 import { SortableContext } from "@dnd-kit/sortable";
 import SortableAccountItem from "../sortable/SortableAccountItems";
+import { hasAccess, useAppMode } from "../../context/AppModeContex";
 
 const BilanzColumn: React.FC<BilanzProps> = ({
   title,
@@ -21,7 +21,7 @@ const BilanzColumn: React.FC<BilanzProps> = ({
   let sum = 0;
 
   const { accountTotals, interactiveBalanceData, setInteractiveBalanceData, addAccountTo, removeAccountFrom } = useInteractiveBalanceData();
-  const { teacherMode } = useTeacherMode();
+  const { appMode } = useAppMode();
   const { openWindow } = useWindowManager();
 
   const assigendAccountIds = useMemo(() => {
@@ -91,7 +91,7 @@ const BilanzColumn: React.FC<BilanzProps> = ({
     <div className="p-4">
       <div ref={setNodeRef} >
         <h2 className="text-xl font-bold mb-4">{title}</h2>
-        {teacherMode &&
+        {hasAccess(appMode, "edit") &&
           <div className="flex">
             <button className="bg-green-500 hover:bg-green-700 px-1 py-1 mt-1 mr-1 rounded" onClick={addPosition}>
               + Position
@@ -141,7 +141,7 @@ const BilanzColumn: React.FC<BilanzProps> = ({
               key={accountId}
               accountId={accountId}
               account={account}
-              teacherMode={teacherMode}
+              teacherMode={hasAccess(appMode, "edit")}
               parentId={parentId}
               onRemove={() => removeAccountFrom(
                 title === "Aktiva" ? "assets" : "liabilitiesAndEquity",

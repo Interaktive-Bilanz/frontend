@@ -4,7 +4,7 @@ import { useWindowManager } from "../../context/WindowManagerContext";
 import { useInteractiveBalanceData } from "../../context/InteractiveBalanceDataContext";
 import { toast } from "react-toastify";
 
-export const BookingsListComponent: React.FC<EntryLinesProps> = ({
+export const EntriesListComponent: React.FC<EntryLinesProps> = ({
     accountId,
     lines,
     type
@@ -115,7 +115,7 @@ export const BookingsListComponent: React.FC<EntryLinesProps> = ({
                         <td></td>
                         <td className="px-1 py-0.5 whitespace-nowrap text-right border-l border-solid">
                             <input type="text"
-                                className="w-full text-xs"
+                                className="w-full text-xs border"
                                 value={newEntryLineAmount}
                                 onChange={e => setNewEntryLineAmount(e.target.value)} />
                         </td>

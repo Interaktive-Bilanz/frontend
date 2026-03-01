@@ -6,6 +6,7 @@ import { calculateAccountTotals, AccountTotal } from "../util/balanceCalculation
 import { ensurePositionIds } from "../util/addIdsToPositions";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "react-toastify";
+import { getAssigendAccountIds } from "../util/getAssignedAccountIds";
 
 interface InteractiveBalanceDataContextType {
   interactiveBalanceData: InteractiveBalanceData;
@@ -23,7 +24,7 @@ interface InteractiveBalanceDataContextType {
 
   deletePosition: (positionId: string) => void;
 
-  addNewAccount: (accountId: string) => void;
+  addNewAccount: (id: string, label: string) => void;
 
   addAccountTo: (positionId: string, accountId: string) => void;
 
@@ -38,6 +39,9 @@ interface InteractiveBalanceDataContextType {
   movePosition: (positionId: string, fromPositionId: string, toPositionId: string) => void;
 
   accountTotals: Record<string, AccountTotal>;
+
+  assigendAccountIds: Set<string>;
+
 }
 
 const InteractiveBalanceDataContext = createContext<InteractiveBalanceDataContextType | null>(null);
@@ -58,6 +62,11 @@ export const InteractiveBalanceDataProvider: React.FC<{ children: React.ReactNod
   );
 
   const [draftEntry, setDraftEntry] = useState<JournalEntry | null>(null);
+
+  const assigendAccountIds = useMemo(() => {
+    return getAssigendAccountIds(interactiveBalanceData.balanceSheet);
+  }, [interactiveBalanceData.balanceSheet]);
+
 
   const updatePositionLabel = (positionId: string, newLabel: string) => {
     setInteractiveBalanceData(draft => {
@@ -123,18 +132,23 @@ export const InteractiveBalanceDataProvider: React.FC<{ children: React.ReactNod
     })
   }
 
-  const addNewAccount = (accountId: string) => {
+  const addNewAccount = (id: string, label: string) => {
 
 
-    if (!/^[0-9]{4}$/.test(accountId)) {
+    if (!/^[0-9]{4}$/.test(id)) {
       console.log("not a valid account id");
       toast.error("Account ID nicht zulässig");
       throw new Error("Invalid account ID format");
     }
 
+    if (interactiveBalanceData.accounts.some(a => a.id === id)) {
+      toast.error("Konto mit dieser Kontonummer existier bereits");
+      throw new Error("Account already exists");
+    }
+
     const newAccount = {
-      id: accountId,
-      label: "Neuer Account"
+      id: id,
+      label: label
     };
 
     setInteractiveBalanceData(draft => {
@@ -145,7 +159,9 @@ export const InteractiveBalanceDataProvider: React.FC<{ children: React.ReactNod
   const addAccountTo = (positionId: string, accountId: string) => {
     try {
       console.log("account ID to add: ", accountId);
-      if (!interactiveBalanceData.accounts.find(a => a.id === accountId)) addNewAccount(accountId);
+      if (!interactiveBalanceData.accounts.find(a => a.id === accountId)) {
+        throw new Error("Account does not exist");
+      };
 
       setInteractiveBalanceData(draft => {
         if (positionId === "assets") {
@@ -411,7 +427,7 @@ export const InteractiveBalanceDataProvider: React.FC<{ children: React.ReactNod
   return (
     <InteractiveBalanceDataContext.Provider value={{
       interactiveBalanceData, setInteractiveBalanceData, draftEntry, setDraftEntry, commitDraft, cancelDraft, accountTotals, updatePositionLabel, addNewPositionTo, addNewAccount, addAccountTo, deletePosition, removeAccountFrom, reorderAccountsInPosition, reorderPositionsInPosition,
-      moveAccount, movePosition
+      moveAccount, movePosition, assigendAccountIds
     }}>
       {children}
     </InteractiveBalanceDataContext.Provider>

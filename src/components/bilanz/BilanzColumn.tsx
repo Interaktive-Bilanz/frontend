@@ -20,13 +20,13 @@ const BilanzColumn: React.FC<BilanzProps> = ({
 }) => {
   let sum = 0;
 
-  const { accountTotals, interactiveBalanceData, setInteractiveBalanceData, addAccountTo, removeAccountFrom } = useInteractiveBalanceData();
+  const { accountTotals, interactiveBalanceData, setInteractiveBalanceData, addAccountTo, removeAccountFrom, assigendAccountIds } = useInteractiveBalanceData();
   const { appMode } = useAppMode();
   const { openWindow } = useWindowManager();
 
-  const assigendAccountIds = useMemo(() => {
-    return getAssigendAccountIds(interactiveBalanceData.balanceSheet);
-  }, [interactiveBalanceData.balanceSheet]);
+  // const assigendAccountIds = useMemo(() => {
+  //   return getAssigendAccountIds(interactiveBalanceData.balanceSheet);
+  // }, [interactiveBalanceData.balanceSheet]);
 
   const unassignedAccounts = useMemo(() => {
     return interactiveBalanceData.accounts.filter(a => !assigendAccountIds.has(a.id));

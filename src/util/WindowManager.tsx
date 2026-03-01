@@ -13,8 +13,9 @@ import JsonEditor from "../components/bilanz/JsonEditorComponent";
 import { DragProvider } from "../context/DragContext";
 import { AppMode, hasAccess, useAppMode } from "../context/AppModeContex";
 import { Sidebar } from "../components/sidebar/Sidebar";
+import { ChartOfAccounts } from "../components/chartOfAccounts/chartOfAccountsComponent";
 
-type WindowContentType = "Account" | "JournalEntry" | "FileHandeling";
+type WindowContentType = "Account" | "JournalEntry" | "FileHandeling" | "ChartOfAccounts";
 
 export interface WindowData {
   type: WindowContentType;
@@ -45,6 +46,9 @@ function generateTitle(data: WindowData) {
     case "FileHandeling": {
       return "File Handeling";
     }
+    case "ChartOfAccounts": {
+      return "Kontenplan";
+    }
     default: return "No Title";
   }
 }
@@ -69,6 +73,7 @@ const WindowManager = () => {
     "Account": 3,
     "JournalEntry": 1,
     "FileHandeling": 1,
+    "ChartOfAccounts": 1
   }
 
   const openWindow = (windowData: WindowData) => {
@@ -186,9 +191,11 @@ const WindowManager = () => {
                   isDraft={w.data.payload.isDraft}
                 />
               )}
-
               {w.data.type === "FileHandeling" && (
                 <FileHandlerComponent key={w.data.type} />
+              )}
+              {w.data.type === "ChartOfAccounts" && (
+                <ChartOfAccounts/>
               )}
             </div>
           </Rnd>

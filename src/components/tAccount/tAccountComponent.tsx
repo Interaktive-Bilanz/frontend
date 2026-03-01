@@ -1,5 +1,5 @@
 import { Booking, EntryLinesProps, TAccountProps } from "./tAccountInterfaces";
-import { BookingsListComponent } from "./entryListComponent";
+import { EntriesListComponent } from "./entryListComponent";
 import React from "react";
 import { useInteractiveBalanceData } from "../../context/InteractiveBalanceDataContext";
 import { EntryLine } from "../../types/InteractiveBalanceData";
@@ -60,10 +60,10 @@ export const TAccountComponent: React.FC<TAccountProps> = ({
             </div>
             <div className="grid grid-cols-2 border-t-4 border-solid border-black">
                 <div className="pr-1 border-r-2 border-solid border-black w-full pb-1">
-                    <BookingsListComponent lines={debitLines} accountId={accountId} type="debit" />
+                    <EntriesListComponent lines={debitLines} accountId={accountId} type="debit" />
                 </div>
                 <div className="pl-1 border-l-2 border-solid border-black w-full pb-1">
-                    <BookingsListComponent lines={creditLines} accountId={accountId} type="credit" />
+                    <EntriesListComponent lines={creditLines} accountId={accountId} type="credit" />
                 </div>
             </div>
             <div className="grid grid-cols-2 border-t-2 border-solid border-gray-300 -mt-1">

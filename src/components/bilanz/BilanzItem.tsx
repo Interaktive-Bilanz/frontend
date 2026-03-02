@@ -221,28 +221,6 @@ const BilanzItem: React.FC<{
                   ) : <option key={"noAccAvailable"} className="text-xs"></option>}
                 </select>
               </div>
-              {/* <button
-                className="bg-green-500 hover:bg-green-700 px-1 py-1 mt-1 mr-1 rounded"
-                onClick={() => addNewAccountTo(String(position.id), newAccountId)}>
-                <div className="flex items-center">
-                  + Konto
-                  <select name="" id=""></select>
-                  <input
-                    value={newAccountId}
-                    type="text"
-                    size={4}
-                    maxLength={4}
-                    placeholder="1234"
-                    pattern="[0-9]{4}"
-                    className="ml-1 h-5 px-1 text-sm border border-gray-300 rounded box-border text-center"
-                    onClick={(e) => e.stopPropagation()}
-                    onChange={(e) => {
-                      const value = e.target.value.replace('/[^0-9]/g', '');
-                      if (value.length <= 4) setNewAccountId(value);
-                    }}
-                  />
-                </div>
-              </button> */}
             </div>
           }
           <SortableContext items={position.accounts ?? []}>

@@ -4,12 +4,55 @@ import { validateJson } from "../../util/validateJson";
 import WindowManager from "../../util/WindowManager";
 import { useWindowManager, WindowManagerContext } from "../../context/WindowManagerContext";
 import { toast } from 'react-toastify';
+import defaultProjectFile from "../../api/empyt_project.json"
+import { InteractiveBalanceData } from "../../types/InteractiveBalanceData";
 
 export function FileHandlerComponent() {
     const { interactiveBalanceData, setInteractiveBalanceData } = useInteractiveBalanceData();
     const [uploadedFile, setUploadedFile] = useState<File | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const { closeAllWindowsExcept } = useWindowManager();
+
+    const defaultProject = defaultProjectFile as unknown as InteractiveBalanceData;
+
+    const donwloadBeforeResetToast = () => {
+        toast.warning(({ closeToast }) => (
+            <div>
+                <div>Aktuelles Projekt vorher runterladen?</div>
+                <div className="flex justify-between">
+                    <button
+                        className="text-black border px-2 py-0.5 rounded bg-gray-100 hover:bg-gray-200 text-sm"
+                        onClick={() => {
+                            handleDownload();
+                            setInteractiveBalanceData(defaultProject);
+                            closeToast();
+                        }}
+                    >
+                        Ja
+                    </button>
+                    <button
+                        className="text-black border px-2 py-0.5 rounded bg-gray-100 hover:bg-gray-200 text-sm"
+                        onClick={() => {
+                            setInteractiveBalanceData(defaultProject);
+                            closeToast();
+                        }}
+                    >
+                        Nein
+                    </button>
+                    <button
+                        className="text-black border px-2 py-0.5 rounded bg-gray-100 hover:bg-gray-200 text-sm"
+                        onClick={() => {
+                            closeToast();
+                        }}>
+                        Abbrechen
+                    </button>
+                </div>
+            </div >
+        ), {
+            position: "top-center",
+            autoClose: false,
+        });
+    }
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setErrorMessage(null);
@@ -111,43 +154,54 @@ export function FileHandlerComponent() {
     }
 
     return (
-        <div className="flex justify-center">
-            <div className="flex flex-col items-center space-y-2 p-4 bg-white border rounded shadow-md w-80">
-                <label className="flex flex-col w-full">
-                    <span className="text-sm font-medium text-gray-700 mb-1">Upload JSON</span>
-                    <input
-                        type="file"
-                        accept=".json"
-                        onChange={handleFileChange}
-                        className="block w-full text-xs text-gray-600 file:mr-4 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-green-100 file:text-green-700 hover:file:bg-green-200"
-                    />
-                </label>
+        <>
+            <div className="flex justify-center">
+                <div className="flex flex-col items-center space-y-2 p-4 bg-white border rounded shadow-md w-80">
+                    <label className="flex flex-col w-full">
+                        <span className="text-sm font-medium text-gray-700 mb-1">Upload JSON</span>
+                        <input
+                            type="file"
+                            accept=".json"
+                            onChange={handleFileChange}
+                            className="block w-full text-xs text-gray-600 file:mr-4 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-green-100 file:text-green-700 hover:file:bg-green-200"
+                        />
+                    </label>
 
-                <button
-                    disabled={!uploadedFile}
-                    onClick={handleUpload}
-                    className={`w-full px-3 py-1 rounded text-white text-sm font-medium transition-colors ${uploadedFile ? "bg-green-500 hover:bg-green-600" : "bg-gray-300 cursor-not-allowed"
-                        }`}
-                >
-                    Upload
-                </button>
+                    <button
+                        disabled={!uploadedFile}
+                        onClick={handleUpload}
+                        className={`w-full px-3 py-1 rounded text-white text-sm font-medium transition-colors ${uploadedFile ? "bg-green-500 hover:bg-green-600" : "bg-gray-300 cursor-not-allowed"
+                            }`}
+                    >
+                        Upload
+                    </button>
 
-                <button
-                    disabled={!interactiveBalanceData}
-                    onClick={handleDownload}
-                    className={`w-full px-3 py-1 rounded text-white text-sm font-medium transition-colors ${interactiveBalanceData ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-300 cursor-not-allowed"
-                        }`}
-                >
-                    Download
-                </button>
+                    <button
+                        disabled={!interactiveBalanceData}
+                        onClick={handleDownload}
+                        className={`w-full px-3 py-1 rounded text-white text-sm font-medium transition-colors ${interactiveBalanceData ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-300 cursor-not-allowed"
+                            }`}
+                    >
+                        Download
+                    </button>
 
-                {errorMessage && (
-                    <div className="bg-red-100 text-red-700 border border-red-300 rounded p-2 text-sm w-full text-center">
-                        {errorMessage}
-                    </div>
-                )}
+                    {errorMessage && (
+                        <div className="bg-red-100 text-red-700 border border-red-300 rounded p-2 text-sm w-full text-center">
+                            {errorMessage}
+                        </div>
+                    )}
+                </div>
             </div>
-        </div>
+            <div className="flex justify-center mt-4">
+                <button
+                    className="w-80 px-3 py-1 rounded text-white text-sm font-medium transition-colors bg-blue-500 hover:bg-blue-600"
+                    onClick={donwloadBeforeResetToast}
+                >
+                    Mit leerem Projekt starten
+                </button>
+            </div>
+
+        </>
     );
 
 }

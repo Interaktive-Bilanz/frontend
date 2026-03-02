@@ -1,0 +1,14 @@
+{
+  "balanceSheet": {
+    "assets": {
+      "positions": [],
+      "accounts": []
+    },
+    "liabilitiesAndEquity": {
+      "positions": [],
+      "accounts": []
+    }
+  },
+  "accounts": [],
+  "journalEntries": []
+}

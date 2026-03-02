@@ -5,9 +5,9 @@ import { InteractiveBalanceData } from "../../types/InteractiveBalanceData";
 import { useInteractiveBalanceData } from "../../context/InteractiveBalanceDataContext";
 import { useWindowManager } from "../../context/WindowManagerContext";
 import { toast } from "react-toastify";
+import { sumLines } from "../../util/sumEntryLines";
 
-const sumLines = (lines: EntryLine[]) =>
-    lines.reduce((sum, item) => sum + item.amount, 0);
+
 
 
 export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps) {

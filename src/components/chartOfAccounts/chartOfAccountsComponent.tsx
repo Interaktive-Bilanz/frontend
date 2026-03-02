@@ -15,8 +15,12 @@ export function ChartOfAccounts() {
 
     const [newAccountId, setNewAccountId] = useState("")
     const [newAccountLabel, setNewAccountLabel] = useState("")
+    const [showNotAdded, setShowNotAdded] = useState(false);
 
     const accounts = interactiveBalanceData.accounts;
+
+    const totalDebit = accounts.reduce((sum, a) => sum + getAccountTotals(accountTotals, a.id).debit, 0);
+    const totalCredit = accounts.reduce((sum, a) => sum + getAccountTotals(accountTotals, a.id).credit, 0);
 
     const handleAddAccount = () => {
         if (newAccountId.length <= 0 || newAccountLabel.length <= 0) {
@@ -37,13 +41,14 @@ export function ChartOfAccounts() {
 
             setNewAccountId("");
             setNewAccountLabel("");
+            setShowNotAdded(true);
         } catch (error) {
 
         }
     }
 
     return (
-        <div>
+        <div className="min-h-0">
             <table className="w-full table-fixed">
                 <thead>
                     <tr className="text-left">
@@ -89,6 +94,76 @@ export function ChartOfAccounts() {
                                 </tr>
                             )
                         })}
+                    {showNotAdded ?
+                        <>
+                            <tr>
+                                <td>
+                                    <div className="flex justify-center">
+                                        <button
+                                            className="px-2 py-0.5 rounded bg-gray-100 hover:bg-gray-200 text-sm"
+                                            onClick={() => setShowNotAdded(prev => !prev)}>
+                                            &#9650;
+                                        </button>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span>Nicht zugewiesene Konten verstecken</span>
+                                </td>
+                            </tr>
+                            {accounts
+                                .filter(a => !assigendAccountIds.has(a.id))
+                                .map(account => {
+                                    const accountTotal = getAccountTotals(accountTotals, account.id);
+                                    return (
+                                        //<tr key={account.id} className="cursor-pointer transition-all border duration-100 hover:scale-95"
+                                        <tr className="bg-gray-100 cursor-pointer border hover:bg-blue-50 transition-colors duration-100"
+                                            onClick={() =>
+                                                openWindow({
+                                                    type: "Account",
+                                                    payload: { id: account?.id, label: account?.label }
+                                                })}>
+                                            <td>{account.id}</td>
+                                            <td>{account.label}</td>
+                                            <td>{accountTotal.debit}</td>
+                                            <td>{accountTotal.credit}</td>
+                                            {hasAccess(appMode, "edit") &&
+                                                <td className="px-1 py-0.5 text-center">
+                                                    <button
+                                                        className="px-2 py-0.5 rounded bg-red-100 hover:bg-red-200 text-sm"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            console.log("Remove account ", account.id);
+                                                        }}
+                                                    >
+                                                        -
+                                                    </button>
+                                                </td>
+                                            }
+                                        </tr>
+                                    )
+                                }
+                                )}
+                                <tr>
+                                    <td></td>
+                                    <td>&sum;</td>
+                                    <td>{totalDebit}</td>
+                                    <td>{totalCredit}</td>
+                                </tr>
+                        </> :
+                        <tr>
+                            <td>
+                                <div className="flex justify-center">
+                                    <button
+                                        className="px-2 py-0.5 rounded bg-gray-100 hover:bg-gray-200 text-sm"
+                                        onClick={() => setShowNotAdded(prev => !prev)}>
+                                        &#9660;
+                                    </button>
+                                </div>
+                            </td>
+                            <td>
+                                <span>Nicht zugewiesene Konten anzeigen</span>
+                            </td>
+                        </tr>}
                     {hasAccess(appMode, "edit") &&
                         <tr className="border">
                             <td>

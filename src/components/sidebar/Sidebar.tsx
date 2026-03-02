@@ -45,7 +45,8 @@ export function Sidebar() {
                 </button>
                 <button
                     title="Journal"
-                    className="relative ml-4 my-1 bg-gray-300 rounded-xl size-14 flex items-center justify-center text-4xl">
+                    className="relative ml-4 my-1 bg-gray-300 rounded-xl size-14 flex items-center justify-center text-4xl"
+                    onClick={() => openWindow({type: "Journal", payload:{}})}>
                     <span>&#x1F4D2;</span>
                 </button>
                 <button

@@ -14,7 +14,7 @@ import { DragProvider } from "../context/DragContext";
 import { AppMode, hasAccess, useAppMode } from "../context/AppModeContex";
 import { Sidebar } from "../components/sidebar/Sidebar";
 import { ChartOfAccounts } from "../components/chartOfAccounts/chartOfAccountsComponent";
-import { Journal } from "../components/journal/Journal";
+// import { Journal } from "../components/journal/Journal";
 
 type WindowContentType = "Account" | "JournalEntry" | "FileHandeling" | "ChartOfAccounts" | "Journal";
 
@@ -202,9 +202,9 @@ const WindowManager = () => {
               {w.data.type === "ChartOfAccounts" && (
                 <ChartOfAccounts/>
               )}
-              {w.data.type === "Journal" && (
+              {/* {w.data.type === "Journal" && (
                 <Journal/>
-              )}
+              )} */}
             </div>
           </Rnd>
         ))}

@@ -35,9 +35,13 @@ const BilanzItem: React.FC<{
 }> = ({ position, parentId, level = 0 }) => {
   const [open, setOpen] = useState(false);
 
-  const { interactiveBalanceData, setInteractiveBalanceData, updatePositionLabel, addNewPositionTo, accountTotals, addAccountTo, deletePosition, removeAccountFrom } = useInteractiveBalanceData();
+  const { interactiveBalanceData, updatePositionLabel, addNewPositionTo, accountTotals, addAccountTo, deletePosition, removeAccountFrom } = useInteractiveBalanceData();
 
   const { dropIndicator, openPositionIds, toggleOpenPositionId } = useDragContext();
+
+  const dropBefore = dropIndicator?.targetId === position.id && dropIndicator?.intent === 'before';
+  const dropInside = dropIndicator?.targetId === position.id && dropIndicator?.intent === 'inside';
+  const dropAfter = dropIndicator?.targetId === position.id && dropIndicator?.intent === 'after';
 
   const isOpen = openPositionIds.has(position.id!);
 
@@ -47,6 +51,7 @@ const BilanzItem: React.FC<{
 
   const positionBalance = calculatePositionSaldo(position, accountTotals);
 
+  //aktiv oder passiv check
   const displaypositionBalance = Math.abs(positionBalance);
 
   const { appMode } = useAppMode();
@@ -102,7 +107,7 @@ const BilanzItem: React.FC<{
   return (
     // <div style={style} className={`ml-${level} mt-1`}>
     <div className={`ml-${level} mt-1`}>
-      {dropIndicator?.targetId === position.id && dropIndicator!.intent === 'before' && (
+      {dropBefore && (
         <div className="h-1 bg-blue-400 rounded mx-2" />
       )}
       <div className="flex">
@@ -113,7 +118,7 @@ const BilanzItem: React.FC<{
             (nodeRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
           }}
           tabIndex={0}
-          className={`bg-white hover:bg-blue-100 border border-gray-300 rounded px-2 py-1 w-full text-left cursor-pointer ${dropIndicator?.targetId === position.id && dropIndicator!.intent === 'inside'
+          className={`bg-white hover:bg-blue-100 border border-gray-300 rounded px-2 py-1 w-full text-left cursor-pointer ${dropInside
             ? 'ring-2 ring-blue-400' : ''
             }`}
           onClick={() => toggleOpenPositionId(position.id!)}
@@ -172,7 +177,7 @@ const BilanzItem: React.FC<{
           </div>
         </div>
       </div>
-      {dropIndicator?.targetId === position.id && dropIndicator!.intent === 'after' && (
+      {dropAfter && (
         <div className="h-1 bg-blue-400 rounded mx-2" />
       )}
 

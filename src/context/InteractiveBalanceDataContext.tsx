@@ -10,13 +10,15 @@ import { getAssigendAccountIds } from "../util/getAssignedAccountIds";
 
 interface InteractiveBalanceDataContextType {
   interactiveBalanceData: InteractiveBalanceData;
-  setInteractiveBalanceData: React.Dispatch<React.SetStateAction<InteractiveBalanceData>>;
+  // setInteractiveBalanceData: React.Dispatch<React.SetStateAction<InteractiveBalanceData>>;
 
   draftEntry: JournalEntry | null;
   setDraftEntry: React.Dispatch<React.SetStateAction<JournalEntry | null>>;
   //setDraftEntry: (entry: JournalEntry | null) => void;
   commitDraft: () => void;
   cancelDraft: () => void;
+
+  loadProject: (project: InteractiveBalanceData) => void;
 
   updatePositionLabel: (positionId: string, newLabel: string) => void;
 
@@ -58,7 +60,7 @@ export const InteractiveBalanceDataProvider: React.FC<{ children: React.ReactNod
   const [interactiveBalanceData, setInteractiveBalanceData] = useLocalStorage<InteractiveBalanceData>(
     "interactiveBalanceData",
     ensurePositionIds(defaultData),
-    true
+    false
   );
 
   const [draftEntry, setDraftEntry] = useState<JournalEntry | null>(null);
@@ -67,6 +69,10 @@ export const InteractiveBalanceDataProvider: React.FC<{ children: React.ReactNod
     return getAssigendAccountIds(interactiveBalanceData.balanceSheet);
   }, [interactiveBalanceData.balanceSheet]);
 
+  const loadProject = (project: InteractiveBalanceData) => {
+    const projectWithIds = ensurePositionIds(project);
+    setInteractiveBalanceData(projectWithIds);
+  }
 
   const updatePositionLabel = (positionId: string, newLabel: string) => {
     setInteractiveBalanceData(draft => {
@@ -96,22 +102,40 @@ export const InteractiveBalanceDataProvider: React.FC<{ children: React.ReactNod
       id: uuidv4()
     };
 
-    setInteractiveBalanceData(draft => {
-      const findAndAdd = (positions: Position[]) => {
-        for (const position of positions) {
-          if (position.id === positionId) {
-            position.positions.push(newPosition)
-            return;
-          }
-          if (position.positions?.length) {
-            findAndAdd(position.positions);
+    if (positionId === "assets" || positionId === "liabilitiesAndEquity") {
+      setInteractiveBalanceData(prev => {
+        return {
+          ...prev,
+          balanceSheet: {
+            ...prev.balanceSheet,
+            [positionId]: {
+              ...prev.balanceSheet[positionId],
+              positions: [
+                ...prev.balanceSheet[positionId].positions ?? [],
+                newPosition
+              ]
+            }
           }
         }
-      };
+      });
+    } else {
+      setInteractiveBalanceData(draft => {
+        const findAndAdd = (positions: Position[]) => {
+          for (const position of positions) {
+            if (position.id === positionId) {
+              position.positions.push(newPosition)
+              return;
+            }
+            if (position.positions?.length) {
+              findAndAdd(position.positions);
+            }
+          }
+        };
 
-      findAndAdd(draft.balanceSheet.assets.positions as Position[]);
-      findAndAdd(draft.balanceSheet.liabilitiesAndEquity.positions as Position[]);
-    });
+        findAndAdd(draft.balanceSheet.assets.positions as Position[]);
+        findAndAdd(draft.balanceSheet.liabilitiesAndEquity.positions as Position[]);
+      });
+    }
   };
 
 
@@ -426,8 +450,8 @@ export const InteractiveBalanceDataProvider: React.FC<{ children: React.ReactNod
 
   return (
     <InteractiveBalanceDataContext.Provider value={{
-      interactiveBalanceData, setInteractiveBalanceData, draftEntry, setDraftEntry, commitDraft, cancelDraft, accountTotals, updatePositionLabel, addNewPositionTo, addNewAccount, addAccountTo, deletePosition, removeAccountFrom, reorderAccountsInPosition, reorderPositionsInPosition,
-      moveAccount, movePosition, assigendAccountIds
+      interactiveBalanceData, draftEntry, setDraftEntry, commitDraft, cancelDraft, accountTotals, updatePositionLabel, addNewPositionTo, addNewAccount, addAccountTo, deletePosition, removeAccountFrom, reorderAccountsInPosition, reorderPositionsInPosition,
+      moveAccount, movePosition, assigendAccountIds, loadProject
     }}>
       {children}
     </InteractiveBalanceDataContext.Provider>

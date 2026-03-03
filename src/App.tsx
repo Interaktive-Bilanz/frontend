@@ -5,20 +5,23 @@ import WindowManager from "./util/WindowManager";
 import { InteractiveBalanceDataProvider } from "./context/InteractiveBalanceDataContext";
 import { ToastContainer } from "react-toastify";
 import { AppModeProvider } from "./context/AppModeContex";
+import { DragProvider } from "./context/DragContext";
 
 const App = () => {
   return (
     <AppModeProvider>
-        <InteractiveBalanceDataProvider>
-          <ToastContainer
-            position="bottom-right"
-            autoClose={4000}
-            theme="colored"
-          />
-          <Workspace>
+      <InteractiveBalanceDataProvider>
+        <ToastContainer
+          position="bottom-right"
+          autoClose={4000}
+          theme="colored"
+        />
+        <Workspace>
+          <DragProvider>
             <WindowManager />
-          </Workspace>
-        </InteractiveBalanceDataProvider>
+          </DragProvider>
+        </Workspace>
+      </InteractiveBalanceDataProvider>
     </AppModeProvider>
   );
 };

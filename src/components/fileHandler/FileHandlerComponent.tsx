@@ -6,12 +6,15 @@ import { useWindowManager, WindowManagerContext } from "../../context/WindowMana
 import { toast } from 'react-toastify';
 import defaultProjectFile from "../../api/empyt_project.json"
 import { InteractiveBalanceData } from "../../types/InteractiveBalanceData";
+import { useDragContext } from "../../context/DragContext";
+import { ensurePositionIds } from "../../util/addIdsToPositions";
 
 export function FileHandlerComponent() {
-    const { interactiveBalanceData, setInteractiveBalanceData } = useInteractiveBalanceData();
+    const { interactiveBalanceData, loadProject } = useInteractiveBalanceData();
     const [uploadedFile, setUploadedFile] = useState<File | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const { closeAllWindowsExcept } = useWindowManager();
+    const { setDropIndicator, clearOpenPositionIds } = useDragContext();
 
     const defaultProject = defaultProjectFile as unknown as InteractiveBalanceData;
 
@@ -24,7 +27,9 @@ export function FileHandlerComponent() {
                         className="text-black border px-2 py-0.5 rounded bg-gray-100 hover:bg-gray-200 text-sm"
                         onClick={() => {
                             handleDownload();
-                            setInteractiveBalanceData(defaultProject);
+                            setDropIndicator(null);
+                            clearOpenPositionIds();
+                            loadProject(defaultProject);
                             closeToast();
                         }}
                     >
@@ -33,7 +38,9 @@ export function FileHandlerComponent() {
                     <button
                         className="text-black border px-2 py-0.5 rounded bg-gray-100 hover:bg-gray-200 text-sm"
                         onClick={() => {
-                            setInteractiveBalanceData(defaultProject);
+                            setDropIndicator(null);
+                            clearOpenPositionIds();
+                            loadProject(defaultProject);
                             closeToast();
                         }}
                     >
@@ -122,7 +129,10 @@ export function FileHandlerComponent() {
                 return;
             }
 
-            setInteractiveBalanceData(projectObject);
+            setDropIndicator(null);
+            clearOpenPositionIds();
+
+            loadProject(projectObject);
 
             closeAllWindowsExcept({
                 type: "FileHandeling",

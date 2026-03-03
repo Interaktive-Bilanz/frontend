@@ -20,7 +20,7 @@ const BilanzColumn: React.FC<BilanzProps> = ({
 }) => {
   let sum = 0;
 
-  const { accountTotals, interactiveBalanceData, setInteractiveBalanceData, addAccountTo, removeAccountFrom, assigendAccountIds } = useInteractiveBalanceData();
+  const { accountTotals, interactiveBalanceData, addAccountTo, removeAccountFrom, assigendAccountIds, addNewPositionTo } = useInteractiveBalanceData();
   const { appMode } = useAppMode();
   const { openWindow } = useWindowManager();
 
@@ -50,34 +50,34 @@ const BilanzColumn: React.FC<BilanzProps> = ({
 
 
 
-  const addPosition = () => {
-    const isAssets = title === "Aktiva";
+  // const addPosition = () => {
+  //   const isAssets = title === "Aktiva";
 
-    const newPosition = {
-      label: "Neue Position",
-      accounts: [],
-      positions: [],
-      id: uuidv4()
-    };
+  //   const newPosition = {
+  //     label: "Neue Position",
+  //     accounts: [],
+  //     positions: [],
+  //     id: uuidv4()
+  //   };
 
-    setInteractiveBalanceData(prev => {
-      const targetKey = isAssets ? 'assets' : 'liabilitiesAndEquity';
+  //   setInteractiveBalanceData(prev => {
+  //     const targetKey = isAssets ? 'assets' : 'liabilitiesAndEquity';
 
-      return {
-        ...prev,
-        balanceSheet: {
-          ...prev.balanceSheet,
-          [targetKey]: {
-            ...prev.balanceSheet[targetKey],
-            positions: [
-              ...prev.balanceSheet[targetKey].positions ?? [],
-              newPosition
-            ]
-          }
-        }
-      }
-    })
-  }
+  //     return {
+  //       ...prev,
+  //       balanceSheet: {
+  //         ...prev.balanceSheet,
+  //         [targetKey]: {
+  //           ...prev.balanceSheet[targetKey],
+  //           positions: [
+  //             ...prev.balanceSheet[targetKey].positions ?? [],
+  //             newPosition
+  //           ]
+  //         }
+  //       }
+  //     }
+  //   })
+  // }
 
   const { setNodeRef } = useDroppable({
     id: title === "Aktiva" ? "assets" : "liabilitiesAndEquity",
@@ -93,7 +93,9 @@ const BilanzColumn: React.FC<BilanzProps> = ({
         <h2 className="text-xl font-bold mb-4">{title}</h2>
         {hasAccess(appMode, "edit") &&
           <div className="flex">
-            <button className="bg-green-500 hover:bg-green-700 px-1 py-1 mt-1 mr-1 rounded" onClick={addPosition}>
+            <button
+              className="bg-green-500 hover:bg-green-700 px-1 py-1 mt-1 mr-1 rounded"
+              onClick={() => addNewPositionTo(title === "Aktiva" ? "assets" : "liabilitiesAndEquity")}>
               + Position
             </button>
             <div

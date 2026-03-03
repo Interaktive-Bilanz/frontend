@@ -11,7 +11,7 @@ import { useDebounce } from "../../hooks/useDebounce";
 import { ensurePositionIds } from "../../util/addIdsToPositions";
 
 const JsonEditor = () => {
-    const { interactiveBalanceData, setInteractiveBalanceData } = useInteractiveBalanceData();
+    const { interactiveBalanceData, loadProject } = useInteractiveBalanceData();
     const [hasMounted, setHasMounted] = useState(false);
     const [editorValue, setEditorValue] = useState("");
     const [editorKey, setEditorKey] = useState(0);
@@ -45,8 +45,7 @@ const JsonEditor = () => {
             const isValid = validateJson(parsedEditorValue);
 
             if (isValid) {
-                const dataWithIds = ensurePositionIds(parsedEditorValue as unknown as InteractiveBalanceData);
-                setInteractiveBalanceData(dataWithIds);
+                loadProject(parsedEditorValue as unknown as InteractiveBalanceData);
                 setValidationState('valid');
             } else {
                 setValidationState('invalid-schema');

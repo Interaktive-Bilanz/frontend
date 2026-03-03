@@ -60,11 +60,9 @@ function generateTitle(data: WindowData) {
 const WindowManager = () => {
   const [windows, setWindows] = useState<WindowType[]>([]);
   const [topZ, setTopZ] = useState(1);
-  const { cancelDraft } = useInteractiveBalanceData()
   const contentRef = useRef<HTMLDivElement>(null);
   const [minHeight, setMinHeight] = useState<number>(0);
-  const { appMode, isTeacherFromUrl, setAppMode } = useAppMode();
-  const { interactiveBalanceData, setInteractiveBalanceData } = useInteractiveBalanceData();
+  const { appMode, isTeacherFromUrl } = useAppMode();
 
   useEffect(() => {
     if (contentRef.current) {
@@ -141,9 +139,7 @@ const WindowManager = () => {
           {isTeacherFromUrl && <div className="flex justify-center my-1"><div className="text-white font-bold bg-red-500 rounded-md px-2 py-1">Teacher Mode</div></div>}
 
           <div className={"flex-1 flex items-start p-8 h-full " + (hasAccess(appMode, "teacher") ? "justify-evenly gap-4" : "justify-center")}>
-            <DragProvider>
               <BilanzComponent />
-            </DragProvider>
             {hasAccess(appMode, "teacher") &&
               <div className="w-1/2 h-90vh">
                 <JsonEditor />

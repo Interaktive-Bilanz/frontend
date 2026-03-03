@@ -44,6 +44,8 @@ interface InteractiveBalanceDataContextType {
 
   assigendAccountIds: Set<string>;
 
+  positionSideMap: Map<string, 'assets' | 'liabilitiesAndEquity'>;
+
 }
 
 const InteractiveBalanceDataContext = createContext<InteractiveBalanceDataContextType | null>(null);
@@ -448,10 +450,26 @@ export const InteractiveBalanceDataProvider: React.FC<{ children: React.ReactNod
     return calculateAccountTotals(mergedEntries);
   }, [interactiveBalanceData.journalEntries, draftEntry]);
 
+  const positionSideMap = useMemo(() => {
+    const map = new Map<string, 'assets' | 'liabilitiesAndEquity'>();
+
+    const walk = (positions: Position[], side: 'assets' | 'liabilitiesAndEquity') => {
+      for (const pos of positions) {
+        if (pos.id) map.set(pos.id, side);
+        walk(pos.positions, side);
+      }
+    };
+
+    walk(interactiveBalanceData.balanceSheet.assets.positions ?? [], 'assets');
+    walk(interactiveBalanceData.balanceSheet.liabilitiesAndEquity.positions ?? [], 'liabilitiesAndEquity');
+
+    return map;
+  }, [interactiveBalanceData.balanceSheet]);
+
   return (
     <InteractiveBalanceDataContext.Provider value={{
       interactiveBalanceData, draftEntry, setDraftEntry, commitDraft, cancelDraft, accountTotals, updatePositionLabel, addNewPositionTo, addNewAccount, addAccountTo, deletePosition, removeAccountFrom, reorderAccountsInPosition, reorderPositionsInPosition,
-      moveAccount, movePosition, assigendAccountIds, loadProject
+      moveAccount, movePosition, assigendAccountIds, loadProject, positionSideMap
     }}>
       {children}
     </InteractiveBalanceDataContext.Provider>

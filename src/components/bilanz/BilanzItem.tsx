@@ -35,7 +35,7 @@ const BilanzItem: React.FC<{
 }> = ({ position, parentId, level = 0 }) => {
   const [open, setOpen] = useState(false);
 
-  const { interactiveBalanceData, updatePositionLabel, addNewPositionTo, accountTotals, addAccountTo, deletePosition, removeAccountFrom } = useInteractiveBalanceData();
+  const { interactiveBalanceData, updatePositionLabel, addNewPositionTo, accountTotals, addAccountTo, deletePosition, removeAccountFrom, positionSideMap } = useInteractiveBalanceData();
 
   const { dropIndicator, openPositionIds, toggleOpenPositionId } = useDragContext();
 
@@ -45,14 +45,25 @@ const BilanzItem: React.FC<{
 
   const isOpen = openPositionIds.has(position.id!);
 
+  const side = positionSideMap.get(position.id!);
+
   const accounts = interactiveBalanceData.accounts;
 
   const { openWindow } = useWindowManager();
 
   const positionBalance = calculatePositionSaldo(position, accountTotals);
 
-  //aktiv oder passiv check
-  const displaypositionBalance = Math.abs(positionBalance);
+  console.log(`Pos ${position.label} balance:`, positionBalance);
+
+  const isAbnormal = (side === 'assets' && positionBalance < 0) ||
+    (side === 'liabilitiesAndEquity' && positionBalance > 0);
+
+  // const displayBalance = Math.abs(positionBalance);
+  const displayBalance = (() => {
+    if (positionBalance < 0 && side === 'assets') return positionBalance;
+    if (positionBalance > 0 && side === 'liabilitiesAndEquity') return positionBalance * -1;
+    return Math.abs(positionBalance);
+  })();
 
   const { appMode } = useAppMode();
 
@@ -173,7 +184,7 @@ const BilanzItem: React.FC<{
                 }}>&#x274C;</button>
               </div>
             }
-            <div className="text-nowrap whitespace-nowrap ml-2">{displaypositionBalance.toFixed(2)} €</div>
+            <div className={`text-nowrap whitespace-nowrap ml-2 ${isAbnormal ? 'text-red-500' : ''}`}>{isAbnormal && "! "}{displayBalance.toFixed(2)}{isAbnormal && " !"} €</div>
           </div>
         </div>
       </div>

@@ -186,8 +186,9 @@ const BilanzItem: React.FC<{
               </div>
             }
             <div className={`text-nowrap whitespace-nowrap ml-2 ${isAbnormal ? 'text-red-500' : ''}`}>
-              {positionBalance <= 0 ? "H " : "S "}
               {displayBalance.toFixed(2)} €
+              {positionBalance < 0 && " H"}
+              {positionBalance > 0 && " S"}
             </div>
           </div>
         </div>

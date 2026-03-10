@@ -91,8 +91,9 @@ const SortableAccountItem: React.FC<SortableAccountItemProps> = ({
             </button>
           )}
           <span className={`text-nowrap whitespace-nowrap ${isAbnormal && 'text-red-500'}`}>
-            {accountBalance <= 0 ? "H " : "S "}
             {displayAccountBalance.toFixed(2)} €
+            {accountBalance < 0 && " H"}
+            {accountBalance > 0 && " S"}
           </span>
         </div>
       </button>

@@ -75,7 +75,7 @@ export const TAccountComponent: React.FC<TAccountProps> = ({
                         </div>
                         <div className="text-lg">{sollSum.toFixed(2)} €</div>
                     </div>
-                    {sumDif <= 0 && (
+                    {sumDif < 0 && (
                         <div className="flex justify-between">
                             <div className="text-lg">Saldo</div>
                             <div className="text-lg">{(-1 * sumDif).toFixed(2)} €</div>

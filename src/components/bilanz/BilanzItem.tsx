@@ -58,12 +58,13 @@ const BilanzItem: React.FC<{
   const isAbnormal = (side === 'assets' && positionBalance < 0) ||
     (side === 'liabilitiesAndEquity' && positionBalance > 0);
 
+  const displayBalance = Math.abs(positionBalance);
   // const displayBalance = Math.abs(positionBalance);
-  const displayBalance = (() => {
-    if (positionBalance < 0 && side === 'assets') return positionBalance;
-    if (positionBalance > 0 && side === 'liabilitiesAndEquity') return positionBalance * -1;
-    return Math.abs(positionBalance);
-  })();
+  // const displayBalance = (() => {
+  //   if (positionBalance < 0 && side === 'assets') return positionBalance;
+  //   if (positionBalance > 0 && side === 'liabilitiesAndEquity') return positionBalance * -1;
+  //   return Math.abs(positionBalance);
+  // })();
 
   const { appMode } = useAppMode();
 
@@ -184,7 +185,10 @@ const BilanzItem: React.FC<{
                 }}>&#x274C;</button>
               </div>
             }
-            <div className={`text-nowrap whitespace-nowrap ml-2 ${isAbnormal ? 'text-red-500' : ''}`}>{isAbnormal && "! "}{displayBalance.toFixed(2)}{isAbnormal && " !"} €</div>
+            <div className={`text-nowrap whitespace-nowrap ml-2 ${isAbnormal ? 'text-red-500' : ''}`}>
+              {positionBalance <= 0 ? "H " : "S "}
+              {displayBalance.toFixed(2)} €
+            </div>
           </div>
         </div>
       </div>
@@ -248,6 +252,7 @@ const BilanzItem: React.FC<{
                   key={accountId}
                   accountId={accountId}
                   account={account}
+                  side={side}
                   teacherMode={hasAccess(appMode, "edit")}
                   parentId={position.id!}
                   onRemove={() => removeAccountFrom(

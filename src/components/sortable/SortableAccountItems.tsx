@@ -7,25 +7,34 @@ import { CSS } from "@dnd-kit/utilities";
 
 
 interface SortableAccountItemProps {
-    accountId: string;
-    account: Account;
-    teacherMode: boolean;
-    onRemove: () => void;
-    onOpen: () => void;
-    parentId: string;
+  accountId: string;
+  account: Account;
+  teacherMode: boolean;
+  onRemove: () => void;
+  onOpen: () => void;
+  parentId: string;
+  side: "assets" | "liabilitiesAndEquity" | undefined
 }
 
 const SortableAccountItem: React.FC<SortableAccountItemProps> = ({
-    accountId,
-    account,
-    teacherMode,
-    onRemove,
-    onOpen,
-    parentId
+  accountId,
+  account,
+  side,
+  teacherMode,
+  onRemove,
+  onOpen,
+  parentId
 }) => {
-    const { interactiveBalanceData, accountTotals } = useInteractiveBalanceData();
+  const { interactiveBalanceData, accountTotals } = useInteractiveBalanceData();
 
-    const {
+  const accountBalance = getAccountTotals(accountTotals, accountId).balance;
+
+  const isAbnormal = (side === 'assets' && accountBalance < 0) ||
+    (side === 'liabilitiesAndEquity' && accountBalance > 0);
+
+  const displayAccountBalance = Math.abs(accountBalance);
+
+  const {
     attributes,
     listeners,
     setNodeRef,
@@ -35,10 +44,10 @@ const SortableAccountItem: React.FC<SortableAccountItemProps> = ({
   } = useSortable({
     id: accountId,
     data: {
-        type: 'account',
-        accountId: accountId,
-        label: account.label,
-        parentId: parentId
+      type: 'account',
+      accountId: accountId,
+      label: account.label,
+      parentId: parentId
     },
     disabled: !teacherMode
   });
@@ -58,8 +67,8 @@ const SortableAccountItem: React.FC<SortableAccountItemProps> = ({
       >
         <div className="flex justify-between items-center">
           {teacherMode && (
-            <span 
-              {...attributes} 
+            <span
+              {...attributes}
               {...listeners}
               className="cursor-grab active:cursor-grabbing mr-2 text-gray-400 hover:text-gray-600"
               onClick={(e) => e.stopPropagation()}
@@ -71,8 +80,8 @@ const SortableAccountItem: React.FC<SortableAccountItemProps> = ({
             {accountId} {account.label}
           </div>
           {teacherMode && (
-            <button 
-              className="bg-transparent hover:bg-gray-100 mr-1 px-1 py-1 rounded" 
+            <button
+              className="bg-transparent hover:bg-gray-100 mr-1 px-1 py-1 rounded"
               onClick={(e) => {
                 e.stopPropagation();
                 onRemove();
@@ -81,8 +90,9 @@ const SortableAccountItem: React.FC<SortableAccountItemProps> = ({
               &#x274C;
             </button>
           )}
-          <span className="text-nowrap whitespace-nowrap">
-            {Math.abs(getAccountTotals(accountTotals, accountId).balance).toFixed(2)} €
+          <span className={`text-nowrap whitespace-nowrap ${isAbnormal && 'text-red-500'}`}>
+            {accountBalance <= 0 ? "H " : "S "}
+            {displayAccountBalance.toFixed(2)} €
           </span>
         </div>
       </button>

@@ -77,6 +77,9 @@ const BilanzComponent = () => {
     liabilitiesEquityBalanceSum += getAccountTotals(accountTotals, account).balance;
   }
 
+  const displayBalanceAssets = assetsBalanceSum;
+  const displayBalanceLiabilitiesAndEquity = liabilitiesEquityBalanceSum * -1;
+
   const balancesMatch = Math.abs(assetsBalanceSum) === Math.abs(liabilitiesEquityBalanceSum);
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -310,7 +313,9 @@ const BilanzComponent = () => {
             accounts={balanceSheet.assets.accounts}
           />
           <div className="p-4">
-            <span className={`text-lg font-semibold ${balancesMatch ? 'text-green-600' : 'text-red-600'}`}>Summe {Math.abs(assetsBalanceSum).toFixed(2)} €</span>
+            {/* <span className={`text-lg font-semibold ${balancesMatch ? 'text-green-600' : 'text-red-600'}`}>Summe {Math.abs(assetsBalanceSum).toFixed(2)} €</span> */}
+            <span className={`text-lg font-semibold ${balancesMatch && displayBalanceAssets >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              Summe {displayBalanceAssets > 0 ? "S" : "H"} {Math.abs(displayBalanceAssets).toFixed(2)} €</span>
           </div>
         </div>
         <div className="w-1/2">
@@ -320,7 +325,9 @@ const BilanzComponent = () => {
             accounts={balanceSheet.liabilitiesAndEquity.accounts}
           />
           <div className="p-4">
-            <span className={`text-lg font-semibold ${balancesMatch ? 'text-green-600' : 'text-red-600'}`}>Summe {Math.abs(liabilitiesEquityBalanceSum).toFixed(2)} €</span>
+            {/* <span className={`text-lg font-semibold ${balancesMatch ? 'text-green-600' : 'text-red-600'}`}>Summe {Math.abs(liabilitiesEquityBalanceSum).toFixed(2)} €</span> */}
+            <span className={`text-lg font-semibold ${balancesMatch && displayBalanceLiabilitiesAndEquity >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              Summe {displayBalanceLiabilitiesAndEquity > 0 ? "H" : "S"} {Math.abs(displayBalanceLiabilitiesAndEquity).toFixed(2)} €</span>
           </div>
         </div>
         <DragOverlay>

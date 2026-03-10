@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { Account, InteractiveBalanceData, JournalEntry, Position } from "../types/InteractiveBalanceData";
 import { useLocalStorage } from "../hooks/useLocalStorage";
-import defaultDataJson from "../api/chat_gpt_example4.json"
+// import defaultDataJson from "../api/chat_gpt_example4.json"
+import defaultDataJson from "../api/empyt_project.json"
 import { calculateAccountTotals, AccountTotal } from "../util/balanceCalculations";
 import { ensurePositionIds } from "../util/addIdsToPositions";
 import { v4 as uuidv4 } from "uuid";

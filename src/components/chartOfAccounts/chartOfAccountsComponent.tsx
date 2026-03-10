@@ -9,7 +9,7 @@ import { hasAccess, useAppMode } from "../../context/AppModeContex";
 
 
 export function ChartOfAccounts() {
-    const { interactiveBalanceData, accountTotals, addNewAccount, assigendAccountIds } = useInteractiveBalanceData();
+    const { interactiveBalanceData, accountTotals, addNewAccount, assigendAccountIds, deleteAccount } = useInteractiveBalanceData();
     const { openWindow, closeWindow } = useWindowManager();
     const { appMode } = useAppMode();
 
@@ -47,6 +47,15 @@ export function ChartOfAccounts() {
         }
     }
 
+    const handleDeleteAccount = (id: string, label: string) => {
+        try {
+            deleteAccount(id);
+            closeWindow({type: "Account", payload: {id: id, label:label}});
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     return (
         <div className="min-h-0">
             <table className="w-full table-fixed">
@@ -78,13 +87,13 @@ export function ChartOfAccounts() {
                                     <td>{account.label}</td>
                                     <td>{accountTotal.debit}</td>
                                     <td>{accountTotal.credit}</td>
-                                    {hasAccess(appMode, "edit") &&
+                                    {hasAccess(appMode, "edit") && accountTotal.debit === 0 && accountTotal.credit === 0 &&
                                         <td className="px-1 py-0.5 text-center">
                                             <button
                                                 className="px-2 py-0.5 rounded bg-red-100 hover:bg-red-200 text-sm"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    console.log("Remove account ", account.id);
+                                                    handleDeleteAccount(account.id, account.label);
                                                 }}
                                             >
                                                 -
@@ -132,7 +141,7 @@ export function ChartOfAccounts() {
                                                         className="px-2 py-0.5 rounded bg-red-100 hover:bg-red-200 text-sm"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
-                                                            console.log("Remove account ", account.id);
+                                                            handleDeleteAccount(account.id, account.label);
                                                         }}
                                                     >
                                                         -
@@ -143,12 +152,12 @@ export function ChartOfAccounts() {
                                     )
                                 }
                                 )}
-                                <tr>
-                                    <td></td>
-                                    <td>&sum;</td>
-                                    <td>{totalDebit}</td>
-                                    <td>{totalCredit}</td>
-                                </tr>
+                            <tr>
+                                <td></td>
+                                <td>&sum;</td>
+                                <td>{totalDebit}</td>
+                                <td>{totalCredit}</td>
+                            </tr>
                         </> :
                         <tr>
                             <td>

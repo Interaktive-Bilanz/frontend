@@ -10,7 +10,7 @@ import { useDragContext } from "../../context/DragContext";
 import { ensurePositionIds } from "../../util/addIdsToPositions";
 
 export function FileHandlerComponent() {
-    const { interactiveBalanceData, loadProject } = useInteractiveBalanceData();
+    const { interactiveBalanceData, loadProject, cancelDraft } = useInteractiveBalanceData();
     const [uploadedFile, setUploadedFile] = useState<File | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const { closeAllWindowsExcept } = useWindowManager();
@@ -29,6 +29,7 @@ export function FileHandlerComponent() {
                             handleDownload();
                             setDropIndicator(null);
                             clearOpenPositionIds();
+                            cancelDraft();
                             loadProject(defaultProject);
                             closeToast();
                         }}
@@ -40,6 +41,7 @@ export function FileHandlerComponent() {
                         onClick={() => {
                             setDropIndicator(null);
                             clearOpenPositionIds();
+                            cancelDraft();
                             loadProject(defaultProject);
                             closeToast();
                         }}

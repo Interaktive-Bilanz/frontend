@@ -14,7 +14,7 @@ export function Journal() {
     return (
         <div>
             <button
-                className="px-2 py-0.5 rounded bg-gray-100 hover:bg-gray-200 text-sm"
+                className="h-8 xl:h-auto px-2 py-0.5 rounded bg-gray-100 hover:bg-gray-200 text-sm"
                 onClick={() => openWindow({ type: "JournalEntry", payload: { isDraft: true } })}
                 >
                 Neue Buchung
@@ -34,7 +34,7 @@ export function Journal() {
                         const debitSum = sumLines(debitLines);
                         return (
                             <tr
-                                className="cursor-pointer border hover:bg-blue-50 transition-colors duration-100"
+                                className="h-8 xl:h-auto cursor-pointer border hover:bg-blue-50 transition-colors duration-100"
                                 onClick={() => openWindow({ type: "JournalEntry", payload: { isDraft: false, id: entry.id } })}>
                                 <td>{entry.id}</td>
                                 <td>{entry.description}</td>

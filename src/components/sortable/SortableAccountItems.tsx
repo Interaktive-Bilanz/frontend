@@ -75,7 +75,7 @@ const SortableAccountItem: React.FC<SortableAccountItemProps> = ({
                   className="inline-block cursor-grab active:cursor-grabbing mr-2 active:text-blue-500 active:scale-110 transition-all duration-200 select-none touch-none"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <GripVertical size={16} />
+                  <GripVertical size={24} />
                 </span>
             )}
             <div lang="de" className="min-w-0 hyphens-auto break-words flex-1">

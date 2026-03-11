@@ -80,7 +80,8 @@ const WindowManager = () => {
   }
 
   const openWindow = (windowData: WindowData) => {
-
+    const newZ = topZ + 1;
+    setTopZ(newZ);
     setWindows((prev) => {
 
       const sameTypeCount = prev.filter(w => w.data.type === windowData.type).length;
@@ -139,7 +140,7 @@ const WindowManager = () => {
           {isTeacherFromUrl && <div className="flex justify-center my-1"><div className="text-white font-bold bg-red-500 rounded-md px-2 py-1">Teacher Mode</div></div>}
 
           <div className={`flex-1 flex flex-col lg:flex-row items-start p-2 md:p-8 h-full gap-4 ${hasAccess(appMode, "teacher") ? "lg:justify-evenly" : "justify-center"}`}>
-              <BilanzComponent />
+            <BilanzComponent />
             {hasAccess(appMode, "teacher") &&
               <div className="w-full lg:w-1/2 hidden md:block h-90vh">
                 <JsonEditor />
@@ -175,7 +176,11 @@ const WindowManager = () => {
               px-3 py-2 flex justify-between items-center cursor-move`}>
               <span>{w.title}</span>
               <button
-                onClick={() => closeWindow(w.data)}
+                // onMouseDown={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  closeWindow(w.data);
+                }}
                 className="bg-red-700 hover:bg-red-500 text-white px-2 py-1 rounded"
               >
                 X
@@ -196,10 +201,10 @@ const WindowManager = () => {
                 <FileHandlerComponent key={w.data.type} />
               )}
               {w.data.type === "ChartOfAccounts" && (
-                <ChartOfAccounts/>
+                <ChartOfAccounts />
               )}
               {w.data.type === "Journal" && (
-                <Journal/>
+                <Journal />
               )}
             </div>
           </Rnd>

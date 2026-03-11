@@ -11,6 +11,7 @@ import SortableAccountItem from "../sortable/SortableAccountItems";
 import { useDragContext } from "../../context/DragContext";
 import { hasAccess, useAppMode } from "../../context/AppModeContex";
 import { GripVertical } from "lucide-react";
+import { confirmToast } from "../../util/confirmToast";
 
 export function calculatePositionSaldo(
   position: Position,
@@ -116,6 +117,11 @@ const BilanzItem: React.FC<{
     opacity: isDragging ? 0.5 : 1,
   };
 
+  const deletePositionHandler = (position:Position) => {
+    confirmToast(
+      `Position ${position.label} wirklich löschen?`,
+      () => deletePosition(String(position.id)));
+  }
 
   return (
     // <div style={style} className={`ml-${level} mt-1`}>
@@ -182,7 +188,7 @@ const BilanzItem: React.FC<{
                     }}>&#x270E;</button>}
                   < button className="bg-gray-100 hover:bg-gray-200 w-8 h-8 px-1 py-1 rounded" onClick={(e) => {
                     e.stopPropagation();
-                    deletePosition(String(position.id));
+                    deletePositionHandler(position);
                   }}>&#x274C;</button>
                 </>
               }

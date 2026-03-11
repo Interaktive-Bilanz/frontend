@@ -70,7 +70,7 @@ export const TAccountComponent: React.FC<TAccountProps> = ({
                 <div className=" p-1 border-r-2 border-solid border-black">
                     <div className="flex justify-between items-center">
                         <div className="inline-flex items-center gap-1">
-                            <span className="text-lg">Summe</span>
+                            {/* <span className="text-lg">Summe</span> */}
                             <span className="text-lg font-normal font-mono">∑</span>
                         </div>
                         <div className="text-lg">{sollSum.toFixed(2)} €</div>
@@ -85,7 +85,7 @@ export const TAccountComponent: React.FC<TAccountProps> = ({
                 <div className=" p-1 border-l-2 boder-solid border-black">
                     <div className="flex justify-between items-center">
                         <div className="inline-flex items-center gap-1">
-                            <span className="text-lg">Summe</span>
+                            {/* <span className="text-lg">Summe</span> */}
                             <span className="text-lg font-normal font-mono">∑</span>
                         </div>
                         <div className="text-lg">{habenSum.toFixed(2)} €</div>

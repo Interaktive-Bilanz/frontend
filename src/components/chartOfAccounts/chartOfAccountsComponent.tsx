@@ -63,8 +63,8 @@ export function ChartOfAccounts() {
                     <tr className="text-left">
                         <th className="w-1/12">Nr</th>
                         <th className="w-6/12">Bezeichnung</th>
-                        <th className="w-2/12">&sum; Soll</th>
-                        <th className="w-2/12">&sum; Haben</th>
+                        <th className="w-2/12 text-right">&sum; Soll</th>
+                        <th className="w-2/12 text-right">&sum; Haben</th>
                         <th className="w-1/12"></th>
                     </tr>
                 </thead>
@@ -83,8 +83,8 @@ export function ChartOfAccounts() {
                                         })}>
                                     <td>{account.id}</td>
                                     <td>{account.label}</td>
-                                    <td>{accountTotal.debit}</td>
-                                    <td>{accountTotal.credit}</td>
+                                    <td className="text-right">{accountTotal.debit.toFixed(2)} €</td>
+                                    <td className="text-right">{accountTotal.credit.toFixed(2)} €</td>
                                     <td className="px-1 py-0.5 text-center">
                                         {hasAccess(appMode, "edit") && accountTotal.debit === 0 && accountTotal.credit === 0 &&
                                             <button
@@ -131,8 +131,8 @@ export function ChartOfAccounts() {
                                                 })}>
                                             <td>{account.id}</td>
                                             <td>{account.label}</td>
-                                            <td>{accountTotal.debit}</td>
-                                            <td>{accountTotal.credit}</td>
+                                            <td className="text-right">{accountTotal.debit.toFixed(2)} €</td>
+                                            <td className="text-right">{accountTotal.credit.toFixed(2)} €</td>
                                             <td className="px-1 py-0.5 text-center">
                                                 {hasAccess(appMode, "edit") && accountTotal.debit === 0 && accountTotal.credit === 0 &&
                                                     <button
@@ -182,6 +182,13 @@ export function ChartOfAccounts() {
                                     minLength={4}
                                     maxLength={4}
                                     value={newAccountId}
+                                    onKeyDown={(e) => {
+                                        e.stopPropagation();
+                                        if (e.key === "Enter") {
+                                            e.preventDefault();
+                                            handleAddAccount();
+                                        }
+                                    }}
                                     onChange={(e) => setNewAccountId(e.target.value)} />
                             </td>
                             <td>
@@ -190,6 +197,13 @@ export function ChartOfAccounts() {
                                     className="border text-xs w-10/12"
                                     type="text"
                                     value={newAccountLabel}
+                                    onKeyDown={(e) => {
+                                        e.stopPropagation();
+                                        if (e.key === "Enter") {
+                                            e.preventDefault();
+                                            handleAddAccount();
+                                        }
+                                    }}
                                     onChange={(e) => setNewAccountLabel(e.target.value)} />
                             </td>
                             <td></td>

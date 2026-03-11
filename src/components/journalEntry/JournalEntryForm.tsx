@@ -219,7 +219,9 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
                                                 type: "Account",
                                                 payload: { id: account?.id, label: account?.label }
                                             })}>
-                                        <td className="px-1 py-0.5">{debitLine.accountId} {account?.label}</td>
+                                        <td className="px-1 py-0.5 hyphens-auto break-words max-w-0 overflow-hidden">
+                                            {debitLine.accountId} {account?.label}
+                                        </td>
                                         <td className="px-1 py-0.5">{debitLine.amount} €</td>
                                         {isDraft &&
                                             <td className="px-1 py-0.5 text-center">
@@ -299,7 +301,9 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
                                                 type: "Account", payload: { id: account?.id, label: account?.label }
                                             })
                                         }>
-                                        <td className="px-1 py-0.5">{creditLine.accountId} {account?.label}</td>
+                                        <td className="px-1 py-0.5 hyphens-auto break-words max-w-0 overflow-hidden">
+                                            {creditLine.accountId} {account?.label}
+                                        </td>
                                         <td className="px-1 py-0.5">{creditLine.amount} €</td>
                                         {isDraft &&
                                             <td className="px-1 py-0.5 text-center">

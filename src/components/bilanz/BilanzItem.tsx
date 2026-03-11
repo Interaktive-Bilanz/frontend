@@ -91,6 +91,14 @@ const BilanzItem: React.FC<{
     }
   }, [unassignedAccounts]);
 
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (editLabel && inputRef.current) {
+      inputRef.current.select();
+    }
+  }, [editLabel]);
+
   const nodeRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -117,7 +125,7 @@ const BilanzItem: React.FC<{
     opacity: isDragging ? 0.5 : 1,
   };
 
-  const deletePositionHandler = (position:Position) => {
+  const deletePositionHandler = (position: Position) => {
     confirmToast(
       `Position ${position.label} wirklich löschen?`,
       () => deletePosition(String(position.id)));
@@ -163,9 +171,19 @@ const BilanzItem: React.FC<{
               {editLabel ?
                 <div className="min-w-0 hyphens-auto flex-1">
                   <input
+                    ref={inputRef}
+                    autoFocus
                     type="text"
-                    className="h-5 px-1 text-sm border border-gray-300 rounded box-border"
+                    className="w-full h-5 px-1 text-sm border border-gray-300 rounded box-border"
                     value={labelDraft}
+                    onKeyDown={(e) => {
+                      e.stopPropagation();
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        updatePositionLabel(String(position.id), labelDraft)
+                        setEditLabel(false);
+                      }
+                    }}
                     onClick={(e) => e.stopPropagation()}
                     onChange={(e) => {
                       setLabelDraft(e.target.value);
@@ -185,7 +203,7 @@ const BilanzItem: React.FC<{
                     <button className="bg-gray-100 hover:bg-gray-200 w-8 h-8 mr-2 px-1 py-1 rounded" onClick={(e) => {
                       e.stopPropagation();
                       setEditLabel(true);
-                    }}>&#x270E;</button>}
+                    }}>&#x270F;</button>}
                   < button className="bg-gray-100 hover:bg-gray-200 w-8 h-8 px-1 py-1 rounded" onClick={(e) => {
                     e.stopPropagation();
                     deletePositionHandler(position);

@@ -157,11 +157,11 @@ const WindowManager = () => {
               x: w.x,
               y: w.y,
               width: w.data.type === "FileHandeling" ? "auto" : w.width,
-              height: "auto",
+              height: w.data.type === "FileHandeling" ? "auto" : w.height,
             }}
             minWidth={w.data.type === "FileHandeling" ? 400 : 550}
             minHeight={w.data.type === "FileHandeling" ? 250 : 400}
-            enableResizing={w.data.type !== "FileHandeling"}
+            enableResizing={false} //{w.data.type !== "FileHandeling"}
             bounds="window"
             style={{ zIndex: w.zIndex }}
             onMouseDown={() => bringToFront(w.data)}
@@ -169,43 +169,45 @@ const WindowManager = () => {
             cancel=".clickable, button, input, select, textarea"
             className="border border-gray-700 bg-white shadow-lg absolute flex flex-col"
           >
-            <div className={`window-drag-handle 
+            <div className="flex flex-col h-full">
+              <div className={`window-drag-handle 
               ${w.data.type === "Account" ? "bg-green-400 text-gray-800" : ""} 
               ${w.data.type === "JournalEntry" ? "bg-yellow-100 text-gray-800" : ""} 
               ${w.data.type != "JournalEntry" && w.data.type != "Account" ? "bg-gray-800 text-white" : ""} 
-              px-3 py-2 flex justify-between items-center cursor-move`}>
-              <span>{w.title}</span>
-              <button
-                // onMouseDown={(e) => e.stopPropagation()}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  closeWindow(w.data);
-                }}
-                className="bg-red-700 hover:bg-red-500 text-white px-2 py-1 rounded"
-              >
-                X
-              </button>
-            </div>
-            <div className="p-4 text-sm text-gray-700">
-              {w.data.type === "Account" && (
-                <TAccountComponent key={w.data.payload.id} {...w.data.payload} />
-              )}
-              {w.data.type === "JournalEntry" && (
-                <JournalEntryForm
-                  key={w.data.payload.id ?? "new"}
-                  entryId={w.data.payload.id}
-                  isDraft={w.data.payload.isDraft}
-                />
-              )}
-              {w.data.type === "FileHandeling" && (
-                <FileHandlerComponent key={w.data.type} />
-              )}
-              {w.data.type === "ChartOfAccounts" && (
-                <ChartOfAccounts />
-              )}
-              {w.data.type === "Journal" && (
-                <Journal />
-              )}
+              px-3 py-2 flex justify-between items-center cursor-move shrink-0`}>
+                <span>{w.title}</span>
+                <button
+                  // onMouseDown={(e) => e.stopPropagation()}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    closeWindow(w.data);
+                  }}
+                  className="bg-red-700 hover:bg-red-500 text-white px-2 py-1 rounded"
+                >
+                  X
+                </button>
+              </div>
+              <div className="p-4 text-sm text-gray-700 overflow-y-auto flex-1">
+                {w.data.type === "Account" && (
+                  <TAccountComponent key={w.data.payload.id} {...w.data.payload} />
+                )}
+                {w.data.type === "JournalEntry" && (
+                  <JournalEntryForm
+                    key={w.data.payload.id ?? "new"}
+                    entryId={w.data.payload.id}
+                    isDraft={w.data.payload.isDraft}
+                  />
+                )}
+                {w.data.type === "FileHandeling" && (
+                  <FileHandlerComponent key={w.data.type} />
+                )}
+                {w.data.type === "ChartOfAccounts" && (
+                  <ChartOfAccounts />
+                )}
+                {w.data.type === "Journal" && (
+                  <Journal />
+                )}
+              </div>
             </div>
           </Rnd>
         ))}

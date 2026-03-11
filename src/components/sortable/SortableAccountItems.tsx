@@ -3,6 +3,7 @@ import { useInteractiveBalanceData } from "../../context/InteractiveBalanceDataC
 import { Account } from "../../types/InteractiveBalanceData";
 import { getAccountTotals } from "../../util/balanceCalculations";
 import { CSS } from "@dnd-kit/utilities";
+import { GripVertical } from "lucide-react";
 
 
 
@@ -65,36 +66,38 @@ const SortableAccountItem: React.FC<SortableAccountItemProps> = ({
         lang="de"
         onClick={onOpen}
       >
-        <div className="flex justify-between items-center">
-          {teacherMode && (
-            <span
-              {...attributes}
-              {...listeners}
-              className="cursor-grab active:cursor-grabbing mr-2 text-gray-400 hover:text-gray-600"
-              onClick={(e) => e.stopPropagation()}
-            >
-              ⋮⋮
-            </span>
-          )}
-          <div lang="de" className="min-w-0 hyphens-auto break-words flex-1">
-            {accountId} {account.label}
+        <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-y-1">
+          <div className="flex items-center min-w-0 flex-1">
+            {teacherMode && (
+              <span
+                  {...attributes}
+                  {...listeners}
+                  className="inline-block cursor-grab active:cursor-grabbing mr-2 active:text-blue-500 active:scale-110 transition-all duration-200 select-none touch-none"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <GripVertical size={16} />
+                </span>
+            )}
+            <div lang="de" className="min-w-0 hyphens-auto break-words flex-1">
+              {accountId} {account.label}
+            </div>
+            {teacherMode && (
+              <button
+                className="bg-transparent hover:bg-gray-100 mr-1 px-1 py-1 rounded"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRemove();
+                }}
+              >
+                &#x274C;
+              </button>
+            )}
           </div>
-          {teacherMode && (
-            <button
-              className="bg-transparent hover:bg-gray-100 mr-1 px-1 py-1 rounded"
-              onClick={(e) => {
-                e.stopPropagation();
-                onRemove();
-              }}
-            >
-              &#x274C;
-            </button>
-          )}
-          <span className={`text-nowrap whitespace-nowrap ${isAbnormal && 'text-red-500'}`}>
+          <div className={`self-end xl:self-auto text-right xl:ml-2 text-nowrap ${isAbnormal && 'text-red-500'}`}>
             {displayAccountBalance.toFixed(2)} €
             {accountBalance < 0 && " H"}
             {accountBalance > 0 && " S"}
-          </span>
+          </div>
         </div>
       </button>
     </div>

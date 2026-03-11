@@ -10,6 +10,7 @@ import { CSS } from "@dnd-kit/utilities";
 import SortableAccountItem from "../sortable/SortableAccountItems";
 import { useDragContext } from "../../context/DragContext";
 import { hasAccess, useAppMode } from "../../context/AppModeContex";
+import { GripVertical } from "lucide-react";
 
 export function calculatePositionSaldo(
   position: Position,
@@ -141,51 +142,52 @@ const BilanzItem: React.FC<{
             }
           }}
         >
-          <div className="flex justify-between items-center">
-            {hasAccess(appMode, "edit") && (
-              <span
-                {...attributes}
-                {...listeners}
-                className="cursor-grab mr-2"
-                onClick={(e) => e.stopPropagation()}
-              >
-                ⋮⋮
-              </span>
-            )}
-            {editLabel ?
-              <div className="min-w-0 hyphens-auto flex-1">
-                <input
-                  type="text"
-                  className="h-5 px-1 text-sm border border-gray-300 rounded box-border"
-                  value={labelDraft}
+          <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-y-1">
+            <div className="flex flex-row items-center min-w-0 flex-1 w-full">
+              {hasAccess(appMode, "edit") && (
+                <span
+                  {...attributes}
+                  {...listeners}
+                  className="inline-block cursor-grab active:cursor-grabbing mr-2 active:text-blue-500 active:scale-110 transition-all duration-200 select-none touch-none"
                   onClick={(e) => e.stopPropagation()}
-                  onChange={(e) => {
-                    setLabelDraft(e.target.value);
-                  }} />
-              </div> :
-              <div className="min-w-0 hyphens-auto flex-1">{position.label}</div>
+                >
+                  <GripVertical size={24} />
+                </span>
+              )}
+              {editLabel ?
+                <div className="min-w-0 hyphens-auto flex-1">
+                  <input
+                    type="text"
+                    className="h-5 px-1 text-sm border border-gray-300 rounded box-border"
+                    value={labelDraft}
+                    onClick={(e) => e.stopPropagation()}
+                    onChange={(e) => {
+                      setLabelDraft(e.target.value);
+                    }} />
+                </div> :
+                <div className="min-w-0 hyphens-auto flex-1">{position.label}</div>
 
-            }
-            {hasAccess(appMode, "edit") &&
-              <div>
-                {editLabel ?
-                  <button className="bg-transparent hover:bg-gray-100 mr-1 px-1 py-1 rounded" onClick={(e) => {
+              }
+              {hasAccess(appMode, "edit") &&
+                <>
+                  {editLabel ?
+                    <button className="bg-gray-100 hover:bg-gray-200 w-8 h-8 mr-2 px-1 py-1 rounded" onClick={(e) => {
+                      e.stopPropagation();
+                      updatePositionLabel(String(position.id), labelDraft)
+                      setEditLabel(false);
+                    }}>&#x2705;</button> :
+                    <button className="bg-gray-100 hover:bg-gray-200 w-8 h-8 mr-2 px-1 py-1 rounded" onClick={(e) => {
+                      e.stopPropagation();
+                      setEditLabel(true);
+                    }}>&#x270E;</button>}
+                  < button className="bg-gray-100 hover:bg-gray-200 w-8 h-8 px-1 py-1 rounded" onClick={(e) => {
                     e.stopPropagation();
-                    updatePositionLabel(String(position.id), labelDraft)
-                    setEditLabel(false);
-                  }}>&#x2705;</button> :
-                  <button className="bg-transparent hover:bg-gray-100 mr-1 px-1 py-1 rounded" onClick={(e) => {
-                    e.stopPropagation();
-                    setEditLabel(true);
-                  }}>&#x270E;</button>
-                }
-                <button className="bg-transparent hover:bg-gray-100 mr-1 px-1 py-1 rounded" onClick={(e) => {
-                  e.stopPropagation();
-                  deletePosition(String(position.id));
-                }}>&#x274C;</button>
-              </div>
-            }
-            <div className={`text-nowrap whitespace-nowrap ml-2 ${isAbnormal ? 'text-red-500' : ''}`}>
+                    deletePosition(String(position.id));
+                  }}>&#x274C;</button>
+                </>
+              }
+            </div>
+            <div className={`self-end xl:self-auto text-right xl:ml-2 text-nowrap ${isAbnormal ? 'text-red-500' : ''}`}>
               {displayBalance.toFixed(2)} €
               {positionBalance < 0 && " H"}
               {positionBalance > 0 && " S"}
@@ -193,94 +195,98 @@ const BilanzItem: React.FC<{
           </div>
         </div>
       </div>
-      {dropAfter && (
-        <div className="h-1 bg-blue-400 rounded mx-2" />
-      )}
+      {
+        dropAfter && (
+          <div className="h-1 bg-blue-400 rounded mx-2" />
+        )
+      }
 
 
 
-      {isOpen && (
-        <div className="ml-4">
-          {hasAccess(appMode, "edit") &&
-            <div className="flex">
-              <button
-                className="bg-green-500 hover:bg-green-700 px-1 py-1 mt-1 mr-1 rounded"
-                onClick={(e) =>
-                  addNewPositionTo(String(position.id))}
-              >
-                + Position
-              </button>
-              <div
-                role="button"
-                tabIndex={0}
-                className="flex items-center bg-green-500 hover:bg-green-700 px-1 py-1 mt-1 mr-1 rounded gap-1"
-                onClick={() => {
-                  if (newAccountId) {
-                    addAccountTo(String(position.id), newAccountId);
-                  } else {
-                    toast.info("Bitte ein Konto auswählen.");
-                  }
-                }}
-              >
-                <span>+ Konto</span>
-
-                <select
-                  className="h-5 w-20 text-sm rounded"
-                  onClick={(e) => {
-                    if (unassignedAccounts.length === 0) toast.info("Kein verfügbares Konto. Bitte weitere Konten anlegen.");
-                    e.stopPropagation()
-
-                  }}
-                  onChange={(e) => {
-                    setNewAccountId(e.target.value);
-                  }}
-                // disabled={unassignedAccounts.length === 0}
+      {
+        isOpen && (
+          <div className="ml-4">
+            {hasAccess(appMode, "edit") &&
+              <div className="flex">
+                <button
+                  className="bg-green-500 hover:bg-green-700 px-1 py-1 mt-1 mr-1 rounded"
+                  onClick={(e) =>
+                    addNewPositionTo(String(position.id))}
                 >
-                  {unassignedAccounts.length > 0 ? unassignedAccounts.map((a) => (
-                    <option key={a.id} value={a.id}>{a.id} {a.label}</option>
-                  )
-                  ) : <option key={"noAccAvailable"} className="text-xs"></option>}
-                </select>
-              </div>
-            </div>
-          }
-          <SortableContext items={position.accounts ?? []}>
-            {position.accounts?.map((accountId) => {
-              const account = accounts.find(a => a.id === accountId)
-              if (!account) return;
-              return (
-                <SortableAccountItem
-                  key={accountId}
-                  accountId={accountId}
-                  account={account}
-                  side={side}
-                  teacherMode={hasAccess(appMode, "edit")}
-                  parentId={position.id!}
-                  onRemove={() => removeAccountFrom(
-                    position.id!,
-                    accountId
-                  )}
-                  onOpen={() => openWindow({
-                    type: "Account",
-                    payload: { id: accountId, label: account.label }
-                  })}
-                />
-              )
-            })}
-          </SortableContext>
+                  + Position
+                </button>
+                <div
+                  role="button"
+                  tabIndex={0}
+                  className="flex items-center bg-green-500 hover:bg-green-700 px-1 py-1 mt-1 mr-1 rounded gap-1"
+                  onClick={() => {
+                    if (newAccountId) {
+                      addAccountTo(String(position.id), newAccountId);
+                    } else {
+                      toast.info("Bitte ein Konto auswählen.");
+                    }
+                  }}
+                >
+                  <span>+ Konto</span>
 
-          <SortableContext items={position.positions.map(p => p.id!) ?? []}>
-            {position.positions?.map((childpos) => (
-              <BilanzItem
-                key={childpos.id}
-                position={childpos}
-                parentId={position.id!}
-                level={level + 1}
-              />
-            ))}
-          </SortableContext>
-        </div>
-      )}
+                  <select
+                    className="h-5 w-20 text-sm rounded"
+                    onClick={(e) => {
+                      if (unassignedAccounts.length === 0) toast.info("Kein verfügbares Konto. Bitte weitere Konten anlegen.");
+                      e.stopPropagation()
+
+                    }}
+                    onChange={(e) => {
+                      setNewAccountId(e.target.value);
+                    }}
+                  // disabled={unassignedAccounts.length === 0}
+                  >
+                    {unassignedAccounts.length > 0 ? unassignedAccounts.map((a) => (
+                      <option key={a.id} value={a.id}>{a.id} {a.label}</option>
+                    )
+                    ) : <option key={"noAccAvailable"} className="text-xs"></option>}
+                  </select>
+                </div>
+              </div>
+            }
+            <SortableContext items={position.accounts ?? []}>
+              {position.accounts?.map((accountId) => {
+                const account = accounts.find(a => a.id === accountId)
+                if (!account) return;
+                return (
+                  <SortableAccountItem
+                    key={accountId}
+                    accountId={accountId}
+                    account={account}
+                    side={side}
+                    teacherMode={hasAccess(appMode, "edit")}
+                    parentId={position.id!}
+                    onRemove={() => removeAccountFrom(
+                      position.id!,
+                      accountId
+                    )}
+                    onOpen={() => openWindow({
+                      type: "Account",
+                      payload: { id: accountId, label: account.label }
+                    })}
+                  />
+                )
+              })}
+            </SortableContext>
+
+            <SortableContext items={position.positions.map(p => p.id!) ?? []}>
+              {position.positions?.map((childpos) => (
+                <BilanzItem
+                  key={childpos.id}
+                  position={childpos}
+                  parentId={position.id!}
+                  level={level + 1}
+                />
+              ))}
+            </SortableContext>
+          </div>
+        )
+      }
     </div >
   );
 };

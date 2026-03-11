@@ -134,14 +134,14 @@ const WindowManager = () => {
   return (
     <WindowManagerContext.Provider value={{ openWindow, closeWindow, closeAllWindowsExcept, bringToFront }}>
       <Sidebar></Sidebar>
-      <div className="w-screen h-screen bg-gray-200 relative overflow-hidden p-1">
+      <div className="w-screen h-screen bg-gray-200 relative overflow-hidden overflow-y-auto p-1">
         <div>
           {isTeacherFromUrl && <div className="flex justify-center my-1"><div className="text-white font-bold bg-red-500 rounded-md px-2 py-1">Teacher Mode</div></div>}
 
-          <div className={"flex-1 flex items-start p-8 h-full " + (hasAccess(appMode, "teacher") ? "justify-evenly gap-4" : "justify-center")}>
+          <div className={`flex-1 flex flex-col lg:flex-row items-start p-2 md:p-8 h-full gap-4 ${hasAccess(appMode, "teacher") ? "lg:justify-evenly" : "justify-center"}`}>
               <BilanzComponent />
             {hasAccess(appMode, "teacher") &&
-              <div className="w-1/2 h-90vh">
+              <div className="w-full lg:w-1/2 hidden md:block h-90vh">
                 <JsonEditor />
               </div>
             }

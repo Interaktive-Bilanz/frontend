@@ -94,7 +94,7 @@ export const EntriesListComponent: React.FC<EntryLinesProps> = ({
             <tbody>
                 {lines.map((l, index) => (
                     <tr
-                        className="cursor-pointer align-top border-t boder-solid transition-all duration-100 hover:scale-95"
+                        className="cursor-pointer align-top border-t boder-solid hover:bg-blue-50 transition-colors duration-100"
                         key={index}
                         onClick={() => openWindow({ type: "JournalEntry", payload: { isDraft: l.draft, id: l.draft ? "Neue Buchung" : l.entryId } })}
                     >

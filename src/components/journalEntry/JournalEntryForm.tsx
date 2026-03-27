@@ -213,7 +213,7 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
                             {debitLines.map((debitLine, i) => {
                                 const account = interactiveBalanceData.accounts.find(a => a.id === debitLine.accountId);
                                 return (
-                                    <tr key={i} className="cursor-pointer transition-all border duration-100 hover:scale-95"
+                                    <tr key={i} className="cursor-pointer border hover:bg-blue-50 transition-colors duration-100"
                                         onClick={() =>
                                             openWindow({
                                                 type: "Account",
@@ -223,15 +223,15 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
                                             {debitLine.accountId} {account?.label}
                                         </td>
                                         <td className="px-1 py-0.5">{debitLine.amount} €</td>
-                                        {isDraft &&
-                                            <td className="px-1 py-0.5 text-center">
+                                        <td className="px-1 py-0.5 text-center">
+                                            {isDraft &&
                                                 <button className="px-2 py-0.5 rounded bg-red-100 hover:bg-red-200 text-sm"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         removeLine(debitLine.accountId);
                                                     }}>-</button>
-                                            </td>
-                                        }
+                                            }
+                                        </td>
                                     </tr>
                                 );
                             })}
@@ -295,7 +295,7 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
                             {creditLines.map((creditLine, i) => {
                                 const account = interactiveBalanceData.accounts.find(a => a.id === creditLine.accountId);
                                 return (
-                                    <tr key={`entryLine-${i}`} className="cursor-pointer border transition-all duration-100 hover:scale-95"
+                                    <tr key={`entryLine-${i}`} className="cursor-pointer border hover:bg-blue-50 transition-colors duration-100"
                                         onClick={() =>
                                             openWindow({
                                                 type: "Account", payload: { id: account?.id, label: account?.label }
@@ -305,15 +305,15 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
                                             {creditLine.accountId} {account?.label}
                                         </td>
                                         <td className="px-1 py-0.5">{creditLine.amount} €</td>
-                                        {isDraft &&
-                                            <td className="px-1 py-0.5 text-center">
+                                        <td className="px-1 py-0.5 text-center">
+                                            {isDraft &&
                                                 <button className="px-2 py-0.5 rounded bg-red-100 hover:bg-red-200 text-sm"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         removeLine(creditLine.accountId);
                                                     }}>-</button>
-                                            </td>
-                                        }
+                                            }
+                                        </td>
                                     </tr>
                                 );
                             })}

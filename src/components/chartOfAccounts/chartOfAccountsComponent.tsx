@@ -123,7 +123,7 @@ export function ChartOfAccounts() {
                                     const accountTotal = getAccountTotals(accountTotals, account.id);
                                     return (
                                         //<tr key={account.id} className="cursor-pointer transition-all border duration-100 hover:scale-95"
-                                        <tr className="h-8 xl:h-auto bg-gray-100 cursor-pointer border hover:bg-blue-50 transition-colors duration-100"
+                                        <tr className="h-8 xl:h-auto bg-gray-100 cursor-pointer border hover:bg-blue-200 transition-colors duration-100"
                                             onClick={() =>
                                                 openWindow({
                                                     type: "Account",
@@ -150,11 +150,11 @@ export function ChartOfAccounts() {
                                     )
                                 }
                                 )}
-                            <tr className="h-8 xl:h-auto cursor-pointer border hover:bg-blue-50 transition-colors duration-100">
+                            <tr className="h-8 xl:h-auto">
                                 <td></td>
                                 <td>&sum;</td>
-                                <td>{totalDebit}</td>
-                                <td>{totalCredit}</td>
+                                <td className="text-right">{totalDebit.toFixed(2)} €</td>
+                                <td className="text-right">{totalCredit.toFixed(2)} €</td>
                                 <td></td>
                             </tr>
                         </> :

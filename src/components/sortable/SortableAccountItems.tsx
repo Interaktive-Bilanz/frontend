@@ -5,6 +5,7 @@ import { getAccountTotals } from "../../util/balanceCalculations";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical } from "lucide-react";
 import { confirmToast } from "../../util/confirmToast";
+import { formatCurrency } from "../../util/numberFormat";
 
 
 
@@ -110,7 +111,7 @@ const SortableAccountItem: React.FC<SortableAccountItemProps> = ({
             )}
           </div>
           <div className={`self-end xl:self-auto text-right xl:ml-2 text-nowrap ${isAbnormal && 'text-red-500'}`}>
-            {displayAccountBalance.toFixed(2)} €
+            {formatCurrency(displayAccountBalance)}
             {accountBalance < 0 && " H"}
             {accountBalance > 0 && " S"}
           </div>

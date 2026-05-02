@@ -73,7 +73,7 @@ const WindowManager = () => {
 
   const maxWindowCounts: Record<WindowContentType, number> = {
     "Account": 3,
-    "JournalEntry": 1,
+    "JournalEntry": 3,
     "FileHandeling": 1,
     "ChartOfAccounts": 1,
     "Journal": 1,

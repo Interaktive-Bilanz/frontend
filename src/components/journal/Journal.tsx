@@ -1,5 +1,6 @@
 import { useInteractiveBalanceData } from "../../context/InteractiveBalanceDataContext";
 import { useWindowManager } from "../../context/WindowManagerContext";
+import { formatCurrency } from "../../util/numberFormat";
 import { sumLines } from "../../util/sumEntryLines";
 
 
@@ -38,7 +39,7 @@ export function Journal() {
                                 onClick={() => openWindow({ type: "JournalEntry", payload: { isDraft: false, id: entry.id } })}>
                                 <td>{entry.id}</td>
                                 <td>{entry.description}</td>
-                                <td className="text-right pr-1">{debitSum.toFixed(2)} €</td>
+                                <td className="text-right pr-1">{formatCurrency(debitSum)}</td>
                             </tr>
                         )
                     })}

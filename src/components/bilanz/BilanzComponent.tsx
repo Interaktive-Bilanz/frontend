@@ -6,6 +6,7 @@ import { calculateAccountTotals, getAccountTotals } from "../../util/balanceCalc
 import { DndContext, DragEndEvent, DragOverEvent, Over, pointerWithin, DragOverlay, useSensor, useSensors, PointerSensor, TouchSensor, KeyboardSensor } from "@dnd-kit/core";
 import { useEffect, useRef, useState } from "react";
 import { useDragContext } from "../../context/DragContext";
+import { formatCurrency } from "../../util/numberFormat";
 
 const BilanzComponent = () => {
   // const [data, setData] = useState<BilanzData>({
@@ -328,7 +329,7 @@ const BilanzComponent = () => {
             {/* <span className={`text-lg font-semibold ${balancesMatch ? 'text-green-600' : 'text-red-600'}`}>Summe {Math.abs(assetsBalanceSum).toFixed(2)} €</span> */}
             <span className={`text-lg font-semibold ${balancesMatch && displayBalanceAssets >= 0 ? 'text-green-600' : 'text-red-600'}`}>
               <span className="relative -top-0.5">&sum;</span>
-              {" "}{Math.abs(displayBalanceAssets).toFixed(2)} €
+              {" "}{formatCurrency(Math.abs(displayBalanceAssets))}
               {displayBalanceAssets > 0 && " S"}
               {displayBalanceAssets < 0 && " H"}
             </span>
@@ -344,7 +345,7 @@ const BilanzComponent = () => {
             {/* <span className={`text-lg font-semibold ${balancesMatch ? 'text-green-600' : 'text-red-600'}`}>Summe {Math.abs(liabilitiesEquityBalanceSum).toFixed(2)} €</span> */}
             <span className={`text-lg font-semibold ${balancesMatch && displayBalanceLiabilitiesAndEquity >= 0 ? 'text-green-600' : 'text-red-600'}`}>
               <span className="relative -top-0.5">&sum;</span>
-              {" "}{Math.abs(displayBalanceLiabilitiesAndEquity).toFixed(2)} €
+              {" "}{formatCurrency(Math.abs(displayBalanceLiabilitiesAndEquity))}
               {displayBalanceLiabilitiesAndEquity > 0 && " H"}
               {displayBalanceLiabilitiesAndEquity < 0 && " S"}
             </span>

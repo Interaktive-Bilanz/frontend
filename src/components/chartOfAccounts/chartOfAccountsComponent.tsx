@@ -4,6 +4,7 @@ import { useWindowManager } from "../../context/WindowManagerContext";
 import { getAccountTotals } from "../../util/balanceCalculations";
 import { toast } from "react-toastify";
 import { hasAccess, useAppMode } from "../../context/AppModeContex";
+import { formatCurrency } from "../../util/numberFormat";
 
 
 
@@ -83,8 +84,8 @@ export function ChartOfAccounts() {
                                         })}>
                                     <td>{account.id}</td>
                                     <td>{account.label}</td>
-                                    <td className="text-right">{accountTotal.debit.toFixed(2)} €</td>
-                                    <td className="text-right">{accountTotal.credit.toFixed(2)} €</td>
+                                    <td className="text-right">{formatCurrency(accountTotal.debit)}</td>
+                                    <td className="text-right">{formatCurrency(accountTotal.credit)}</td>
                                     <td className="px-1 py-0.5 text-center">
                                         {hasAccess(appMode, "edit") && accountTotal.debit === 0 && accountTotal.credit === 0 &&
                                             <button
@@ -131,8 +132,8 @@ export function ChartOfAccounts() {
                                                 })}>
                                             <td>{account.id}</td>
                                             <td>{account.label}</td>
-                                            <td className="text-right">{accountTotal.debit.toFixed(2)} €</td>
-                                            <td className="text-right">{accountTotal.credit.toFixed(2)} €</td>
+                                            <td className="text-right">{formatCurrency(accountTotal.debit)}</td>
+                                            <td className="text-right">{formatCurrency(accountTotal.credit)}</td>
                                             <td className="px-1 py-0.5 text-center">
                                                 {hasAccess(appMode, "edit") && accountTotal.debit === 0 && accountTotal.credit === 0 &&
                                                     <button
@@ -153,8 +154,8 @@ export function ChartOfAccounts() {
                             <tr className="h-8 xl:h-auto">
                                 <td></td>
                                 <td>&sum;</td>
-                                <td className="text-right">{totalDebit.toFixed(2)} €</td>
-                                <td className="text-right">{totalCredit.toFixed(2)} €</td>
+                                <td className="text-right">{formatCurrency(totalDebit)}</td>
+                                <td className="text-right">{formatCurrency(totalCredit)}</td>
                                 <td></td>
                             </tr>
                         </> :

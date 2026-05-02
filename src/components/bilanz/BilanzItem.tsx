@@ -12,6 +12,7 @@ import { useDragContext } from "../../context/DragContext";
 import { hasAccess, useAppMode } from "../../context/AppModeContex";
 import { GripVertical } from "lucide-react";
 import { confirmToast } from "../../util/confirmToast";
+import { formatCurrency } from "../../util/numberFormat";
 
 export function calculatePositionSaldo(
   position: Position,
@@ -212,7 +213,7 @@ const BilanzItem: React.FC<{
               }
             </div>
             <div className={`self-end xl:self-auto text-right xl:ml-2 text-nowrap ${isAbnormal ? 'text-red-500' : ''}`}>
-              {displayBalance.toFixed(2)} €
+              {formatCurrency(displayBalance)}
               {positionBalance < 0 && " H"}
               {positionBalance > 0 && " S"}
             </div>

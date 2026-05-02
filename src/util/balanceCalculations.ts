@@ -27,7 +27,9 @@ export function calculateAccountTotals(journalEntries: JournalEntry[]): Record<s
                 acc.credit += line.amount;
             }
 
-            acc.balance = acc.debit - acc.credit;
+            acc.debit = Math.round(acc.debit * 100) / 100;
+            acc.credit = Math.round(acc.credit * 100) / 100;
+            acc.balance = Math.round((acc.debit - acc.credit) * 100) / 100;
             result[line.accountId] = acc;
         }
     }

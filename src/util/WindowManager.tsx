@@ -73,14 +73,15 @@ const WindowManager = () => {
 
   const maxWindowCounts: Record<WindowContentType, number> = {
     "Account": 3,
-    "JournalEntry": 1,
+    "JournalEntry": 3,
     "FileHandeling": 1,
     "ChartOfAccounts": 1,
     "Journal": 1,
   }
 
   const openWindow = (windowData: WindowData) => {
-
+    const newZ = topZ + 1;
+    setTopZ(newZ);
     setWindows((prev) => {
 
       const sameTypeCount = prev.filter(w => w.data.type === windowData.type).length;
@@ -134,14 +135,14 @@ const WindowManager = () => {
   return (
     <WindowManagerContext.Provider value={{ openWindow, closeWindow, closeAllWindowsExcept, bringToFront }}>
       <Sidebar></Sidebar>
-      <div className="w-screen h-screen bg-gray-200 relative overflow-hidden p-1">
+      <div className="w-screen h-screen bg-gray-200 relative overflow-hidden overflow-y-auto p-1">
         <div>
           {isTeacherFromUrl && <div className="flex justify-center my-1"><div className="text-white font-bold bg-red-500 rounded-md px-2 py-1">Teacher Mode</div></div>}
 
-          <div className={"flex-1 flex items-start p-8 h-full " + (hasAccess(appMode, "teacher") ? "justify-evenly gap-4" : "justify-center")}>
-              <BilanzComponent />
+          <div className={`flex-1 flex flex-col lg:flex-row items-start p-2 md:p-8 h-full gap-4 ${hasAccess(appMode, "teacher") ? "lg:justify-evenly" : "justify-center"}`}>
+            <BilanzComponent />
             {hasAccess(appMode, "teacher") &&
-              <div className="w-1/2 h-90vh">
+              <div className="w-full lg:w-1/2 hidden md:block h-90vh">
                 <JsonEditor />
               </div>
             }
@@ -156,11 +157,11 @@ const WindowManager = () => {
               x: w.x,
               y: w.y,
               width: w.data.type === "FileHandeling" ? "auto" : w.width,
-              height: "auto",
+              height: w.data.type === "FileHandeling" ? "auto" : w.height,
             }}
             minWidth={w.data.type === "FileHandeling" ? 400 : 550}
             minHeight={w.data.type === "FileHandeling" ? 250 : 400}
-            enableResizing={w.data.type !== "FileHandeling"}
+            enableResizing={false} //{w.data.type !== "FileHandeling"}
             bounds="window"
             style={{ zIndex: w.zIndex }}
             onMouseDown={() => bringToFront(w.data)}
@@ -168,39 +169,45 @@ const WindowManager = () => {
             cancel=".clickable, button, input, select, textarea"
             className="border border-gray-700 bg-white shadow-lg absolute flex flex-col"
           >
-            <div className={`window-drag-handle 
+            <div className="flex flex-col h-full">
+              <div className={`window-drag-handle 
               ${w.data.type === "Account" ? "bg-green-400 text-gray-800" : ""} 
               ${w.data.type === "JournalEntry" ? "bg-yellow-100 text-gray-800" : ""} 
               ${w.data.type != "JournalEntry" && w.data.type != "Account" ? "bg-gray-800 text-white" : ""} 
-              px-3 py-2 flex justify-between items-center cursor-move`}>
-              <span>{w.title}</span>
-              <button
-                onClick={() => closeWindow(w.data)}
-                className="bg-red-700 hover:bg-red-500 text-white px-2 py-1 rounded"
-              >
-                X
-              </button>
-            </div>
-            <div className="p-4 text-sm text-gray-700">
-              {w.data.type === "Account" && (
-                <TAccountComponent key={w.data.payload.id} {...w.data.payload} />
-              )}
-              {w.data.type === "JournalEntry" && (
-                <JournalEntryForm
-                  key={w.data.payload.id ?? "new"}
-                  entryId={w.data.payload.id}
-                  isDraft={w.data.payload.isDraft}
-                />
-              )}
-              {w.data.type === "FileHandeling" && (
-                <FileHandlerComponent key={w.data.type} />
-              )}
-              {w.data.type === "ChartOfAccounts" && (
-                <ChartOfAccounts/>
-              )}
-              {w.data.type === "Journal" && (
-                <Journal/>
-              )}
+              px-3 py-2 flex justify-between items-center cursor-move shrink-0`}>
+                <span>{w.title}</span>
+                <button
+                  // onMouseDown={(e) => e.stopPropagation()}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    closeWindow(w.data);
+                  }}
+                  className="bg-red-700 hover:bg-red-500 text-white px-2 py-1 rounded"
+                >
+                  X
+                </button>
+              </div>
+              <div className="p-4 text-sm text-gray-700 overflow-y-auto flex-1">
+                {w.data.type === "Account" && (
+                  <TAccountComponent key={w.data.payload.id} {...w.data.payload} />
+                )}
+                {w.data.type === "JournalEntry" && (
+                  <JournalEntryForm
+                    key={w.data.payload.id ?? "new"}
+                    entryId={w.data.payload.id}
+                    isDraft={w.data.payload.isDraft}
+                  />
+                )}
+                {w.data.type === "FileHandeling" && (
+                  <FileHandlerComponent key={w.data.type} />
+                )}
+                {w.data.type === "ChartOfAccounts" && (
+                  <ChartOfAccounts />
+                )}
+                {w.data.type === "Journal" && (
+                  <Journal />
+                )}
+              </div>
             </div>
           </Rnd>
         ))}

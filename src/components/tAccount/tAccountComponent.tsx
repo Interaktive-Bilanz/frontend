@@ -4,6 +4,7 @@ import React from "react";
 import { useInteractiveBalanceData } from "../../context/InteractiveBalanceDataContext";
 import { EntryLine } from "../../types/InteractiveBalanceData";
 import { getAccountTotals } from "../../util/balanceCalculations";
+import { formatCurrency } from "../../util/numberFormat";
 
 const sumEntryLines = (lines: EntryLinesProps["lines"]) =>
     lines.reduce((sum, item) => sum + item.line.amount, 0);
@@ -70,30 +71,30 @@ export const TAccountComponent: React.FC<TAccountProps> = ({
                 <div className=" p-1 border-r-2 border-solid border-black">
                     <div className="flex justify-between items-center">
                         <div className="inline-flex items-center gap-1">
-                            <span className="text-lg">Summe</span>
+                            {/* <span className="text-lg">Summe</span> */}
                             <span className="text-lg font-normal font-mono">∑</span>
                         </div>
-                        <div className="text-lg">{sollSum.toFixed(2)} €</div>
+                        <div className="text-lg">{formatCurrency(sollSum)}</div>
                     </div>
                     {sumDif < 0 && (
                         <div className="flex justify-between">
                             <div className="text-lg">Saldo</div>
-                            <div className="text-lg">{(-1 * sumDif).toFixed(2)} €</div>
+                            <div className="text-lg">{formatCurrency((-1 * sumDif))}</div>
                         </div>
                     )}
                 </div>
                 <div className=" p-1 border-l-2 boder-solid border-black">
                     <div className="flex justify-between items-center">
                         <div className="inline-flex items-center gap-1">
-                            <span className="text-lg">Summe</span>
+                            {/* <span className="text-lg">Summe</span> */}
                             <span className="text-lg font-normal font-mono">∑</span>
                         </div>
-                        <div className="text-lg">{habenSum.toFixed(2)} €</div>
+                        <div className="text-lg">{formatCurrency(habenSum)}</div>
                     </div>
                     {sumDif > 0 && (
                         <div className="flex justify-between">
                             <div className="text-lg">Saldo</div>
-                            <div className="text-lg">{sumDif.toFixed(2)} €</div>
+                            <div className="text-lg">{formatCurrency(sumDif)}</div>
                         </div>
                     )}
                 </div>

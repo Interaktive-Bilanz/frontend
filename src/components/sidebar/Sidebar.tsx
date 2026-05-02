@@ -59,7 +59,7 @@ export function Sidebar() {
                     title={`Mode: ${MODE_TITLES[appMode]} — klicken zum Ändern`}
                     className="relative ml-4 my-1 bg-gray-300 rounded-xl size-14 flex items-center justify-center text-4xl"
                     onClick={() => cycleMode()}>
-                    {appMode === 'standard' ? '👁️' : appMode === 'edit' ? '✏️' : '🎓'}
+                    {appMode === 'standard' ? '\u{1F441}\uFE0F' : appMode === 'edit' ? '\u270F\uFE0F' : '\u{1F393}'}
                 </button>
             </div>
         </div >

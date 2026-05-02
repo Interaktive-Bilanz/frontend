@@ -6,6 +6,8 @@ import { useInteractiveBalanceData } from "../../context/InteractiveBalanceDataC
 import { useWindowManager } from "../../context/WindowManagerContext";
 import { toast } from "react-toastify";
 import { sumLines } from "../../util/sumEntryLines";
+import { formatCurrency } from "../../util/numberFormat";
+import { CurrencyInput } from "../common/CurrencyInputs";
 
 
 
@@ -16,8 +18,8 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
     const { openWindow, closeWindow } = useWindowManager();
     const [selectedDebitAccount, setSelectedDebitAccount] = useState("");
     const [selectedCreditAccount, setSelectedCreditAccount] = useState("");
-    const [newDebitLineAmount, setNewDebitLineAmount] = useState("");
-    const [newCreditLineAmount, setNewCreditLineAmount] = useState("");
+    const [newDebitLineAmount, setNewDebitLineAmount] = useState<number | null>(null);
+    const [newCreditLineAmount, setNewCreditLineAmount] = useState<number | null>(null);
     const debitAmountAsNumber = Number(newDebitLineAmount);
     const creditAmountAsNumber = Number(newCreditLineAmount);
 
@@ -77,12 +79,10 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
 
         const account = interactiveBalanceData.accounts.find(a => a.id === accountId);
 
-        if (!account || amount <= 0) return;
-
-        if (Number.isNaN(amount)) {
-            toast.error("Bitte einen gültigen Betrag eingeben.");
+        if (!account) {
+            toast.error("Bitte ein Konto auswählen.");
             return;
-        }
+        };
 
         setDraftEntry(prev => ({
             ...prev!,
@@ -105,12 +105,13 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
         switch (entryType) {
             case "credit":
                 setSelectedCreditAccount("");
-                setNewCreditLineAmount("");
+                setNewCreditLineAmount(null);
                 break;
             case "debit":
                 setSelectedDebitAccount("");
-                setNewDebitLineAmount("");
+                setNewDebitLineAmount(null);
                 break;
+
         }
     }
 
@@ -135,6 +136,7 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
         if (!draftEntry) return;
 
         if (balance !== 0) {
+            console.log("Balance: ", balance);
             toast.error("Ungültige Buchung. Saldo muss 0,00 betragen.");
             return;
         } else if (draftEntry?.entryLines.length === 0) {
@@ -169,10 +171,12 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
     }
 
     const debitLines = currentEntry.entryLines.filter(l => l.entryType === "debit");
+    console.log("debit lines: ", debitLines);
     const debitSum = sumLines(debitLines);
     const creditLines = currentEntry.entryLines.filter(l => l.entryType === "credit");
+    console.log("credit lines: ", creditLines);
     const creditSum = sumLines(creditLines);
-    const balance = debitSum - creditSum;
+    const balance = Math.round((debitSum - creditSum) * 100) / 100;
 
     const usedAccountIds = new Set(
         draftEntry?.entryLines?.map(l => l.accountId) ?? []
@@ -213,23 +217,25 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
                             {debitLines.map((debitLine, i) => {
                                 const account = interactiveBalanceData.accounts.find(a => a.id === debitLine.accountId);
                                 return (
-                                    <tr key={i} className="cursor-pointer transition-all border duration-100 hover:scale-95"
+                                    <tr key={i} className="cursor-pointer border hover:bg-blue-50 transition-colors duration-100"
                                         onClick={() =>
                                             openWindow({
                                                 type: "Account",
                                                 payload: { id: account?.id, label: account?.label }
                                             })}>
-                                        <td className="px-1 py-0.5">{debitLine.accountId} {account?.label}</td>
-                                        <td className="px-1 py-0.5">{debitLine.amount} €</td>
-                                        {isDraft &&
-                                            <td className="px-1 py-0.5 text-center">
+                                        <td className="px-1 py-0.5 hyphens-auto break-words max-w-0 overflow-hidden">
+                                            {debitLine.accountId} {account?.label}
+                                        </td>
+                                        <td className="px-1 py-0.5">{formatCurrency(debitLine.amount)}</td>
+                                        <td className="px-1 py-0.5 text-center">
+                                            {isDraft &&
                                                 <button className="px-2 py-0.5 rounded bg-red-100 hover:bg-red-200 text-sm"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         removeLine(debitLine.accountId);
                                                     }}>-</button>
-                                            </td>
-                                        }
+                                            }
+                                        </td>
                                     </tr>
                                 );
                             })}
@@ -253,18 +259,28 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
                                     </td>
 
                                     <td className="px-1 py-0.5">
-                                        <input
+                                        <CurrencyInput
+                                            value={newDebitLineAmount}
+                                            onChange={setNewDebitLineAmount}
+                                            className="w-full border txt-xs" />
+                                        {/* <input
                                             className="w-full border text-xs"
                                             type="text"
                                             value={newDebitLineAmount}
                                             onChange={e => setNewDebitLineAmount(e.target.value)}
-                                        />
+                                        /> */}
                                     </td>
 
                                     <td className="px-1 py-0.5 text-center">
                                         <button
                                             className="px-2 py-0.5 rounded bg-green-100 hover:bg-green-200 text-sm"
-                                            onClick={() => addLine(selectedDebitAccount, debitAmountAsNumber, "debit")}
+                                            onClick={() => {
+                                                if (!newDebitLineAmount) {
+                                                    toast.error("Bitte einen gültigen Betrag eingeben.");
+                                                    return;
+                                                }
+                                                addLine(selectedDebitAccount, debitAmountAsNumber, "debit");
+                                            }}
                                         >
                                             +
                                         </button>
@@ -293,23 +309,25 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
                             {creditLines.map((creditLine, i) => {
                                 const account = interactiveBalanceData.accounts.find(a => a.id === creditLine.accountId);
                                 return (
-                                    <tr key={`entryLine-${i}`} className="cursor-pointer border transition-all duration-100 hover:scale-95"
+                                    <tr key={`entryLine-${i}`} className="cursor-pointer border hover:bg-blue-50 transition-colors duration-100"
                                         onClick={() =>
                                             openWindow({
                                                 type: "Account", payload: { id: account?.id, label: account?.label }
                                             })
                                         }>
-                                        <td className="px-1 py-0.5">{creditLine.accountId} {account?.label}</td>
-                                        <td className="px-1 py-0.5">{creditLine.amount} €</td>
-                                        {isDraft &&
-                                            <td className="px-1 py-0.5 text-center">
+                                        <td className="px-1 py-0.5 hyphens-auto break-words max-w-0 overflow-hidden">
+                                            {creditLine.accountId} {account?.label}
+                                        </td>
+                                        <td className="px-1 py-0.5">{formatCurrency(creditLine.amount)}</td>
+                                        <td className="px-1 py-0.5 text-center">
+                                            {isDraft &&
                                                 <button className="px-2 py-0.5 rounded bg-red-100 hover:bg-red-200 text-sm"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         removeLine(creditLine.accountId);
                                                     }}>-</button>
-                                            </td>
-                                        }
+                                            }
+                                        </td>
                                     </tr>
                                 );
                             })}
@@ -333,18 +351,28 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
                                     </td>
 
                                     <td className="px-1 py-0.5">
-                                        <input
+                                        <CurrencyInput
+                                            value={newCreditLineAmount}
+                                            onChange={setNewCreditLineAmount}
+                                            className="w-full border txt-xs" />
+                                        {/* <input
                                             className="w-full border text-xs"
                                             type="text"
                                             value={newCreditLineAmount}
                                             onChange={e => setNewCreditLineAmount(e.target.value)}
-                                        />
+                                        /> */}
                                     </td>
 
                                     <td className="px-1 py-0.5 text-center">
                                         <button
                                             className="px-2 py-0.5 rounded bg-green-100 hover:bg-green-200 text-sm"
-                                            onClick={() => addLine(selectedCreditAccount, creditAmountAsNumber, "credit")}
+                                            onClick={() => {
+                                                if (!newCreditLineAmount) {
+                                                    toast.error("Bitte einen gültigen Betrag eingeben.");
+                                                    return;
+                                                }
+                                                addLine(selectedCreditAccount, newCreditLineAmount, "credit");
+                                            }}
                                         >
                                             +
                                         </button>
@@ -358,15 +386,15 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
 
             <div className="flex justify-between grid-cols-2 text-lg mt-2">
                 <div className={`text-lg font-semibold ${balance !== 0 ? 'text-red-600' : 'text-green-600'}`}>
-                    Sollsumme {debitSum.toFixed(2)} €
+                    Sollsumme {formatCurrency(debitSum)}
                 </div>
                 <div className={`text-lg font-semibold ${balance !== 0 ? 'text-red-600' : 'text-green-600'}`}>
-                    Habensumme {creditSum.toFixed(2)} €
+                    Habensumme {formatCurrency(creditSum)}
                 </div>
             </div>
 
             <div className="flex justify-center  text-lg mt-2">
-                <div className={`text-lg font-semibold ${balance !== 0 ? 'text-red-600' : 'text-green-600'}`}>Saldo: {(balance).toFixed(2)} €</div>
+                <div className={`text-lg font-semibold ${balance !== 0 ? 'text-red-600' : 'text-green-600'}`}>Saldo: {formatCurrency(balance)}</div>
             </div>
 
             {/* Betrag & Actions */}

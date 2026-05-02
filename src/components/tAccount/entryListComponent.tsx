@@ -3,6 +3,8 @@ import { BookingsListProps, EntryLinesProps } from "./tAccountInterfaces";
 import { useWindowManager } from "../../context/WindowManagerContext";
 import { useInteractiveBalanceData } from "../../context/InteractiveBalanceDataContext";
 import { toast } from "react-toastify";
+import { formatCurrency } from "../../util/numberFormat";
+import { CurrencyInput } from "../common/CurrencyInputs";
 
 export const EntriesListComponent: React.FC<EntryLinesProps> = ({
     accountId,
@@ -12,7 +14,7 @@ export const EntriesListComponent: React.FC<EntryLinesProps> = ({
 
     const { openWindow } = useWindowManager();
     const { setDraftEntry, draftEntry, interactiveBalanceData } = useInteractiveBalanceData();
-    const [newEntryLineAmount, setNewEntryLineAmount] = useState("");
+    const [newEntryLineAmount, setNewEntryLineAmount] = useState<number | null>(null);
     const amountAsNumber = Number(newEntryLineAmount);
 
     const addLine = (amount: number) => {
@@ -23,7 +25,7 @@ export const EntriesListComponent: React.FC<EntryLinesProps> = ({
             toast.error("Bitte einen gültigen Betrag eingeben.");
             return;
         }
-        
+
         if (!draftEntry) {
             const highestId = (interactiveBalanceData.journalEntries ?? []).reduce(
                 (max, entry) => Math.max(max, entry.id),
@@ -52,7 +54,7 @@ export const EntriesListComponent: React.FC<EntryLinesProps> = ({
             ));
         };
 
-        setNewEntryLineAmount("");
+        setNewEntryLineAmount(null);
 
         openWindow({
             type: "JournalEntry",
@@ -94,13 +96,13 @@ export const EntriesListComponent: React.FC<EntryLinesProps> = ({
             <tbody>
                 {lines.map((l, index) => (
                     <tr
-                        className="cursor-pointer align-top border-t boder-solid transition-all duration-100 hover:scale-95"
+                        className="cursor-pointer align-top border-t boder-solid hover:bg-blue-50 transition-colors duration-100"
                         key={index}
                         onClick={() => openWindow({ type: "JournalEntry", payload: { isDraft: l.draft, id: l.draft ? "Neue Buchung" : l.entryId } })}
                     >
                         <td className="whitespace-nowrap border-r border-solid text-center align-middle">{l.draft ? "Neu" : l.entryId}</td>
                         <td className="text-xs break-words">{l.description}</td>
-                        <td className="whitespace-nowrap text-end align-middle border-l border-solid">{l.line.amount.toFixed(2)} €</td>
+                        <td className="whitespace-nowrap text-end align-middle border-l border-solid">{formatCurrency(l.line.amount)}</td>
                         <td>
                             {l.draft &&
                                 <button className="px-2 py-0.5 rounded bg-red-100 hover:bg-red-200 text-sm"
@@ -114,10 +116,14 @@ export const EntriesListComponent: React.FC<EntryLinesProps> = ({
                         <td className="px-1 py-0.5 whitespace-nowrap border-r border-solid">Neu</td>
                         <td></td>
                         <td className="px-1 py-0.5 whitespace-nowrap text-right border-l border-solid">
-                            <input type="text"
+                            <CurrencyInput
+                                value={newEntryLineAmount}
+                                onChange={setNewEntryLineAmount}
+                                className="w-full text-xs border" />
+                            {/* <input type="text"
                                 className="w-full text-xs border"
                                 value={newEntryLineAmount}
-                                onChange={e => setNewEntryLineAmount(e.target.value)} />
+                                onChange={e => setNewEntryLineAmount(e.target.value)} /> */}
                         </td>
                         <td>
                             <button

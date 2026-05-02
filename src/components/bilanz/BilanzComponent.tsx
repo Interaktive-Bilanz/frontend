@@ -3,9 +3,10 @@ import { InteractiveBalanceData, Position } from "../../types/InteractiveBalance
 import { useInteractiveBalanceData } from "../../context/InteractiveBalanceDataContext";
 import { calculatePositionSaldo } from "./BilanzItem";
 import { calculateAccountTotals, getAccountTotals } from "../../util/balanceCalculations";
-import { DndContext, DragEndEvent, DragOverEvent, Over, pointerWithin, DragOverlay } from "@dnd-kit/core";
+import { DndContext, DragEndEvent, DragOverEvent, Over, pointerWithin, DragOverlay, useSensor, useSensors, PointerSensor, TouchSensor, KeyboardSensor } from "@dnd-kit/core";
 import { useEffect, useRef, useState } from "react";
 import { useDragContext } from "../../context/DragContext";
+import { formatCurrency } from "../../util/numberFormat";
 
 const BilanzComponent = () => {
   // const [data, setData] = useState<BilanzData>({
@@ -81,6 +82,17 @@ const BilanzComponent = () => {
   const displayBalanceLiabilitiesAndEquity = liabilitiesEquityBalanceSum * -1;
 
   const balancesMatch = Math.abs(assetsBalanceSum) === Math.abs(liabilitiesEquityBalanceSum);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 8 }, // prevents accidental drags while scrolling
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 200, tolerance: 8 }, // hold 200ms before drag starts
+    }),
+    useSensor(KeyboardSensor)
+  );
+
 
   const handleDragEnd = (event: DragEndEvent) => {
     const intent = getDropIntent(event.over);
@@ -274,6 +286,7 @@ const BilanzComponent = () => {
 
   return (
     <DndContext
+      sensors={sensors}
       collisionDetection={pointerWithin}
       onDragStart={(e) => {
         setOpenBeforeDragIds(openPositionIds);
@@ -305,32 +318,34 @@ const BilanzComponent = () => {
         handleDragEnd(e);
       }}
     >
-      <div className="flex w-2/5 bg-white border-black border rounded-md border-double">
-        <div className="w-1/2">
+      <div className="flex flex-col sm:flex-row sm:items-stretch w-full md:w-4/5 lg:w-3/5 xl:w-2/5 bg-white border-black border rounded-md border-double">
+        <div className="w-full sm:w-1/2 sm:flex sm:flex-col">
           <BilanzColumn
             title="Aktiva"
             positions={balanceSheet.assets.positions}
             accounts={balanceSheet.assets.accounts}
           />
-          <div className="p-4">
+          <div className="p-4 sm:mt-auto">
             {/* <span className={`text-lg font-semibold ${balancesMatch ? 'text-green-600' : 'text-red-600'}`}>Summe {Math.abs(assetsBalanceSum).toFixed(2)} €</span> */}
             <span className={`text-lg font-semibold ${balancesMatch && displayBalanceAssets >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              Summe {Math.abs(displayBalanceAssets).toFixed(2)} €
+              <span className="relative -top-0.5">&sum;</span>
+              {" "}{formatCurrency(Math.abs(displayBalanceAssets))}
               {displayBalanceAssets > 0 && " S"}
               {displayBalanceAssets < 0 && " H"}
-              </span>
+            </span>
           </div>
         </div>
-        <div className="w-1/2">
+        <div className="w-full sm:w-1/2 sm:flex sm:flex-col">
           <BilanzColumn
             title="Passiva"
             positions={balanceSheet.liabilitiesAndEquity.positions}
             accounts={balanceSheet.liabilitiesAndEquity.accounts}
           />
-          <div className="p-4">
+          <div className="p-4 sm:mt-auto">
             {/* <span className={`text-lg font-semibold ${balancesMatch ? 'text-green-600' : 'text-red-600'}`}>Summe {Math.abs(liabilitiesEquityBalanceSum).toFixed(2)} €</span> */}
             <span className={`text-lg font-semibold ${balancesMatch && displayBalanceLiabilitiesAndEquity >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              Summe {Math.abs(displayBalanceLiabilitiesAndEquity).toFixed(2)} €
+              <span className="relative -top-0.5">&sum;</span>
+              {" "}{formatCurrency(Math.abs(displayBalanceLiabilitiesAndEquity))}
               {displayBalanceLiabilitiesAndEquity > 0 && " H"}
               {displayBalanceLiabilitiesAndEquity < 0 && " S"}
             </span>

@@ -48,37 +48,6 @@ const BilanzColumn: React.FC<BilanzProps> = ({
     sum += calculatePositionSaldo(position, accountTotals) ?? 0;
   }
 
-
-
-  // const addPosition = () => {
-  //   const isAssets = title === "Aktiva";
-
-  //   const newPosition = {
-  //     label: "Neue Position",
-  //     accounts: [],
-  //     positions: [],
-  //     id: uuidv4()
-  //   };
-
-  //   setInteractiveBalanceData(prev => {
-  //     const targetKey = isAssets ? 'assets' : 'liabilitiesAndEquity';
-
-  //     return {
-  //       ...prev,
-  //       balanceSheet: {
-  //         ...prev.balanceSheet,
-  //         [targetKey]: {
-  //           ...prev.balanceSheet[targetKey],
-  //           positions: [
-  //             ...prev.balanceSheet[targetKey].positions ?? [],
-  //             newPosition
-  //           ]
-  //         }
-  //       }
-  //     }
-  //   })
-  // }
-
   const { setNodeRef } = useDroppable({
     id: title === "Aktiva" ? "assets" : "liabilitiesAndEquity",
     data: {
@@ -143,6 +112,7 @@ const BilanzColumn: React.FC<BilanzProps> = ({
               key={accountId}
               accountId={accountId}
               account={account}
+              side= {title === "Aktiva" ? "assets" : "liabilitiesAndEquity"}
               teacherMode={hasAccess(appMode, "edit")}
               parentId={parentId}
               onRemove={() => removeAccountFrom(

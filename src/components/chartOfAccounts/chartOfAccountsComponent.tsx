@@ -4,6 +4,7 @@ import { useWindowManager } from "../../context/WindowManagerContext";
 import { getAccountTotals } from "../../util/balanceCalculations";
 import { toast } from "react-toastify";
 import { hasAccess, useAppMode } from "../../context/AppModeContex";
+import { formatCurrency } from "../../util/numberFormat";
 
 
 
@@ -50,7 +51,7 @@ export function ChartOfAccounts() {
     const handleDeleteAccount = (id: string, label: string) => {
         try {
             deleteAccount(id);
-            closeWindow({type: "Account", payload: {id: id, label:label}});
+            closeWindow({ type: "Account", payload: { id: id, label: label } });
         } catch (error) {
             console.error(error);
         }
@@ -63,11 +64,9 @@ export function ChartOfAccounts() {
                     <tr className="text-left">
                         <th className="w-1/12">Nr</th>
                         <th className="w-6/12">Bezeichnung</th>
-                        <th className="w-2/12">&sum; Soll</th>
-                        <th className="w-2/12">&sum; Haben</th>
-                        {hasAccess(appMode, "edit") &&
-                            <th className="w-1/12"></th>
-                        }
+                        <th className="w-2/12 text-right">&sum; Soll</th>
+                        <th className="w-2/12 text-right">&sum; Haben</th>
+                        <th className="w-1/12"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -77,7 +76,7 @@ export function ChartOfAccounts() {
                             const accountTotal = getAccountTotals(accountTotals, account.id);
                             return (
                                 //<tr key={account.id} className="cursor-pointer transition-all border duration-100 hover:scale-95"
-                                <tr className="cursor-pointer border hover:bg-blue-50 transition-colors duration-100"
+                                <tr className="h-8 xl:h-auto cursor-pointer border hover:bg-blue-50 transition-colors duration-100"
                                     onClick={() =>
                                         openWindow({
                                             type: "Account",
@@ -85,10 +84,10 @@ export function ChartOfAccounts() {
                                         })}>
                                     <td>{account.id}</td>
                                     <td>{account.label}</td>
-                                    <td>{accountTotal.debit}</td>
-                                    <td>{accountTotal.credit}</td>
-                                    {hasAccess(appMode, "edit") && accountTotal.debit === 0 && accountTotal.credit === 0 &&
-                                        <td className="px-1 py-0.5 text-center">
+                                    <td className="text-right">{formatCurrency(accountTotal.debit)}</td>
+                                    <td className="text-right">{formatCurrency(accountTotal.credit)}</td>
+                                    <td className="px-1 py-0.5 text-center">
+                                        {hasAccess(appMode, "edit") && accountTotal.debit === 0 && accountTotal.credit === 0 &&
                                             <button
                                                 className="px-2 py-0.5 rounded bg-red-100 hover:bg-red-200 text-sm"
                                                 onClick={(e) => {
@@ -98,18 +97,18 @@ export function ChartOfAccounts() {
                                             >
                                                 -
                                             </button>
-                                        </td>
-                                    }
+                                        }
+                                    </td>
                                 </tr>
                             )
                         })}
                     {showNotAdded ?
                         <>
-                            <tr>
+                            <tr className="h-8">
                                 <td>
                                     <div className="flex justify-center">
                                         <button
-                                            className="px-2 py-0.5 rounded bg-gray-100 hover:bg-gray-200 text-sm"
+                                            className="px-2 py-0.5 rounded bg-gray-100 hover:bg-gray-200 h-8 w-8 xl:h-auto xl:w-auto text-sm"
                                             onClick={() => setShowNotAdded(prev => !prev)}>
                                             &#9650;
                                         </button>
@@ -125,7 +124,7 @@ export function ChartOfAccounts() {
                                     const accountTotal = getAccountTotals(accountTotals, account.id);
                                     return (
                                         //<tr key={account.id} className="cursor-pointer transition-all border duration-100 hover:scale-95"
-                                        <tr className="bg-gray-100 cursor-pointer border hover:bg-blue-50 transition-colors duration-100"
+                                        <tr className="h-8 xl:h-auto bg-gray-100 cursor-pointer border hover:bg-blue-200 transition-colors duration-100"
                                             onClick={() =>
                                                 openWindow({
                                                     type: "Account",
@@ -133,12 +132,12 @@ export function ChartOfAccounts() {
                                                 })}>
                                             <td>{account.id}</td>
                                             <td>{account.label}</td>
-                                            <td>{accountTotal.debit}</td>
-                                            <td>{accountTotal.credit}</td>
-                                            {hasAccess(appMode, "edit") &&
-                                                <td className="px-1 py-0.5 text-center">
+                                            <td className="text-right">{formatCurrency(accountTotal.debit)}</td>
+                                            <td className="text-right">{formatCurrency(accountTotal.credit)}</td>
+                                            <td className="px-1 py-0.5 text-center">
+                                                {hasAccess(appMode, "edit") && accountTotal.debit === 0 && accountTotal.credit === 0 &&
                                                     <button
-                                                        className="px-2 py-0.5 rounded bg-red-100 hover:bg-red-200 text-sm"
+                                                        className="px-2 py-0.5 rounded bg-red-100 hover:bg-red-200 h-8 w-8 xl:h-auto xl:w-auto text-sm"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             handleDeleteAccount(account.id, account.label);
@@ -146,24 +145,25 @@ export function ChartOfAccounts() {
                                                     >
                                                         -
                                                     </button>
-                                                </td>
-                                            }
+                                                }
+                                            </td>
                                         </tr>
                                     )
                                 }
                                 )}
-                            <tr>
+                            <tr className="h-8 xl:h-auto">
                                 <td></td>
                                 <td>&sum;</td>
-                                <td>{totalDebit}</td>
-                                <td>{totalCredit}</td>
+                                <td className="text-right">{formatCurrency(totalDebit)}</td>
+                                <td className="text-right">{formatCurrency(totalCredit)}</td>
+                                <td></td>
                             </tr>
                         </> :
-                        <tr>
+                        <tr className="h-8">
                             <td>
                                 <div className="flex justify-center">
                                     <button
-                                        className="px-2 py-0.5 rounded bg-gray-100 hover:bg-gray-200 text-sm"
+                                        className="px-2 py-0.5 rounded bg-gray-100 hover:bg-gray-200 h-8 w-8 xl:h-auto xl:w-auto text-sm"
                                         onClick={() => setShowNotAdded(prev => !prev)}>
                                         &#9660;
                                     </button>
@@ -183,6 +183,13 @@ export function ChartOfAccounts() {
                                     minLength={4}
                                     maxLength={4}
                                     value={newAccountId}
+                                    onKeyDown={(e) => {
+                                        e.stopPropagation();
+                                        if (e.key === "Enter") {
+                                            e.preventDefault();
+                                            handleAddAccount();
+                                        }
+                                    }}
                                     onChange={(e) => setNewAccountId(e.target.value)} />
                             </td>
                             <td>
@@ -191,13 +198,20 @@ export function ChartOfAccounts() {
                                     className="border text-xs w-10/12"
                                     type="text"
                                     value={newAccountLabel}
+                                    onKeyDown={(e) => {
+                                        e.stopPropagation();
+                                        if (e.key === "Enter") {
+                                            e.preventDefault();
+                                            handleAddAccount();
+                                        }
+                                    }}
                                     onChange={(e) => setNewAccountLabel(e.target.value)} />
                             </td>
                             <td></td>
                             <td></td>
                             <td className="px-1 py-0.5 text-center">
                                 <button
-                                    className="px-2 py-0.5 rounded bg-green-100 hover:bg-green-200 text-sm"
+                                    className="px-2 py-0.5 rounded bg-green-100 hover:bg-green-200 h-8 w-8 xl:h-auto xl:w-auto text-sm"
                                     onClick={() => handleAddAccount()}
                                 >
                                     +

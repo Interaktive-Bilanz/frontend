@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { Account, InteractiveBalanceData, JournalEntry, Position } from "../types/InteractiveBalanceData";
+import { Account, EntryLine, InteractiveBalanceData, JournalEntry, Position } from "../types/InteractiveBalanceData";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 // import defaultDataJson from "../api/chat_gpt_example4.json"
 import defaultDataJson from "../api/empyt_project.json"
@@ -8,6 +8,7 @@ import { ensurePositionIds } from "../util/addIdsToPositions";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "react-toastify";
 import { getAssigendAccountIds } from "../util/getAssignedAccountIds";
+import { JournalEntryForm } from "../components/journalEntry/JournalEntryForm";
 
 interface InteractiveBalanceDataContextType {
   interactiveBalanceData: InteractiveBalanceData;
@@ -18,6 +19,8 @@ interface InteractiveBalanceDataContextType {
   //setDraftEntry: (entry: JournalEntry | null) => void;
   commitDraft: () => void;
   cancelDraft: () => void;
+
+  createReverseEntry: (entryId: number) => number;
 
   loadProject: (project: InteractiveBalanceData) => void;
 
@@ -185,7 +188,7 @@ export const InteractiveBalanceDataProvider: React.FC<{ children: React.ReactNod
     });
   };
 
-  const deleteAccount = (id: string)  => {
+  const deleteAccount = (id: string) => {
 
     const totals = getAccountTotals(accountTotals, id);
 
@@ -193,7 +196,7 @@ export const InteractiveBalanceDataProvider: React.FC<{ children: React.ReactNod
       toast.error("Konto ist bereits bebucht und kann deshalb nicht gelöscht werden.");
       return;
     }
-    
+
     setInteractiveBalanceData(draft => {
       draft.accounts.splice(draft.accounts.findIndex(account => account.id === id))
 
@@ -201,21 +204,21 @@ export const InteractiveBalanceDataProvider: React.FC<{ children: React.ReactNod
       draft.balanceSheet.liabilitiesAndEquity.accounts?.splice(draft.balanceSheet.liabilitiesAndEquity.accounts?.findIndex(accountId => accountId === id));
 
       const findAndRemove = (positions: Position[]) => {
-            for (const position of positions) {
-              if (position.accounts.includes(id)) {
-                const index = position.accounts?.findIndex(accountId => accountId === id);
-                if (index != -1) {
-                  position.accounts.splice(index);
-                }
-                return;
-              }
-              if (position.positions?.length) {
-                findAndRemove(position.positions);
-              }
+        for (const position of positions) {
+          if (position.accounts.includes(id)) {
+            const index = position.accounts?.findIndex(accountId => accountId === id);
+            if (index != -1) {
+              position.accounts.splice(index);
             }
-          };
-          findAndRemove(draft.balanceSheet.assets.positions as Position[]);
-          findAndRemove(draft.balanceSheet.liabilitiesAndEquity.positions as Position[]);
+            return;
+          }
+          if (position.positions?.length) {
+            findAndRemove(position.positions);
+          }
+        }
+      };
+      findAndRemove(draft.balanceSheet.assets.positions as Position[]);
+      findAndRemove(draft.balanceSheet.liabilitiesAndEquity.positions as Position[]);
     });
 
     toast.success("Konto erfolgreich gelöscht.");
@@ -308,6 +311,32 @@ export const InteractiveBalanceDataProvider: React.FC<{ children: React.ReactNod
   const cancelDraft = () => {
     setDraftEntry(null);
   };
+
+  const createJournalEntry = (entry: Omit<JournalEntry, "id">) => {
+    const highestId = interactiveBalanceData.journalEntries.reduce(
+        (max, e) => Math.max(max, e.id), 0
+      );
+    setInteractiveBalanceData(draft => {
+      draft.journalEntries.push({
+        ...entry,
+        id: highestId + 1
+      });
+    });
+
+    return highestId + 1
+  };
+
+  const createReverseEntry = (entryId: number) => {
+    const originalEntry = interactiveBalanceData.journalEntries.find(entry => entry.id === entryId);
+    const newEntryId = createJournalEntry({
+      description: `Storno für Buchung ${originalEntry?.id}: ${originalEntry!.description}`,
+      entryLines: originalEntry!.entryLines.map(line => ({
+        ...line,
+        entryType: line.entryType === "debit" ? "credit" : "debit"
+      }))
+    })
+    return newEntryId
+  }
 
   const reorderAccountsInPosition = (positionId: string, oldIndex: number, newIndex: number) => {
     setInteractiveBalanceData(draft => {
@@ -507,7 +536,7 @@ export const InteractiveBalanceDataProvider: React.FC<{ children: React.ReactNod
 
   return (
     <InteractiveBalanceDataContext.Provider value={{
-      interactiveBalanceData, draftEntry, setDraftEntry, commitDraft, cancelDraft, accountTotals, updatePositionLabel, addNewPositionTo, addNewAccount, addAccountTo, deletePosition, removeAccountFrom, reorderAccountsInPosition, reorderPositionsInPosition,
+      interactiveBalanceData, draftEntry, setDraftEntry, commitDraft, cancelDraft, createReverseEntry, accountTotals, updatePositionLabel, addNewPositionTo, addNewAccount, addAccountTo, deletePosition, removeAccountFrom, reorderAccountsInPosition, reorderPositionsInPosition,
       moveAccount, movePosition, assigendAccountIds, loadProject, positionSideMap, deleteAccount
     }}>
       {children}

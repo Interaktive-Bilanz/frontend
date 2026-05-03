@@ -14,7 +14,7 @@ import { CurrencyInput } from "../common/CurrencyInputs";
 
 export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps) {
 
-    const { interactiveBalanceData, draftEntry, setDraftEntry, cancelDraft, commitDraft } = useInteractiveBalanceData();
+    const { interactiveBalanceData, draftEntry, setDraftEntry, cancelDraft, commitDraft, createReverseEntry } = useInteractiveBalanceData();
     const { openWindow, closeWindow } = useWindowManager();
     const [selectedDebitAccount, setSelectedDebitAccount] = useState("");
     const [selectedCreditAccount, setSelectedCreditAccount] = useState("");
@@ -168,6 +168,17 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
         //         payload: { id: draftEntry.id }
         //     });
         // }
+    }
+
+    const handleReverse = () => {
+        const reverseEntryId = createReverseEntry(entryId as number);
+
+        openWindow({
+            type: "JournalEntry",
+            payload: {
+                id: reverseEntryId
+            }
+        })
     }
 
     const debitLines = currentEntry.entryLines.filter(l => l.entryType === "debit");
@@ -403,6 +414,11 @@ export function JournalEntryForm({ entryId, isDraft = false }: JournalEntryProps
                     <button className="px-2 py-1 border rounded bg-gray-100 hover:bg-gray-200 text-xs"
                         onClick={() => handelCancel()}>Abbrechen</button>
                     <button className={`px-2 py-1 border rounded ${balance === 0 && draftEntry?.entryLines.length != 0 && draftEntry?.description.length != 0 ? 'bg-yellow-200 hover:bg-yellow-300' : 'bg-gray-400 '} text-xs font-semibold`} onClick={() => handleCommit()}>Buchen!</button>
+                </div>
+            }
+            {!isDraft &&
+                <div className="flex justify-end space-x-2 mt-2">
+                    <button className={`px-2 py-1 border rounded text-xs font-semibold bg-yellow-200 hover:bg-yellow-300`} onClick={() => handleReverse()}>Stornieren</button>
                 </div>
             }
         </div >
